@@ -1,0 +1,376 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{6B6EDDD6-7CA3-4B4F-8A0D-096E05DE2EA6}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SkyDean.FareLiz.WinForm</RootNamespace>
+    <AssemblyName>FareLiz</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath />
+    <SccProvider>
+    </SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\Bin\x86\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <OutputPath>..\Bin\x64\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <Optimize>true</Optimize>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Properties\FareLizIcon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>SkyDean.FareLiz.WinForm.Program</StartupObject>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\SkyDean.FareLiz.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="log4net, Version=1.2.11.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\CommonAssemblyInfo.cs">
+      <Link>Properties\CommonAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="BootStrap.cs" />
+    <Compile Include="Config\DefaultConfigBuilder.cs" />
+    <Compile Include="Data\WebFareBrowserControlFactory.cs" />
+    <Compile Include="Presentation\Controllers\CheckFareController.cs" />
+    <Compile Include="Presentation\Controllers\CheckFareEvents.cs" />
+    <Compile Include="Utils\GUIBuilder.cs" />
+    <Compile Include="Data\OnlineCurrencyProvider.cs" />
+    <Compile Include="Data\CollectionToPropertyConverter.cs" />
+    <Compile Include="Data\DateRangeDiffConverter.cs" />
+    <Compile Include="ExecutionInfo.cs" />
+    <Compile Include="ExecutionParam.cs" />
+    <Compile Include="WinFormGlobalContext.cs" />
+    <Compile Include="Presentation\Views\AboutForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Presentation\Views\AboutForm.Designer.cs">
+      <DependentUpon>AboutForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Presentation\Views\GraphForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Presentation\Views\GraphForm.designer.cs">
+      <DependentUpon>GraphForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Presentation\Views\IntroForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Presentation\Views\IntroForm.Designer.cs">
+      <DependentUpon>IntroForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Presentation\Views\ObjectBrowserDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Presentation\Views\ObjectBrowserDialog.Designer.cs">
+      <DependentUpon>ObjectBrowserDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Presentation\Views\EnvConfiguratorDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Presentation\Views\EnvConfiguratorDialog.Designer.cs">
+      <DependentUpon>EnvConfiguratorDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Presentation\Views\OverlayAnimation.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Presentation\Views\OverlayAnimation.Designer.cs">
+      <DependentUpon>OverlayAnimation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Singleton.cs" />
+    <Compile Include="CommandLineParser.cs" />
+    <Compile Include="Presentation\Views\LiveFareDataForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Presentation\Views\LiveFareDataForm.Designer.cs">
+      <DependentUpon>LiveFareDataForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SchedulerSetting.cs" />
+    <Compile Include="Presentation\Views\CheckFareForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Presentation\Views\CheckFareForm.Designer.cs">
+      <DependentUpon>CheckFareForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Presentation\Views\FlightStatisticForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Presentation\Views\FlightStatisticForm.designer.cs">
+      <DependentUpon>FlightStatisticForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SchedulerManager.cs" />
+    <Compile Include="Presentation\Views\SchedulerForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Presentation\Views\SchedulerForm.Designer.cs">
+      <DependentUpon>SchedulerForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\AssemblyLoader.cs" />
+    <Compile Include="Utils\AssemblyPluginResolver.cs" />
+    <EmbeddedResource Include="Presentation\Views\CheckFareForm.resx">
+      <DependentUpon>CheckFareForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Presentation\Views\AboutForm.resx">
+      <DependentUpon>AboutForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Presentation\Views\EnvConfiguratorDialog.resx">
+      <DependentUpon>EnvConfiguratorDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Presentation\Views\IntroForm.resx">
+      <DependentUpon>IntroForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Presentation\Views\LiveFareDataForm.resx">
+      <DependentUpon>LiveFareDataForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Presentation\Views\FlightStatisticForm.resx">
+      <DependentUpon>FlightStatisticForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Presentation\Views\ObjectBrowserDialog.resx">
+      <DependentUpon>ObjectBrowserDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Presentation\Views\OverlayAnimation.resx">
+      <DependentUpon>OverlayAnimation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Presentation\Views\SchedulerForm.resx">
+      <DependentUpon>SchedulerForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Presentation\Views\GraphForm.resx">
+      <DependentUpon>GraphForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\Monitoring.png" />
+    <None Include="Images\Stop.png" />
+    <None Include="Images\Config.png" />
+    <None Include="Images\BackgroundScheduler.png" />
+    <None Include="Images\FlatTabUpDown.png" />
+    <None Include="Images\LiveMonitor.png" />
+    <None Include="Images\NotifierClose.png" />
+    <None Include="Images\NotifierError.png" />
+    <None Include="Images\NotifierInfo.png" />
+    <None Include="Images\NotifierSuccess.png" />
+    <None Include="Images\NotifierWarning.png" />
+    <None Include="Images\CalendarToggle.png" />
+    <None Include="Images\SkyDeanIcon-BlackSmall.png" />
+    <None Include="Images\Refresh_White.png" />
+    <None Include="Images\Purchase.png" />
+    <None Include="Images\DownArrow.png" />
+    <None Include="Images\DownArrowBig.png" />
+    <EmbeddedResource Include="Data\Currency.txt" />
+    <None Include="Images\Edit.png" />
+    <Content Include="Images\Traffic.png" />
+    <None Include="Images\UpArrow.png" />
+    <Content Include="Properties\FareLizIcon.ico" />
+    <None Include="Images\FareLiz.png" />
+    <Content Include="Properties\Config.ico" />
+    <Content Include="Properties\Help.ico" />
+    <Content Include="Images\Hexagon.png" />
+    <Content Include="Images\Clear.png" />
+    <None Include="Images\Loading.gif" />
+    <None Include="Images\Intro-1.png" />
+    <None Include="Images\Intro-2.png" />
+    <None Include="Images\Intro-3.png" />
+    <None Include="Images\Intro-4.png" />
+    <None Include="Images\Help.png" />
+    <Content Include="Images\Error.png" />
+    <Content Include="Images\LoadingSpiral.gif" />
+    <None Include="Properties\LiveFareIcon.ico" />
+    <Content Include="Properties\Plugin.ico" />
+    <Content Include="Properties\Graph.ico" />
+    <Content Include="Images\DataBrowser.png" />
+    <None Include="Images\Search.png" />
+    <None Include="Images\Resize.png" />
+    <Content Include="Images\DownloadPackage.png" />
+    <None Include="Images\Import.png" />
+    <Content Include="Images\Plane.png" />
+    <Content Include="Images\Success.png" />
+    <Content Include="Images\Warning.png" />
+    <Content Include="Properties\Scheduler.ico" />
+    <None Include="Images\Save.png" />
+    <None Include="Images\Scheduler.png" />
+    <None Include="Images\CSV.png" />
+    <None Include="Images\Add.png" />
+    <None Include="Images\Refresh.png" />
+    <None Include="Images\Upload.png" />
+    <None Include="Images\Download.png" />
+    <None Include="Images\Graph.png" />
+    <None Include="Images\Dropbox.png" />
+    <None Include="Images\Date.png" />
+    <None Include="Images\Export.png" />
+    <None Include="Images\Exit.png" />
+    <None Include="Images\Delete.png" />
+    <None Include="Images\DeleteAll.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FareLiz.Core\FareLiz.Core.csproj">
+      <Project>{0fd609d6-29ca-42de-b54f-1ca8857497fe}</Project>
+      <Name>FareLiz.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FareLiz.Data\FareLiz.Data.csproj">
+      <Project>{399f5123-3dc8-4de0-b38f-597f46f0ee45}</Project>
+      <Name>FareLiz.Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FareLiz.Service\FareLiz.Service.csproj">
+      <Project>{81b5abcc-6909-483d-8bb3-84b52e3c7043}</Project>
+      <Name>FareLiz.Service</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FareLiz.WinForm.Components\FareLiz.WinForm.Components.csproj">
+      <Project>{d33bee34-9699-4e46-b7c4-f7621f0522e2}</Project>
+      <Name>FareLiz.WinForm.Components</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target> 
+  -->
+</Project>

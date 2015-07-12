@@ -1,0 +1,526 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{D33BEE34-9699-4E46-B7C4-F7621F0522E2}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SkyDean.FareLiz.WinForm.Components</RootNamespace>
+    <AssemblyName>FareLiz.WinForm.Controls</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\SkyDean.FareLiz.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\SkyDean.FareLiz.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="log4net, Version=1.2.11.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\CommonAssemblyInfo.cs">
+      <Link>Properties\CommonAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="Controls\ComboBox\AirportComboBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\TextBox\AirportTextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\TextBox\AutoCompleteTextbox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\TextBox\AutoCompleteTextbox.Designer.cs">
+      <DependentUpon>AutoCompleteTextbox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ComboBox\CheckBoxComboBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\ComboBox\CheckBoxComboBoxItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\ComboBox\CheckBoxComboBoxItemList.cs" />
+    <Compile Include="Controls\ComboBox\CheckBoxComboBoxListControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\ComboBox\CheckBoxComboBoxListControlContainer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\ComboBox\CheckBoxProperties.cs" />
+    <Compile Include="Controls\ComboBox\GripBounds.cs" />
+    <Compile Include="Controls\ComboBox\ListSelectionWrapper.cs" />
+    <Compile Include="Controls\ComboBox\ObjectSelectionWrapper.cs" />
+    <Compile Include="Controls\ComboBox\Popup.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\ComboBox\Popup.Designer.cs">
+      <DependentUpon>Popup.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ComboBox\PopupComboBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\ComboBox\PopupComboBox.Designer.cs">
+      <DependentUpon>PopupComboBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ControlExtensions.cs" />
+    <Compile Include="Controls\ListView\CsvListView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\DatePicker\BoldedDate.cs" />
+    <Compile Include="Controls\DatePicker\BoldedDateCategory.cs" />
+    <Compile Include="Controls\DatePicker\BoldedDateCategoryCollection.cs" />
+    <Compile Include="Controls\DatePicker\BoldedDatesCollection.cs" />
+    <Compile Include="Controls\DatePicker\CalendarDayOfWeek.cs" />
+    <Compile Include="Controls\DatePicker\DatePicker\DatePickerDateTextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\DatePicker\DatePicker\DatePickerDateTextBox.Subtypes.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\DatePicker\DatePicker\EnhancedDatePicker.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\DatePicker\DatePicker\EnhancedDatePicker.Designer.cs">
+      <DependentUpon>EnhancedDatePicker.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\DatePicker\DatePicker\EnhancedDatePicker.Events.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\DatePicker\Design\CultureInfoCustomTypeConverter.cs" />
+    <Compile Include="Controls\DatePicker\Design\DatePickerControlDesigner.cs" />
+    <Compile Include="Controls\DatePicker\Design\FlagCheckedListBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\DatePicker\Design\FlagEnumUIEditor.cs" />
+    <Compile Include="Controls\DatePicker\Design\MonthCalendarCalendarTypeConverter.cs" />
+    <Compile Include="Controls\DatePicker\Design\MonthCalendarCalendarUIEditor.cs" />
+    <Compile Include="Controls\DatePicker\Design\MonthCalendarColorTableTypeConverter.cs" />
+    <Compile Include="Controls\DatePicker\Design\MonthCalendarControlDesigner.cs" />
+    <Compile Include="Controls\DatePicker\Design\MonthCalendarNamesProviderTypeConverter.cs" />
+    <Compile Include="Controls\DatePicker\EnhancedMonthCalendar.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\DatePicker\EnhancedMonthCalendar.Designer.cs">
+      <DependentUpon>EnhancedMonthCalendar.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\DatePicker\EnhancedMonthCalendar.Events.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\DatePicker\EventClasses\ActiveDateEventArgs.cs" />
+    <Compile Include="Controls\DatePicker\EventClasses\CheckDateEventArgs.cs" />
+    <Compile Include="Controls\DatePicker\EventClasses\DateEventArgs.cs" />
+    <Compile Include="Controls\DatePicker\Helper\DateMethods.cs" />
+    <Compile Include="Controls\DatePicker\Helper\ExtensionMethods.cs" />
+    <Compile Include="Controls\DatePicker\Interfaces\ICustomFormatProvider.cs" />
+    <Compile Include="Controls\DatePicker\MonthCalendarDate.cs" />
+    <Compile Include="Controls\DatePicker\MonthCalendarDay.cs" />
+    <Compile Include="Controls\DatePicker\MonthCalendarEraRange.cs" />
+    <Compile Include="Controls\DatePicker\MonthCalendarFormatProvider.cs" />
+    <Compile Include="Controls\DatePicker\MonthCalendarHitTest.cs" />
+    <Compile Include="Controls\DatePicker\MonthCalendarHitType.cs" />
+    <Compile Include="Controls\DatePicker\MonthCalendarMonth.cs" />
+    <Compile Include="Controls\DatePicker\MonthCalendarMouseMoveFlags.cs" />
+    <Compile Include="Controls\DatePicker\MonthCalendarSelectionMode.cs" />
+    <Compile Include="Controls\DatePicker\MonthCalendarWeek.cs" />
+    <Compile Include="Controls\DatePicker\Renderer\MonthCalendarAbstractRenderer.cs" />
+    <Compile Include="Controls\DatePicker\Renderer\MonthCalendarHeaderState.cs" />
+    <Compile Include="Controls\DatePicker\Renderer\MonthCalendarRenderer.cs" />
+    <Compile Include="Dialog\ExMessageBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialog\ExMessageBox.designer.cs">
+      <DependentUpon>ExMessageBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Grid\ExPropertyGrid.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\Custom\WebFareBrowserControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\TabControl\FlatTabControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\TabControl\FlatTabControl.Designer.cs">
+      <DependentUpon>FlatTabControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\TabControl\FlatTabControl.Events.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\TabControl\FlatTabControl.TabHeader.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\TabControl\FlatTabControl.TabPage.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\TabControl\FlatTabControl.UpDown.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\TabControl\SubClass.cs" />
+    <Compile Include="Controls\Custom\FlightItemsPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\Custom\FlightItemsPanel.Designer.cs">
+      <DependentUpon>FlightItemsPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Button\ImageButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\Custom\JourneyComparer.cs" />
+    <Compile Include="Controls\ListView\ColumnAlignmentCollection.cs" />
+    <Compile Include="Controls\ListView\ColumnDataTypeCollection.cs" />
+    <Compile Include="Controls\ListView\ColumnFilterCollection.cs" />
+    <Compile Include="Controls\ListView\ColumnNamesCollection.cs" />
+    <Compile Include="Controls\ListView\ColumnSizeInfoCollection.cs" />
+    <Compile Include="Controls\ListView\EnhancedListView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\ListView\EnhancedListView.Designer.cs">
+      <DependentUpon>EnhancedListView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ListView\EnhancedListView.Events.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\ListView\EnhancedListView.Grouping.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\ListView\EnhancedListView.SubTypes.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\ListView\FlightDataColumnSorter.cs" />
+    <Compile Include="Controls\ListView\FlightDataListView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\ListView\FlightDataListView.Designer.cs">
+      <DependentUpon>FlightDataListView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ListView\FlightDataListViewEventHandlers.cs" />
+    <Compile Include="Controls\ListView\FlightDataListViewItemAdaptor.cs" />
+    <Compile Include="Controls\ListView\ListViewColumnHeader.cs" />
+    <Compile Include="Controls\ListView\ListViewColumnSorter.cs" />
+    <Compile Include="Controls\ListView\ListViewExtensions.cs" />
+    <Compile Include="Controls\ListView\SortInfo.cs" />
+    <Compile Include="Controls\Custom\PopupMessageToolTip.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Dialog\ProgressDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialog\ProgressDialog.Designer.cs">
+      <DependentUpon>ProgressDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="INotifier.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Custom\RadioToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Dialog\SmartForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controls\Button\SplitButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\Button\SwitchButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\Custom\TaskbarFlightNotifier.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controls\Custom\TaskbarNotifierBase.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controls\Custom\TaskbarNotifierBase.designer.cs">
+      <DependentUpon>TaskbarNotifierBase.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Custom\TaskbarNotifierBase.Theme.cs">
+      <DependentUpon>TaskbarNotifierBase.cs</DependentUpon>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controls\Custom\TaskbarTextNotifier.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controls\Custom\TaskbarTextNotifier.designer.cs">
+      <DependentUpon>TaskbarTextNotifier.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Custom\ToolStripControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Utils\BrowserUtils.cs" />
+    <Compile Include="Utils\PaintUtils.cs" />
+    <Compile Include="Utils\Windows7ProgressBar.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Utils\Windows7Taskbar.cs" />
+    <Compile Include="Utils\COMTypes.cs" />
+    <Compile Include="Utils\NativeMethods.cs" />
+    <Compile Include="Utils\Win32Enum.cs" />
+    <Compile Include="Utils\Win32Msgs.cs" />
+    <Compile Include="Utils\Win32Struct.cs" />
+    <Compile Include="Controls\Graph\ArrowObj.cs" />
+    <Compile Include="Controls\Graph\Axis.cs" />
+    <Compile Include="Controls\Graph\AxisLabel.cs" />
+    <Compile Include="Controls\Graph\Bar.cs" />
+    <Compile Include="Controls\Graph\BarItem.cs" />
+    <Compile Include="Controls\Graph\BarSettings.cs" />
+    <Compile Include="Controls\Graph\BasicArrayPointList.cs" />
+    <Compile Include="Controls\Graph\Border.cs" />
+    <Compile Include="Controls\Graph\BoxObj.cs" />
+    <Compile Include="Controls\Graph\Chart.cs" />
+    <Compile Include="Controls\Graph\CollectionPlus.cs" />
+    <Compile Include="Controls\Graph\ColorSymbolRotator.cs" />
+    <Compile Include="Controls\Graph\CurveItem.cs" />
+    <Compile Include="Controls\Graph\CurveList.cs" />
+    <Compile Include="Controls\Graph\DataSourcePointList.cs" />
+    <Compile Include="Controls\Graph\DateAsOrdinalScale.cs" />
+    <Compile Include="Controls\Graph\DateScale.cs" />
+    <Compile Include="Controls\Graph\EllipseObj.cs" />
+    <Compile Include="Controls\Graph\ErrorBar.cs" />
+    <Compile Include="Controls\Graph\ErrorBarItem.cs" />
+    <Compile Include="Controls\Graph\ExponentScale.cs" />
+    <Compile Include="Controls\Graph\Fill.cs" />
+    <Compile Include="Controls\Graph\FilteredPointList.cs" />
+    <Compile Include="Controls\Graph\FontSpec.cs" />
+    <Compile Include="Controls\Graph\GapLabel.cs" />
+    <Compile Include="Controls\Graph\GasGaugeNeedle.cs" />
+    <Compile Include="Controls\Graph\GasGaugeRegion.cs" />
+    <Compile Include="Controls\Graph\GraphObj.cs" />
+    <Compile Include="Controls\Graph\GraphObjList.cs" />
+    <Compile Include="Controls\Graph\GraphPane.cs" />
+    <Compile Include="Controls\Graph\HiLowBar.cs" />
+    <Compile Include="Controls\Graph\HiLowBarItem.cs" />
+    <Compile Include="Controls\Graph\HSBColor.cs" />
+    <Compile Include="Controls\Graph\ImageObj.cs" />
+    <Compile Include="Controls\Graph\IPointList.cs" />
+    <Compile Include="Controls\Graph\IPointListEdit.cs" />
+    <Compile Include="Controls\Graph\JapaneseCandleStick.cs" />
+    <Compile Include="Controls\Graph\JapaneseCandleStickItem.cs" />
+    <Compile Include="Controls\Graph\Label.cs" />
+    <Compile Include="Controls\Graph\Legend.cs" />
+    <Compile Include="Controls\Graph\Line.cs" />
+    <Compile Include="Controls\Graph\LinearAsOrdinalScale.cs" />
+    <Compile Include="Controls\Graph\LinearScale.cs" />
+    <Compile Include="Controls\Graph\LineBase.cs" />
+    <Compile Include="Controls\Graph\LineItem.cs" />
+    <Compile Include="Controls\Graph\LineObj.cs" />
+    <Compile Include="Controls\Graph\Link.cs" />
+    <Compile Include="Controls\Graph\Location.cs" />
+    <Compile Include="Controls\Graph\LogScale.cs" />
+    <Compile Include="Controls\Graph\MajorGrid.cs" />
+    <Compile Include="Controls\Graph\MajorTic.cs" />
+    <Compile Include="Controls\Graph\Margin.cs" />
+    <Compile Include="Controls\Graph\MasterPane.cs" />
+    <Compile Include="Controls\Graph\MinorGrid.cs" />
+    <Compile Include="Controls\Graph\MinorTic.cs" />
+    <Compile Include="Controls\Graph\NoDupePointList.cs" />
+    <Compile Include="Controls\Graph\OHLCBar.cs" />
+    <Compile Include="Controls\Graph\OHLCBarItem.cs" />
+    <Compile Include="Controls\Graph\OrdinalScale.cs" />
+    <Compile Include="Controls\Graph\PaneBase.cs" />
+    <Compile Include="Controls\Graph\PaneLayoutMgr.cs" />
+    <Compile Include="Controls\Graph\PaneList.cs" />
+    <Compile Include="Controls\Graph\PieItem.cs" />
+    <Compile Include="Controls\Graph\PointD.cs" />
+    <Compile Include="Controls\Graph\PointPair.cs" />
+    <Compile Include="Controls\Graph\PointPair4.cs" />
+    <Compile Include="Controls\Graph\PointPairBase.cs" />
+    <Compile Include="Controls\Graph\PointPairCV.cs" />
+    <Compile Include="Controls\Graph\PointPairList.cs" />
+    <Compile Include="Controls\Graph\PolyObj.cs" />
+    <Compile Include="Controls\Graph\RadarPointList.cs" />
+    <Compile Include="Controls\Graph\RollingPointPairList.cs" />
+    <Compile Include="Controls\Graph\SampleMultiPointList.cs" />
+    <Compile Include="Controls\Graph\SamplePointList.cs" />
+    <Compile Include="Controls\Graph\Scale.cs" />
+    <Compile Include="Controls\Graph\ScaleState.cs" />
+    <Compile Include="Controls\Graph\ScaleStateList.cs" />
+    <Compile Include="Controls\Graph\ScrollRange.cs" />
+    <Compile Include="Controls\Graph\ScrollRangeList.cs" />
+    <Compile Include="Controls\Graph\Selection.cs" />
+    <Compile Include="Controls\Graph\StickItem.cs" />
+    <Compile Include="Controls\Graph\StockPointList.cs" />
+    <Compile Include="Controls\Graph\StockPt.cs" />
+    <Compile Include="Controls\Graph\Symbol.cs" />
+    <Compile Include="Controls\Graph\TextObj.cs" />
+    <Compile Include="Controls\Graph\TextScale.cs" />
+    <Compile Include="Controls\Graph\Types.cs" />
+    <Compile Include="Controls\Graph\ValueHandler.cs" />
+    <Compile Include="Controls\Graph\X2Axis.cs" />
+    <Compile Include="Controls\Graph\XAxis.cs" />
+    <Compile Include="Controls\Graph\XDate.cs" />
+    <Compile Include="Controls\Graph\Y2Axis.cs" />
+    <Compile Include="Controls\Graph\Y2AxisList.cs" />
+    <Compile Include="Controls\Graph\YAxis.cs" />
+    <Compile Include="Controls\Graph\YAxisList.cs" />
+    <Compile Include="Controls\Graph\ZedGraphControl.ContextMenu.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\Graph\ZedGraphControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\Graph\ZedGraphControl.Designer.cs">
+      <DependentUpon>ZedGraphControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Graph\ZedGraphControl.Events.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\Graph\ZedGraphControl.Printing.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\Graph\ZedGraphControl.Properties.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\Graph\ZedGraphControl.ScrollBars.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\Graph\ZedGraphException.cs" />
+    <Compile Include="Controls\Graph\ZoomState.cs" />
+    <Compile Include="Controls\Graph\ZoomStateStack.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Controls\ComboBox\PopupComboBox.resx">
+      <DependentUpon>PopupComboBox.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\DatePicker\EnhancedMonthCalendar.resx">
+      <DependentUpon>EnhancedMonthCalendar.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialog\ExMessageBox.resx">
+      <DependentUpon>ExMessageBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\Custom\FlightItemsPanel.resx">
+      <DependentUpon>FlightItemsPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\ListView\EnhancedListView.resx">
+      <DependentUpon>EnhancedListView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\ListView\FlightDataListView.resx">
+      <DependentUpon>FlightDataListView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialog\ProgressDialog.resx">
+      <DependentUpon>ProgressDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\Custom\TaskbarNotifierBase.resx">
+      <DependentUpon>TaskbarNotifierBase.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\Custom\TaskbarTextNotifier.resx">
+      <DependentUpon>TaskbarTextNotifier.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\Graph\ZedGraphControl.resx">
+      <DependentUpon>ZedGraphControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\Graph\ZedGraphLocale.resx" />
+    <None Include="Controls\Graph\ZedGraphLocale.zh-tw.resx" />
+    <None Include="Controls\Graph\ZedGraphLocale.zh-cn.resx" />
+    <None Include="Controls\Graph\ZedGraphLocale.tw.resx" />
+    <None Include="Controls\Graph\ZedGraphLocale.tr.resx" />
+    <None Include="Controls\Graph\ZedGraphLocale.sv.resx" />
+    <None Include="Controls\Graph\ZedGraphLocale.sk.resx" />
+    <None Include="Controls\Graph\ZedGraphLocale.ru.resx" />
+    <None Include="Controls\Graph\ZedGraphLocale.pt.resx" />
+    <None Include="Controls\Graph\ZedGraphLocale.ja.resx" />
+    <None Include="Controls\Graph\ZedGraphLocale.it.resx" />
+    <None Include="Controls\Graph\ZedGraphLocale.hu.resx" />
+    <None Include="Controls\Graph\ZedGraphLocale.fr.resx" />
+    <None Include="Controls\Graph\ZedGraphLocale.es.resx" />
+    <None Include="Controls\Graph\ZedGraphLocale.de.resx" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FareLiz.Core\FareLiz.Core.csproj">
+      <Project>{0fd609d6-29ca-42de-b54f-1ca8857497fe}</Project>
+      <Name>FareLiz.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FareLiz.Data\FareLiz.Data.csproj">
+      <Project>{399f5123-3dc8-4de0-b38f-597f46f0ee45}</Project>
+      <Name>FareLiz.Data</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Refresh.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Refresh_White.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CalendarToggle.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\FlatTabUpDown.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\NotifierClose.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\NotifierError.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\NotifierInfo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\NotifierSuccess.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\NotifierWarning.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\DownArrow.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UpArrow.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Purchase.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

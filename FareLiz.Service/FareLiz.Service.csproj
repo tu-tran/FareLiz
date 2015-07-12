@@ -1,0 +1,191 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{81B5ABCC-6909-483D-8BB3-84B52E3C7043}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SkyDean.FareLiz.Service</RootNamespace>
+    <AssemblyName>FareLiz.Service</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\SkyDean.FareLiz.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Properties\Globe.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Ionic.Zip">
+      <HintPath>..\Lib\Ionic.Zip.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net, Version=1.2.11.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\CommonAssemblyInfo.cs">
+      <Link>Properties\CommonAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="ExceptionHandler.cs" />
+    <Compile Include="ExceptionHelper.cs" />
+    <Compile Include="IServiceRunner.cs" />
+    <Compile Include="Utils\FtpClient.cs" />
+    <Compile Include="Utils\FtpConnectionEventArgs.cs" />
+    <Compile Include="Utils\FtpItem.cs" />
+    <Compile Include="Versioning\PublishParameter.cs" />
+    <Compile Include="Versioning\OnlineVersionPublisher.cs" />
+    <Compile Include="Versioning\VersionPublishService.cs" />
+    <Compile Include="Versioning\OnlineVersionRetriever.cs" />
+    <Compile Include="LiveUpdate\IVersionRetriever.cs" />
+    <Compile Include="LiveUpdate\LiveUpdateClient.cs" />
+    <Compile Include="LiveUpdate\LiveUpdateConfiguration.cs" />
+    <Compile Include="LiveUpdate\LiveUpdateRunner.cs" />
+    <Compile Include="LiveUpdate\LiveUpdateService.cs" />
+    <Compile Include="LiveUpdate\LiveUpdateClientForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LiveUpdate\LiveUpdateClientForm.designer.cs">
+      <DependentUpon>LiveUpdateClientForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LiveUpdate\UpdateParameter.cs" />
+    <Compile Include="LiveUpdate\UpdateRequest.cs" />
+    <Compile Include="LiveUpdate\VersionInfo.cs" />
+    <Compile Include="Utils\ProcessUtils.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="TaskScheduler\Action.cs" />
+    <Compile Include="TaskScheduler\ActionCollection.cs" />
+    <Compile Include="TaskScheduler\CultureSwitcher.cs" />
+    <Compile Include="TaskScheduler\EnumGlobalizer.cs" />
+    <Compile Include="TaskScheduler\Impersonation.cs" />
+    <Compile Include="TaskScheduler\NamedValueCollection.cs" />
+    <Compile Include="TaskScheduler\NotV1SupportedException.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="TaskScheduler\Task.cs" />
+    <Compile Include="TaskScheduler\TaskFolder.cs" />
+    <Compile Include="TaskScheduler\TaskCollection.cs" />
+    <Compile Include="TaskScheduler\TaskFolderCollection.cs" />
+    <Compile Include="TaskScheduler\TaskHandlerInterfaces.cs" />
+    <Compile Include="TaskScheduler\TaskService.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="TaskScheduler\Trigger.cs" />
+    <Compile Include="TaskScheduler\TriggerCollection.cs" />
+    <Compile Include="TaskScheduler\V1\TaskSchedulerV1Interop.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TaskScheduler\V2\TaskSchedulerV2Interop.cs" />
+    <Compile Include="TaskScheduler\Wildcard.cs" />
+    <Compile Include="TaskScheduler\XmlSerializationHelper.cs" />
+    <Compile Include="Utils\WinNative\NativeMethods.cs" />
+    <Compile Include="Utils\WinNative\Win32Enum.cs" />
+    <Compile Include="Utils\WinNative\Win32Struct.cs" />
+    <Compile Include="Versioning\VersionPublishService.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>VersionPublishService.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="LiveUpdate\LiveUpdateClientForm.resx">
+      <DependentUpon>LiveUpdateClientForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TaskScheduler\V1\TaskSchedulerV1Schema.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Versioning\VersionPublishService.resx">
+      <DependentUpon>VersionPublishService.cs</DependentUpon>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>VersionPublishService.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="LiveUpdate\LiveUpdate.png" />
+    <Content Include="Properties\InstallerIcon.ico" />
+    <Content Include="Properties\Globe.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FareLiz.Core\FareLiz.Core.csproj">
+      <Project>{0fd609d6-29ca-42de-b54f-1ca8857497fe}</Project>
+      <Name>FareLiz.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FareLiz.WinForm.Components\FareLiz.WinForm.Components.csproj">
+      <Project>{d33bee34-9699-4e46-b7c4-f7621f0522e2}</Project>
+      <Name>FareLiz.WinForm.Components</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
