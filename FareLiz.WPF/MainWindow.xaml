@@ -1,0 +1,34 @@
+﻿<Window
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="FareLiz.Window"
+    Title="FareLiz"    
+    Width="800"
+    Height="480"
+    MinHeight="160"
+    MinWidth="260"
+    Icon="/FareLizIcon.ico"
+    Style="{StaticResource DefaultWindowStyle}"
+    >
+    <DockPanel>
+        <StatusBar
+			DockPanel.Dock="Bottom"
+			Height="24">
+            <TextBlock Margin="3,0,0,0"><Run Text="Ready"/></TextBlock>
+            <StatusBarItem HorizontalAlignment="Right">
+                <ResizeGrip Opacity="0.75" />
+            </StatusBarItem>
+        </StatusBar>
+
+        <WindowsFormsHost 
+			Height="auto"
+			Width="auto"
+			FontSize="13"
+			Padding="2"
+			Background="Transparent"
+			ScrollViewer.CanContentScroll="True" 
+			ScrollViewer.VerticalScrollBarVisibility="Auto"
+			ScrollViewer.HorizontalScrollBarVisibility="Auto">
+        </WindowsFormsHost>
+    </DockPanel>
+</Window>

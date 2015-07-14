@@ -1,0 +1,171 @@
+﻿using System;
+using System.ComponentModel;
+using System.Linq;
+using SkyDean.FareLiz.Core.Utils;
+
+namespace SkyDean.FareLiz.WinForm.Monitoring
+{
+    /// <summary>
+    /// Aggerating monitor which keeps track of multiple monitors
+    /// </summary>
+    internal class AggeratingFareRequestMonitor : IDisposable
+    {
+        private readonly DataQueue<FareRequestMonitor> _pendingMonitors = new DataQueue<FareRequestMonitor>();
+        private readonly DataQueue<FareRequestMonitor> _startedMonitors = new DataQueue<FareRequestMonitor>();
+        private BackgroundWorker _backgroundWorker = null;
+        private readonly object _syncObj = new object();
+
+        internal AggeratingFareRequestMonitor() { }
+
+        internal void Start()
+        {
+<<<<<<< HEAD
+            IsStopping = false;
+            if (_backgroundWorker == null)
+            {
+                _backgroundWorker = new BackgroundWorker();
+                _backgroundWorker.DoWork += backgroundWorker_DoWork;
+            }
+
+            if (!_backgroundWorker.IsBusy)
+                _backgroundWorker.RunWorkerAsync();
+
+            var activeMons = _activeMonitors.ToList();
+            foreach (var mon in activeMons)
+                mon.Start();
+        }
+
+        internal void Stop()
+        {
+            IsStopping = true;
+        }
+
+        void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            Thread.CurrentThread.Name = GetType().Name + "-BackgroundWorker";
+            while (!IsStopping && _activeMonitors.Count > 0)
+            {
+                if (_disposingMonitors.Count > 0)
+                    ThreadPool.QueueUserWorkItem(new WaitCallback(DisposeInactiveMonitors));
+
+                Thread.Sleep(500);
+            }
+
+#warning FIXME
+            /*
+            StopActiveMonitors();
+            DisposeInactiveMonitors(null);
+             */
+=======
+            var pendingMons = _pendingMonitors.ToList();
+            foreach (var mon in pendingMons)
+                mon.Start();
+            _pendingMonitors.Transfer(_startedMonitors);
+>>>>>>> fc8797f3f60f4f257936cd664322d785b2423649
+        }
+
+        public void Stop()
+        {
+            var startedMons = _startedMonitors.ToList();
+            foreach (var mon in startedMons)
+                mon.Stop();
+<<<<<<< HEAD
+        }
+
+        private void DisposeInactiveMonitors(object stateObj)
+        {
+            if (String.IsNullOrEmpty(Thread.CurrentThread.Name))
+                Thread.CurrentThread.Name = GetType().Name + "-Cleaning";
+            lock (_syncObj)
+            {
+                _disposingMonitors.Clear(true);
+            }
+=======
+            _startedMonitors.Transfer(_pendingMonitors);
+>>>>>>> fc8797f3f60f4f257936cd664322d785b2423649
+        }
+
+        internal void Add(FareRequestMonitor monitor, bool disposeOnStopped)
+        {
+            var activeMons = _pendingMonitors.ToList();
+            var existMon = activeMons.FirstOrDefault(m => m.GetType() == monitor.GetType());
+
+            if (existMon != null)
+            {
+                var newRequests = monitor.ActiveRequests;
+                var existRequests = existMon.ActiveRequests;
+                for (int i = 0; i < newRequests.Count; i++)
+                {
+                    var nr = newRequests[i];
+                    if (existRequests.Any(r => r.IsSame(nr)))
+                        newRequests.RemoveAt(i--);
+                }
+
+                if (newRequests.Count < 1)
+                    return;
+            }
+            else
+            {
+                if (disposeOnStopped)
+                    monitor.MonitorStopped += monitor_MonitorStopped;
+                _activeMonitors.Enqueue(monitor);
+            }
+        }
+
+<<<<<<< HEAD
+        void monitor_MonitorStopped(FareRequestMonitor sender)
+        {
+            _activeMonitors.Remove(sender);
+            _disposingMonitors.Enqueue(sender);
+=======
+            _pendingMonitors.Enqueue(monitor);
+>>>>>>> fc8797f3f60f4f257936cd664322d785b2423649
+        }
+
+        internal void Clear()
+        {
+            Stop();
+            _pendingMonitors.Clear(true);
+            _startedMonitors.Clear(true);
+        }
+
+        internal void Clear(Type monitorType)
+        {
+            ClearPending(monitorType);
+            ClearStarted(monitorType);
+        }
+
+        internal void ClearPending(Type monitorType)
+        {
+            Clear(monitorType, _pendingMonitors);
+        }
+
+        internal void ClearStarted(Type monitorType)
+        {
+            Clear(monitorType, _startedMonitors);
+        }
+
+        private void Clear(Type monitorType, DataQueue<FareRequestMonitor> targetQueue)
+        {
+            var allMons = targetQueue.ToList();
+            foreach (var mon in allMons)
+            {
+                if (mon.GetType() == monitorType)
+                {
+                    mon.Stop();
+                    targetQueue.Remove(mon);
+                    mon.Dispose();
+                }
+            }
+        }
+
+        public void Dispose()
+        {
+            lock (_syncObj)
+            {
+                Stop();
+                Clear();
+            }
+        }
+    }
+}

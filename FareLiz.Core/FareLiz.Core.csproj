@@ -1,0 +1,178 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{0FD609D6-29CA-42DE-B54F-1CA8857497FE}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SkyDean.FareLiz.Core</RootNamespace>
+    <AssemblyName>FareLiz.Core</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\SkyDean.FareLiz.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="HtmlAgilityPack, Version=1.4.9.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\packages\HtmlAgilityPack.1.4.9\lib\Net40\HtmlAgilityPack.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="log4net, Version=1.2.13.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="protobuf-net, Version=2.0.0.668, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
+      <HintPath>..\packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.XML" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\CommonAssemblyInfo.cs">
+      <Link>Properties\CommonAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="Config\ConfigurationException.cs" />
+    <Compile Include="Data\Airport.cs" />
+    <Compile Include="Data\AssemblyPublisherAttribute.cs" />
+    <Compile Include="Data\CurrencyInfo.cs" />
+    <Compile Include="Data\DataOptions.cs" />
+    <Compile Include="Data\FlightMonitorItem.cs" />
+    <Compile Include="Data\ParseErrorAction.cs" />
+    <Compile Include="Data\TravelRoute.cs" />
+    <Compile Include="Data\ValueTrimmingOptions.cs" />
+    <Compile Include="ExceptionHandlerAttribute.cs" />
+    <Compile Include="IExceptionHandler.cs" />
+    <Compile Include="Data\DataRequestResult.cs" />
+    <Compile Include="AppContext.cs" />
+    <Compile Include="ILogger.cs" />
+    <Compile Include="Presentation\IFareBrowserControl.cs" />
+    <Compile Include="Presentation\IFlightNotifier.cs" />
+    <Compile Include="JourneyProgressChangedEventArgs.cs" />
+    <Compile Include="PluginExtension.cs" />
+    <Compile Include="Presentation\INotification.cs" />
+    <Compile Include="Presentation\IProgressCallback.cs" />
+    <Compile Include="Data\TravelAgency.cs" />
+    <Compile Include="Presentation\JourneyEventArgs.cs" />
+    <Compile Include="SyncEventArgs.cs" />
+    <Compile Include="Utils\AppDomainProxy.cs" />
+    <Compile Include="Utils\DataGrep.cs" />
+    <Compile Include="Utils\FlightPriceComparer.cs" />
+    <Compile Include="Utils\FlightPriceQualityComparer.cs" />
+    <Compile Include="Utils\IOUtils.cs" />
+    <Compile Include="Utils\JourneyDateEqualityComparer.cs" />
+    <Compile Include="Utils\Log4netLogger.cs" />
+    <Compile Include="Utils\NonSerialiazableTypeSurrogateSelector.cs" />
+    <Compile Include="Utils\ObjectDataTransporter.cs" />
+    <Compile Include="Utils\ReflectionDeepCloner.cs" />
+    <Compile Include="Utils\Singleton.cs" />
+    <Compile Include="Utils\StringFormatter.cs" />
+    <Compile Include="Utils\StringUtilExtensions.cs" />
+    <Compile Include="Utils\ThreadResult.cs" />
+    <Compile Include="Utils\UniqueDataAttribute.cs" />
+    <Compile Include="ValidateResult.cs" />
+    <Compile Include="Data\Flight.cs" />
+    <Compile Include="Config\CurrencyProviderConfig.cs" />
+    <Compile Include="FlightFareRequest.cs" />
+    <Compile Include="ICurrencyProvider.cs" />
+    <Compile Include="IDatabaseSyncer.cs" />
+    <Compile Include="IHelperService.cs" />
+    <Compile Include="IPackageSyncer.cs" />
+    <Compile Include="BackgroundServiceManager.cs" />
+    <Compile Include="IPluginResolver.cs" />
+    <Compile Include="IServiceManager.cs" />
+    <Compile Include="ISyncable.cs" />
+    <Compile Include="Data\JourneyData.cs" />
+    <Compile Include="Data\DataPackage.cs" />
+    <Compile Include="Config\IConfigBuilder.cs" />
+    <Compile Include="Config\IConfig.cs" />
+    <Compile Include="Config\IConfigStore.cs" />
+    <Compile Include="Config\IConfigurable.cs" />
+    <Compile Include="IDataSyncer.cs" />
+    <Compile Include="IObjectDatabase.cs" />
+    <Compile Include="IPlugin.cs" />
+    <Compile Include="ISyncableDatabase.cs" />
+    <Compile Include="DateRangeDiff.cs" />
+    <Compile Include="IArchiveManager.cs" />
+    <Compile Include="IFareDatabase.cs" />
+    <Compile Include="Data\Journey.cs" />
+    <Compile Include="Data\DatePeriod.cs" />
+    <Compile Include="Utils\AppUtil.cs" />
+    <Compile Include="Utils\BackgroundThread.cs" />
+    <Compile Include="Utils\CompareExtensions.cs" />
+    <Compile Include="Utils\TolerantBinaryFormatter.cs" />
+    <Compile Include="Utils\DateTimeExtensions.cs" />
+    <Compile Include="Utils\NumericComparer.cs" />
+    <Compile Include="Utils\PathUtil.cs" />
+    <Compile Include="Utils\StringLogicalComparer.cs" />
+    <Compile Include="Utils\DataQueue.cs" />
+    <Compile Include="Utils\TypeExtensions.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Utils\KeyValue.cs" />
+    <Compile Include="Utils\ObjectExtension.cs" />
+    <Compile Include="Utils\ProtoBufTransfer.cs" />
+    <Compile Include="PluginAttribute.cs" />
+    <Compile Include="Utils\LogUtil.cs" />
+    <Compile Include="MonitorEnvironment.cs" />
+    <Compile Include="NamingRule.cs" />
+    <Compile Include="Data\FlightLeg.cs" />
+    <Compile Include="IFareDataProvider.cs" />
+    <Compile Include="Utils\TypeResolver.cs" />
+    <Compile Include="FilterCondition.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\StringUtil.cs" />
+    <None Include="Data\Airports.csv" />
+    <None Include="packages.config" />
+    <None Include="Utils\XmlTransfer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Properties\SkyDeanBlackIcon.ico" />
+    <None Include="Resources\SkyDeanIcon-BlackSmall.png" />
+    <Content Include="Images\Loading.gif" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target> 
+  -->
+</Project>

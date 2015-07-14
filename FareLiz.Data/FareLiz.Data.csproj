@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{399F5123-3DC8-4DE0-B38F-597F46F0EE45}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SkyDean.FareLiz.Data</RootNamespace>
+    <AssemblyName>FareLiz.Data</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\SkyDean.FareLiz.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\SkyDean.FareLiz.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\CommonAssemblyInfo.cs">
+      <Link>Properties\CommonAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="AirportDataProvider.cs" />
+    <Compile Include="Config\ConfigInfo.cs" />
+    <Compile Include="Config\FileConfigStore.cs" />
+    <Compile Include="Config\IniConfig.cs" />
+    <Compile Include="Config\IniConfigHandler.cs" />
+    <Compile Include="Config\IniConfigurableAttribute.cs" />
+    <Compile Include="Config\ObjectIniConfig.cs" />
+    <Compile Include="Csv\CachedCsvReader.cs" />
+    <Compile Include="Csv\CachedCsvReader.CsvBindingList.cs" />
+    <Compile Include="Csv\CachedCsvReader.CsvPropertyDescriptor.cs" />
+    <Compile Include="Csv\CachedCsvReader.CsvRecordComparer.cs" />
+    <Compile Include="Csv\CsvException.cs" />
+    <Compile Include="Csv\CsvException.Designer.cs">
+      <DependentUpon>CsvException.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Csv\CsvReader.cs" />
+    <Compile Include="Csv\CsvReader.DataReaderValidations.cs" />
+    <Compile Include="Csv\CsvReader.RecordEnumerator.cs" />
+    <Compile Include="Csv\MissingFieldAction.cs" />
+    <Compile Include="Csv\MissingFieldCsvException.cs" />
+    <Compile Include="Csv\ParseErrorEventArgs.cs" />
+    <Compile Include="IObjectPersist.cs" />
+    <Compile Include="Monitoring\AggeratingFareRequestMonitor.cs" />
+    <Compile Include="Monitoring\FareMonitorRequest.cs" />
+    <Compile Include="Monitoring\FareExportMonitor.cs" />
+    <Compile Include="Monitoring\FareRequestMonitor.cs" />
+    <Compile Include="Monitoring\IFareStorage.cs" />
+    <Compile Include="Monitoring\LiveFareFileStorage.cs" />
+    <Compile Include="Monitoring\LiveFareMonitor.cs" />
+    <Compile Include="Monitoring\StorageRoute.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FareLiz.Core\FareLiz.Core.csproj">
+      <Project>{0fd609d6-29ca-42de-b54f-1ca8857497fe}</Project>
+      <Name>FareLiz.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Csv\CsvException.resx">
+      <DependentUpon>CsvException.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

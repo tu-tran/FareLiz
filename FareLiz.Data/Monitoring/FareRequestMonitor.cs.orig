@@ -1,0 +1,212 @@
+﻿using log4net;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Threading;
+using SkyDean.FareLiz.Core;
+using SkyDean.FareLiz.Core.Utils;
+
+namespace SkyDean.FareLiz.WinForm.Monitoring
+{
+    /// <summary>
+    /// Monitor for fare browser requests
+    /// </summary>
+    internal class FareRequestMonitor : IDisposable
+    {        
+        protected ILog Log { get; set; }
+
+        private BackgroundWorker _backgroundWorker = null;
+        private readonly DataQueue<FareBrowserRequest> _pendingQueue = new DataQueue<FareBrowserRequest>();
+        private readonly DataQueue<FareBrowserRequest> _processQueue = new DataQueue<FareBrowserRequest>();        
+
+        internal int BatchProcessSize { get; set; }
+        public bool IsStopping { get; protected set; }
+        internal IFareDataProvider DataProvider { get; private set; }
+        internal TimeSpan RequestTimeout { get; set; }
+        internal List<FareBrowserRequest> ActiveRequests { get { return _pendingQueue.ToList(); } }
+
+        internal event FareRequestHandler RequestStarting;
+        internal event FareRequestHandler RequestCompleted;
+<<<<<<< HEAD
+=======
+        internal event FareLizHandler MonitorStarting;
+>>>>>>> fc8797f3f60f4f257936cd664322d785b2423649
+        internal event FareLizHandler MonitorStopped;
+
+        internal FareRequestMonitor(IFareDataProvider dataProvider, ILog log)
+        {
+            DataProvider = dataProvider;
+            using (var sample = dataProvider.GetFareBrowserControl())
+            {
+                if (sample == null)
+                    throw new ArgumentException("The selected data provider does not provide Fare Browser Control interface");
+            }
+
+            Log = log;
+            BatchProcessSize = 1;
+            RequestTimeout = TimeSpan.FromMinutes(5);
+        }
+
+        protected virtual void OnRequestStarting(FareBrowserRequestArg args)
+        {
+            if (RequestStarting != null)
+                RequestStarting(this, args);
+        }
+
+        protected virtual void OnRequestCompleted(FareBrowserRequestArg args)
+        {
+            if (RequestCompleted != null)
+                RequestCompleted(this, args);
+
+            var request = args.Request;
+            _processQueue.Remove(request);
+            if (_pendingQueue.Count == 0)
+                IsStopping = true;
+        }
+
+        internal void Enqueue(string origin, string destination, DateTime departureDate, DateTime returnDate)
+        {
+            Enqueue(new FareBrowserRequest(origin, destination, departureDate, returnDate, DataProvider.GetFareBrowserControl()));
+        }
+
+        internal void Enqueue(IEnumerable<FareBrowserRequest> requests)
+        {
+            foreach (var r in requests)
+            {
+                Enqueue(r);
+            }
+        }
+
+        internal void Enqueue(FareBrowserRequest request)
+        {
+            request.BrowserControl.GetJourneyCompleted += (b, j) => OnRequestCompleted(new FareBrowserRequestArg(request, j.ResultJourney));
+            _pendingQueue.Enqueue(request);
+        }
+
+        internal void Clear()
+        {
+            _pendingQueue.Clear(true);
+            _processQueue.Clear(true);
+        }
+
+        internal void Start()
+        {
+            if (!IsStopping)
+                return;
+
+            DateTime startDate = DateTime.Now;
+            while (IsStopping && (DateTime.Now - startDate) < RequestTimeout)
+                Thread.Sleep(500);
+
+            if (IsStopping)
+                throw new TimeoutException("Timed out waiting for the monitors to stop");
+
+            if (MonitorStarting != null)
+                MonitorStarting(this);
+
+            if (_backgroundWorker == null)
+            {
+                _backgroundWorker = new BackgroundWorker();
+                _backgroundWorker.DoWork += backgroundWorker_DoWork;
+                _backgroundWorker.RunWorkerCompleted += backgroundWorker_RunWorkerCompleted;
+            }
+
+            // If we can reach here: The background worker should not be doing anything on background
+            _backgroundWorker.RunWorkerAsync();
+        }
+
+        void backgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            IsStopping = false;
+            if (MonitorStopped != null)
+                MonitorStopped(this);
+        }
+
+        void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+<<<<<<< HEAD
+            Thread.CurrentThread.Name = GetType().Name + "-BackgroundWorker";
+            while (!IsStopping && (_activeQueue.Count + _processQueue.Count) > 0)
+=======
+            Thread.CurrentThread.Priority = ThreadPriority.Lowest;
+            while (!IsStopping)
+>>>>>>> fc8797f3f60f4f257936cd664322d785b2423649
+            {
+                int canProcessCount = (BatchProcessSize > _pendingQueue.Count ? _pendingQueue.Count : BatchProcessSize) - _processQueue.Count;
+                if (canProcessCount > 0)
+                {
+                    var itemList = _activeQueue.Dequeue(canProcessCount);
+                    foreach (FareBrowserRequest request in itemList)
+                    {
+<<<<<<< HEAD
+                        var args = new FareBrowserRequestArg(request, null);
+                        OnRequestStarting(args);
+                        if (args.Cancel)
+                            EndProcess(request);
+                        else
+                        {
+                            request.Start();
+                            _processQueue.Enqueue(request);
+=======
+                        var itemList = _pendingQueue.Dequeue(canProcessCount);
+                        foreach (FareBrowserRequest request in itemList)
+                        {
+                            var args = new FareBrowserRequestArg(request, null);
+                            OnRequestStarting(args);
+                            if (args.Cancel)
+                                return;
+                            else
+                            {
+                                request.Start();
+                                _processQueue.Enqueue(request);
+                            }
+>>>>>>> fc8797f3f60f4f257936cd664322d785b2423649
+                        }
+                    }
+                }
+
+<<<<<<< HEAD
+                if (!_isCleaning && _disposingQueue.Count > 0)
+                    ThreadPool.QueueUserWorkItem(new WaitCallback(o =>
+                    {
+                        Thread.CurrentThread.Name = GetType().Name + "-Cleaning";
+                        _isCleaning = true;
+#warning FIXME
+                        //_disposingQueue.Clear(true);
+                        _isCleaning = false;
+                    }));
+
+=======
+>>>>>>> fc8797f3f60f4f257936cd664322d785b2423649
+                Thread.Sleep(500);
+            }
+        }
+
+        internal void Stop()
+        {
+            IsStopping = true;
+        }
+
+        public virtual void Dispose()
+        {
+            Stop();
+            Clear();
+        }
+    }
+
+    internal delegate void FareLizHandler(FareRequestMonitor sender);
+    internal delegate void FareRequestHandler(FareRequestMonitor sender, FareBrowserRequestArg args);
+    internal class FareBrowserRequestArg : CancelEventArgs
+    {
+        internal FareBrowserRequest Request { get; private set; }
+        internal Journey ResultJourney { get; private set; }
+
+        internal FareBrowserRequestArg(FareBrowserRequest request, Journey journey)
+        {
+            Request = request;
+            ResultJourney = journey;
+        }
+
+        internal static readonly new FareBrowserRequestArg Empty = new FareBrowserRequestArg(null, null);
+    }
+}
