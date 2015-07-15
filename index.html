@@ -1,0 +1,119 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Fareliz by tu-tran</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-light.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header">Fareliz</h1>
+        <p class="header">Flight Fare Scanner</p>
+
+        <ul>
+          <li class="download"><a class="buttons" href="https://github.com/tu-tran/FareLiz/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/tu-tran/FareLiz/tarball/master">Download TAR</a></li>
+          <li><a class="buttons github" href="https://github.com/tu-tran/FareLiz">View On GitHub</a></li>
+        </ul>
+
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/tu-tran">tu-tran</a></p>
+
+
+      </header>
+      <section>
+        <p><img src="https://lh3.googleusercontent.com/-a27_7rniU4w/VaYlR9Vqb2I/AAAAAAAAD98/LCpDM97G73o/s512-Ic42/FareLiz.png" alt="FareLiz - Flight Fare Scanner"></p>
+
+<h1>
+<a id="fareliz---flight-fare-scanner" class="anchor" href="#fareliz---flight-fare-scanner" aria-hidden="true"><span class="octicon octicon-link"></span></a>FareLiz - Flight Fare Scanner</h1>
+
+<p>FareLiz is a flight fare scanner implemented using .NET (C#)</p>
+
+<p>The code is licensed under the MIT license. See opensource.org and tl;dr for more details.</p>
+
+<h2>
+<a id="features" class="anchor" href="#features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Features</h2>
+
+<ul>
+<li>Scan for flight fare for certain routes in multiple time period</li>
+<li>Real-time monitoring and notify users as soon as the price changes. It also support highly configurable settings to get the most desirable flight fare (e.g. minimum price difference before triggering the notification, price limit...)</li>
+<li>Command line interface for automated tasks</li>
+<li>Automatic fare scanning using scheduled tasks in Windows</li>
+<li>Fare data storage and analysis</li>
+<li>Cloud storage synchronization: Users can synchronize data with cloud </li>
+</ul>
+
+<h2>
+<a id="download" class="anchor" href="#download" aria-hidden="true"><span class="octicon octicon-link"></span></a>Download</h2>
+
+<p>All releases are published on <a href="https://github.com/tu-tran/FareLiz/releases">GitHub Release page</a>.</p>
+
+<h2>
+<a id="getting-started" class="anchor" href="#getting-started" aria-hidden="true"><span class="octicon octicon-link"></span></a>Getting started</h2>
+
+<h3>
+<a id="for-end-users" class="anchor" href="#for-end-users" aria-hidden="true"><span class="octicon octicon-link"></span></a>For end-users</h3>
+
+<ol>
+<li>Go to  <a href="https://github.com/tu-tran/FareLiz/releases">Release page</a> to download the binaries (in ZIP or installation package for x86 and x64 system)</li>
+<li>Extract/Install the binaries</li>
+<li>Start FareLiz. At first run, the application will ask you to select the appropriate plugins and their configurations.</li>
+<li>The main entry point will be the flight statistics view (which contains historical fare data). From here, the users can initiate different functionalities:</li>
+<li>Scan/store new fare data, click on Fare Scanner</li>
+<li>Schedule an automated fare scanning, click on Scheduler</li>
+<li>Change the software configurations, click on Settings</li>
+</ol>
+
+<h3>
+<a id="for-developers" class="anchor" href="#for-developers" aria-hidden="true"><span class="octicon octicon-link"></span></a>For developers</h3>
+
+<p>The application also provides support for the implementation of 3rd-party plugins. This allows the developers to extend the application to support additional:</p>
+
+<ul>
+<li>Travel agencies data source</li>
+<li>Fare data storage engine</li>
+<li>Cloud data storage synchronization
+All plugin assemblies will follow the name pattern *.Plugins.dll and should be located in the same path as the main executable. To get started, the main solution file is FareLiz.sln. Example implementations of the plugins can be found in Plugins folders of the solution.</li>
+</ul>
+
+<h2>
+<a id="questions" class="anchor" href="#questions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Questions</h2>
+
+<p>Use the <a href="https://github.com/tu-tran/FareLiz/issues">GitHub Issues page</a> to create new inquiries/questions/bug reports/feature requests...</p>
+
+<h2>
+<a id="history" class="anchor" href="#history" aria-hidden="true"><span class="octicon octicon-link"></span></a>History</h2>
+
+<p>The project was implemented for personal use: it has been difficult to track down the airline ticket pricing mechanisms, and the existing services were not powerful enough: lack of data/lots of email spam/PAID services. Thus the project was initiated as a one-man project for the sake of simplifying the fare hunting process. As a frequent traveler, it is always easier to pick the annual travel time based on the the price chart from the previous years --&gt; FareLiz was developed.</p>
+
+<h2>
+<a id="contribute" class="anchor" href="#contribute" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contribute</h2>
+
+<p>This project is continuously evolving and any kind of help is greatly appreciated. You are more than welcome to get involved in the development of the project.</p>
+      </section>
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+		          <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-42750705-3");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
