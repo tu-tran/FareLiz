@@ -39,7 +39,7 @@
         /// <returns>
         /// The <see cref="T"/>.
         /// </returns>
-        public static T BinarySerializeDeepClone<T>(this T obj, ILog logger) where T : class
+        public static T BinarySerializeDeepClone<T>(this T obj, ILogger logger) where T : class
         {
             if (typeof(ICloneable).IsAssignableFrom(typeof(T)))
             {
@@ -67,7 +67,7 @@
         /// <returns>
         /// The <see cref="T"/>.
         /// </returns>
-        public static T ReflectionDeepClone<T>(this T obj, ILog logger) where T : class
+        public static T ReflectionDeepClone<T>(this T obj, ILogger logger) where T : class
         {
             var cloner = new ReflectionDeepCloner();
             var result = cloner.DeepClone(obj);

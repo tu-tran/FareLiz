@@ -7,75 +7,47 @@ namespace SkyDean.FareLiz.WinForm
 
     using SkyDean.FareLiz.Core.Utils;
 
-    /// <summary>
-    /// The switch type.
-    /// </summary>
+    /// <summary>The switch type.</summary>
     public enum SwitchType
     {
-        /// <summary>
-        /// The simple.
-        /// </summary>
+        /// <summary>The simple.</summary>
         Simple, 
 
-        /// <summary>
-        /// The post minus.
-        /// </summary>
+        /// <summary>The post minus.</summary>
         PostMinus, 
 
-        /// <summary>
-        /// The limited post string.
-        /// </summary>
+        /// <summary>The limited post string.</summary>
         LimitedPostString, 
 
-        /// <summary>
-        /// The un limited post string.
-        /// </summary>
+        /// <summary>The un limited post string.</summary>
         UnLimitedPostString, 
 
-        /// <summary>
-        /// The post char.
-        /// </summary>
+        /// <summary>The post char.</summary>
         PostChar
     }
 
-    /// <summary>
-    /// The switch form.
-    /// </summary>
+    /// <summary>The switch form.</summary>
     internal class SwitchForm
     {
-        /// <summary>
-        /// The description.
-        /// </summary>
+        /// <summary>The description.</summary>
         public string Description;
 
-        /// <summary>
-        /// The id string.
-        /// </summary>
+        /// <summary>The id string.</summary>
         public string IDString;
 
-        /// <summary>
-        /// The max len.
-        /// </summary>
+        /// <summary>The max len.</summary>
         public int MaxLen;
 
-        /// <summary>
-        /// The min len.
-        /// </summary>
+        /// <summary>The min len.</summary>
         public int MinLen;
 
-        /// <summary>
-        /// The multi.
-        /// </summary>
+        /// <summary>The multi.</summary>
         public bool Multi;
 
-        /// <summary>
-        /// The post char set.
-        /// </summary>
+        /// <summary>The post char set.</summary>
         public string PostCharSet;
 
-        /// <summary>
-        /// The type.
-        /// </summary>
+        /// <summary>The type.</summary>
         public SwitchType Type;
 
         /// <summary>
@@ -153,85 +125,55 @@ namespace SkyDean.FareLiz.WinForm
         {
         }
 
-        /// <summary>
-        /// The to string.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="string"/>.
-        /// </returns>
+        /// <summary>The to string.</summary>
+        /// <returns>The <see cref="string" />.</returns>
         public override string ToString()
         {
             return this.IDString;
         }
     }
 
-    /// <summary>
-    /// The switch result.
-    /// </summary>
+    /// <summary>The switch result.</summary>
     internal class SwitchResult
     {
-        /// <summary>
-        /// The post char index.
-        /// </summary>
+        /// <summary>The post char index.</summary>
         public int PostCharIndex;
 
-        /// <summary>
-        /// The post strings.
-        /// </summary>
+        /// <summary>The post strings.</summary>
         public ArrayList PostStrings = new ArrayList();
 
-        /// <summary>
-        /// The there is.
-        /// </summary>
+        /// <summary>The there is.</summary>
         public bool ThereIs;
 
-        /// <summary>
-        /// The with minus.
-        /// </summary>
+        /// <summary>The with minus.</summary>
         public bool WithMinus;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SwitchResult"/> class.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="SwitchResult" /> class.</summary>
         public SwitchResult()
         {
             this.ThereIs = false;
         }
     }
 
-    /// <summary>
-    /// The parser.
-    /// </summary>
+    /// <summary>The parser.</summary>
     internal class Parser
     {
-        /// <summary>
-        /// The k switch i d 1.
-        /// </summary>
+        /// <summary>The k switch i d 1.</summary>
         private const char kSwitchID1 = '-';
 
-        /// <summary>
-        /// The k switch i d 2.
-        /// </summary>
+        /// <summary>The k switch i d 2.</summary>
         private const char kSwitchID2 = '/';
 
-        /// <summary>
-        /// The k switch minus.
-        /// </summary>
+        /// <summary>The k switch minus.</summary>
         private const char kSwitchMinus = '-';
 
-        /// <summary>
-        /// The k stop switch parsing.
-        /// </summary>
+        /// <summary>The k stop switch parsing.</summary>
         private const string kStopSwitchParsing = "--";
 
-        /// <summary>
-        /// The _switches.
-        /// </summary>
+        /// <summary>The _switches.</summary>
         private readonly SwitchResult[] _switches;
 
-        /// <summary>
-        /// The non switch strings.
-        /// </summary>
+        /// <summary>The non switch strings.</summary>
         public ArrayList NonSwitchStrings = new ArrayList();
 
         /// <summary>
@@ -566,19 +508,13 @@ namespace SkyDean.FareLiz.WinForm
         }
     }
 
-    /// <summary>
-    /// The command form.
-    /// </summary>
+    /// <summary>The command form.</summary>
     internal class CommandForm
     {
-        /// <summary>
-        /// The id string.
-        /// </summary>
+        /// <summary>The id string.</summary>
         public string IDString = string.Empty;
 
-        /// <summary>
-        /// The post string mode.
-        /// </summary>
+        /// <summary>The post string mode.</summary>
         public bool PostStringMode;
 
         /// <summary>
@@ -597,19 +533,13 @@ namespace SkyDean.FareLiz.WinForm
         }
     }
 
-    /// <summary>
-    /// The command sub chars set.
-    /// </summary>
+    /// <summary>The command sub chars set.</summary>
     internal class CommandSubCharsSet
     {
-        /// <summary>
-        /// The chars.
-        /// </summary>
+        /// <summary>The chars.</summary>
         public string Chars = string.Empty;
 
-        /// <summary>
-        /// The empty allowed.
-        /// </summary>
+        /// <summary>The empty allowed.</summary>
         public bool EmptyAllowed = false;
     }
 }

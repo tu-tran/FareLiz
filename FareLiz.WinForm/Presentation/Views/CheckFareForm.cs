@@ -26,69 +26,43 @@
     /// <summary>Windows Form used for checking flexible fare data</summary>
     internal partial class CheckFareForm : SmartForm
     {
-        /// <summary>
-        /// The browser starting color.
-        /// </summary>
-        private readonly Color BrowserStartingColor = Color.FromArgb(255, 255, 245);
-
-        /// <summary>
-        /// The browser success color.
-        /// </summary>
-        private readonly Color BrowserSuccessColor = Color.FromArgb(237, 255, 237);
-
-        /// <summary>
-        /// The browser failed color.
-        /// </summary>
+        /// <summary>The browser failed color.</summary>
         private readonly Color BrowserFailedColor = Color.FromArgb(255, 240, 240);
 
-        /// <summary>
-        /// The chk auto focus tab strip.
-        /// </summary>
+        /// <summary>The browser starting color.</summary>
+        private readonly Color BrowserStartingColor = Color.FromArgb(255, 255, 245);
+
+        /// <summary>The browser success color.</summary>
+        private readonly Color BrowserSuccessColor = Color.FromArgb(237, 255, 237);
+
+        /// <summary>The chk auto focus tab strip.</summary>
         private readonly ToolStripControl<CheckBox> chkAutoFocusTabStrip = new ToolStripControl<CheckBox>();
 
-        /// <summary>
-        /// The chk auto sync strip.
-        /// </summary>
+        /// <summary>The chk auto sync strip.</summary>
         private readonly ToolStripControl<CheckBox> chkAutoSyncStrip = new ToolStripControl<CheckBox>();
 
-        /// <summary>
-        /// The chk exit after done strip.
-        /// </summary>
+        /// <summary>The chk exit after done strip.</summary>
         private readonly ToolStripControl<CheckBox> chkExitAfterDoneStrip = new ToolStripControl<CheckBox>();
 
-        /// <summary>
-        /// The load progress.
-        /// </summary>
+        /// <summary>The load progress.</summary>
         private readonly ToolStripControl<Windows7ProgressBar> loadProgress = new ToolStripControl<Windows7ProgressBar> { Visible = false };
 
-        /// <summary>
-        /// The notifier.
-        /// </summary>
+        /// <summary>The notifier.</summary>
         private readonly INotifier notifier = new TaskbarTextNotifier();
 
-        /// <summary>
-        /// The spring label strip.
-        /// </summary>
+        /// <summary>The spring label strip.</summary>
         private readonly ToolStripStatusLabel springLabelStrip = new ToolStripStatusLabel { Spring = true };
 
-        /// <summary>
-        /// The _controller.
-        /// </summary>
+        /// <summary>The _controller.</summary>
         private CheckFareController _controller;
 
-        /// <summary>
-        /// The _execution param.
-        /// </summary>
+        /// <summary>The _execution param.</summary>
         private ExecutionParam _executionParam;
 
-        /// <summary>
-        /// The _first close for live monitor.
-        /// </summary>
+        /// <summary>The _first close for live monitor.</summary>
         private bool _firstCloseForLiveMonitor = true;
 
-        /// <summary>
-        /// The _is changing button state.
-        /// </summary>
+        /// <summary>The _is changing button state.</summary>
         private bool _isChangingButtonState;
 
         /// <summary>
@@ -108,9 +82,7 @@
             this.fareBrowserTabs.ImageList = new ImageList { ImageSize = new Size(6, 6) }; // Get extra empty space on tab header
         }
 
-        /// <summary>
-        /// Gets the min duration.
-        /// </summary>
+        /// <summary>Gets the min duration.</summary>
         internal int MinDuration
         {
             get
@@ -119,9 +91,7 @@
             }
         }
 
-        /// <summary>
-        /// Gets the max duration.
-        /// </summary>
+        /// <summary>Gets the max duration.</summary>
         internal int MaxDuration
         {
             get
@@ -130,9 +100,7 @@
             }
         }
 
-        /// <summary>
-        /// Gets a value indicating whether is round trip.
-        /// </summary>
+        /// <summary>Gets a value indicating whether is round trip.</summary>
         internal bool IsRoundTrip
         {
             get
@@ -141,9 +109,7 @@
             }
         }
 
-        /// <summary>
-        /// Gets the departure date range.
-        /// </summary>
+        /// <summary>Gets the departure date range.</summary>
         internal DateRangeDiff DepartureDateRange
         {
             get
@@ -152,9 +118,7 @@
             }
         }
 
-        /// <summary>
-        /// Gets the departure date.
-        /// </summary>
+        /// <summary>Gets the departure date.</summary>
         internal DateTime DepartureDate
         {
             get
@@ -163,9 +127,7 @@
             }
         }
 
-        /// <summary>
-        /// Gets the return date.
-        /// </summary>
+        /// <summary>Gets the return date.</summary>
         internal DateTime ReturnDate
         {
             get
@@ -174,9 +136,7 @@
             }
         }
 
-        /// <summary>
-        /// Gets the departure.
-        /// </summary>
+        /// <summary>Gets the departure.</summary>
         internal Airport Departure
         {
             get
@@ -185,9 +145,7 @@
             }
         }
 
-        /// <summary>
-        /// Gets the destination.
-        /// </summary>
+        /// <summary>Gets the destination.</summary>
         internal Airport Destination
         {
             get
@@ -196,9 +154,7 @@
             }
         }
 
-        /// <summary>
-        /// Gets a value indicating whether auto sync.
-        /// </summary>
+        /// <summary>Gets a value indicating whether auto sync.</summary>
         internal bool AutoSync
         {
             get
@@ -207,9 +163,7 @@
             }
         }
 
-        /// <summary>
-        /// Gets the notifier.
-        /// </summary>
+        /// <summary>Gets the notifier.</summary>
         internal INotifier Notifier
         {
             get
@@ -348,9 +302,7 @@
             this.ResizeStatusStrip();
         }
 
-        /// <summary>
-        /// The update view for duration.
-        /// </summary>
+        /// <summary>The update view for duration.</summary>
         private void UpdateViewForDuration()
         {
             bool skipDurationConstraint = this.numDepartDateRangePlus.Value == 0 && this.numDepartDateRangeMinus.Value == 0
@@ -380,9 +332,7 @@
             this.btnSummary.Enabled = this.btnSave.Enabled = this.btnUploadPackages.Enabled = enabled;
         }
 
-        /// <summary>
-        /// The clear browser tabs.
-        /// </summary>
+        /// <summary>The clear browser tabs.</summary>
         internal void ClearBrowserTabs()
         {
             this.fareBrowserTabs.SuspendLayout();
@@ -395,12 +345,8 @@
             this.fareBrowserTabs.ResumeLayout();
         }
 
-        /// <summary>
-        /// The extract tab data.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="IList"/>.
-        /// </returns>
+        /// <summary>The extract tab data.</summary>
+        /// <returns>The <see cref="IList" />.</returns>
         private IList<TravelRoute> ExtractTabData()
         {
             AppContext.Logger.Debug("Generating journey from all tabs...");
@@ -494,9 +440,7 @@
             this.SetStatus(message, img);
         }
 
-        /// <summary>
-        /// The resize status strip.
-        /// </summary>
+        /// <summary>The resize status strip.</summary>
         private void ResizeStatusStrip()
         {
             int minusWidth = (this.statusStrip.SizingGrip ? this.statusStrip.SizeGripBounds.Width : 0) + 5 + 2 * SystemInformation.BorderSize.Width
@@ -516,9 +460,7 @@
             }
         }
 
-        /// <summary>
-        /// The check progress.
-        /// </summary>
+        /// <summary>The check progress.</summary>
         private void CheckProgress()
         {
             if (this.loadProgress.ControlItem.Value == this.loadProgress.ControlItem.Maximum)
@@ -535,9 +477,7 @@
             }
         }
 
-        /// <summary>
-        /// The increase progress.
-        /// </summary>
+        /// <summary>The increase progress.</summary>
         private void IncreaseProgress()
         {
             if (this.loadProgress.ControlItem.Value < this.loadProgress.ControlItem.Maximum)

@@ -1,5 +1,12 @@
 ﻿namespace SkyDean.FareLiz.SQLite
 {
+    using SkyDean.FareLiz.Core;
+    using SkyDean.FareLiz.Core.Config;
+    using SkyDean.FareLiz.Core.Data;
+    using SkyDean.FareLiz.Core.Presentation;
+    using SkyDean.FareLiz.Core.Utils;
+    using SkyDean.FareLiz.Data;
+    using SkyDean.FareLiz.WinForm.Components.Dialog;
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
@@ -10,16 +17,6 @@
     using System.Linq;
     using System.Text;
     using System.Windows.Forms;
-
-    using log4net;
-
-    using SkyDean.FareLiz.Core;
-    using SkyDean.FareLiz.Core.Config;
-    using SkyDean.FareLiz.Core.Data;
-    using SkyDean.FareLiz.Core.Presentation;
-    using SkyDean.FareLiz.Core.Utils;
-    using SkyDean.FareLiz.Data;
-    using SkyDean.FareLiz.WinForm.Components.Dialog;
 
     /// <summary>
     /// The sq lite fare database.
@@ -126,7 +123,7 @@
         /// <summary>
         /// Gets or sets the logger.
         /// </summary>
-        public ILog Logger { get; set; }
+        public ILogger Logger { get; set; }
 
         /// <summary>
         /// The initialize.
@@ -141,11 +138,11 @@
             this._formatter = new ProtoBufTransfer(this.Logger);
             var connBuilder = new SQLiteConnectionStringBuilder
                                   {
-                                      DataSource = this.DataFileName, 
-                                      DateTimeKind = DateTimeKind.Utc, 
-                                      ForeignKeys = true, 
-                                      Pooling = true, 
-                                      SyncMode = SynchronizationModes.Full, 
+                                      DataSource = this.DataFileName,
+                                      DateTimeKind = DateTimeKind.Utc,
+                                      ForeignKeys = true,
+                                      Pooling = true,
+                                      SyncMode = SynchronizationModes.Full,
                                       Version = 3
                                   };
 
@@ -182,10 +179,10 @@
         public IList<TravelRoute> GetRoutes(bool loadJourneys, bool loadJourneyData, bool loadHistory, bool loadFlights, IProgressCallback callback)
         {
             this.Logger.DebugFormat(
-                "Get available routes [{0}{1}{2}{3}]", 
-                loadJourneys ? "J" : null, 
-                loadJourneyData ? "D" : null, 
-                loadHistory ? "H" : null, 
+                "Get available routes [{0}{1}{2}{3}]",
+                loadJourneys ? "J" : null,
+                loadJourneyData ? "D" : null,
+                loadHistory ? "H" : null,
                 loadFlights ? "F" : null);
             var result = new List<TravelRoute>();
             using (var connection = new SQLiteConnection(this._connectionString))
@@ -246,11 +243,11 @@
         public void LoadData(TravelRoute route, bool loadJourneyData, bool loadHistory, bool loadFlights, IProgressCallback callback)
         {
             this.Logger.DebugFormat(
-                "Load data for route [{0}-{1}] [{2}{3}{4}]", 
-                route.Departure.IATA, 
-                route.Destination.IATA, 
-                loadJourneyData ? "D" : null, 
-                loadHistory ? "H" : null, 
+                "Load data for route [{0}-{1}] [{2}{3}{4}]",
+                route.Departure.IATA,
+                route.Destination.IATA,
+                loadJourneyData ? "D" : null,
+                loadHistory ? "H" : null,
                 loadFlights ? "F" : null);
             using (var connection = new SQLiteConnection(this._connectionString))
             {
@@ -309,9 +306,9 @@
                                 if (loadJourneyData)
                                 {
                                     var dataDate = DateTime.ParseExact(
-                                        reader.GetString(iUpdate), 
-                                        DATETIME_FORMAT, 
-                                        CultureInfo.InvariantCulture, 
+                                        reader.GetString(iUpdate),
+                                        DATETIME_FORMAT,
+                                        CultureInfo.InvariantCulture,
                                         DateTimeStyles.AssumeUniversal);
                                     var newData = new JourneyData(reader.GetInt64(iDataId), reader.GetString(iCurrency), dataDate);
 
@@ -385,9 +382,9 @@
                                         string currency = reader.GetString(iCurrency);
                                         string dataDateStr = reader.GetString(iUpdate);
                                         DateTime dataDate = DateTime.ParseExact(
-                                            dataDateStr, 
-                                            DATETIME_FORMAT, 
-                                            CultureInfo.InvariantCulture, 
+                                            dataDateStr,
+                                            DATETIME_FORMAT,
+                                            CultureInfo.InvariantCulture,
                                             DateTimeStyles.AssumeUniversal);
 
                                         var newData = new JourneyData(dataId, currency, dataDate);
@@ -489,19 +486,19 @@
             }
 
             ProgressDialog.ExecuteTask(
-                null, 
-                "Reset Database", 
-                "Please wait...", 
-                "SQLiteDbReset", 
-                ProgressBarStyle.Marquee, 
-                this.Logger, 
+                null,
+                "Reset Database",
+                "Please wait...",
+                "SQLiteDbReset",
+                ProgressBarStyle.Marquee,
+                this.Logger,
                 cb =>
-                    {
-                        cb.Begin();
-                        this.Logger.Info("Clear database");
-                        this.Reset(cb);
-                        this.AddData(data, cb);
-                    });
+                {
+                    cb.Begin();
+                    this.Logger.Info("Clear database");
+                    this.Reset(cb);
+                    this.AddData(data, cb);
+                });
         }
 
         /// <summary>
@@ -533,17 +530,17 @@
         public void Reset(IProgressCallback callback)
         {
             ProgressDialog.ExecuteTask(
-                null, 
-                "Initialize new database", 
-                "Please wait...", 
-                "SQLiteDbReset", 
-                ProgressBarStyle.Marquee, 
-                this.Logger, 
+                null,
+                "Initialize new database",
+                "Please wait...",
+                "SQLiteDbReset",
+                ProgressBarStyle.Marquee,
+                this.Logger,
                 cb =>
-                    {
-                        cb.Begin();
-                        this.DoResetDatabase(cb);
-                    });
+                {
+                    cb.Begin();
+                    this.DoResetDatabase(cb);
+                });
         }
 
         /// <summary>
@@ -714,7 +711,7 @@ Packages: {4}", this.DataFileName, StringUtil.FormatSize(new FileInfo(this.DataF
                 using (var command = new SQLiteCommand(connection))
                 {
                     command.CommandText = string.Format(
-                        "DELETE FROM JOURNEY WHERE TDEPARTURE = '{0}' OR TRETURN = '{0}'", 
+                        "DELETE FROM JOURNEY WHERE TDEPARTURE = '{0}' OR TRETURN = '{0}'",
                         DateTime.MinValue.ToString(DATE_FORMAT));
                     connection.Open();
                     command.ExecuteNonQuery();
@@ -777,17 +774,17 @@ Packages: {4}", this.DataFileName, StringUtil.FormatSize(new FileInfo(this.DataF
         public void AddData(IList<TravelRoute> data, string packageId, DateTime packageCreatedAt, IProgressCallback callback)
         {
             ProgressDialog.ExecuteTask(
-                null, 
-                "Data Import", 
-                "Please wait...", 
-                "SQLiteDbAddData", 
-                ProgressBarStyle.Continuous, 
-                this.Logger, 
+                null,
+                "Data Import",
+                "Please wait...",
+                "SQLiteDbAddData",
+                ProgressBarStyle.Continuous,
+                this.Logger,
                 cb =>
-                    {
-                        cb.Begin();
-                        this.DoAddData(data, packageId, packageCreatedAt, cb as ProgressDialog);
-                    });
+                {
+                    cb.Begin();
+                    this.DoAddData(data, packageId, packageCreatedAt, cb as ProgressDialog);
+                });
         }
 
         /// <summary>
@@ -804,25 +801,25 @@ Packages: {4}", this.DataFileName, StringUtil.FormatSize(new FileInfo(this.DataF
             if (data != null && data.Count > 0)
             {
                 ProgressDialog.ExecuteTask(
-                    null, 
-                    "Data Package Import", 
-                    "Please wait...", 
-                    "SQLiteDbAddDataPkg", 
-                    ProgressBarStyle.Continuous, 
-                    this.Logger, 
+                    null,
+                    "Data Package Import",
+                    "Please wait...",
+                    "SQLiteDbAddDataPkg",
+                    ProgressBarStyle.Continuous,
+                    this.Logger,
                     cb =>
+                    {
+                        cb.Begin();
+                        cb.SetRange(0, data.Count);
+                        foreach (var pkg in data)
                         {
-                            cb.Begin();
-                            cb.SetRange(0, data.Count);
-                            foreach (var pkg in data)
-                            {
-                                string log = "Saving package " + pkg.Id;
-                                this.Logger.Info(log);
-                                cb.Text = log;
-                                this.AddData(pkg.Data, pkg.Id, pkg.CreatedDate, cb);
-                                cb.Increment(1);
-                            }
-                        });
+                            string log = "Saving package " + pkg.Id;
+                            this.Logger.Info(log);
+                            cb.Text = log;
+                            this.AddData(pkg.Data, pkg.Id, pkg.CreatedDate, cb);
+                            cb.Increment(1);
+                        }
+                    });
             }
         }
 
@@ -855,14 +852,14 @@ Packages: {4}", this.DataFileName, StringUtil.FormatSize(new FileInfo(this.DataF
                     getIdRouteCmd.Parameters.Add("@sDest", DbType.String);
 
                     var insertRouteCmd = new SQLiteCommand(
-                        "INSERT INTO ROUTE(LID, SDEPARTURE, SDESTINATION) " + "VALUES(@lId, @sDept, @sDest)", 
+                        "INSERT INTO ROUTE(LID, SDEPARTURE, SDESTINATION) " + "VALUES(@lId, @sDept, @sDest)",
                         connection);
                     insertRouteCmd.Parameters.Add("@lId", DbType.Int64);
                     insertRouteCmd.Parameters.Add("@sDept", DbType.String);
                     insertRouteCmd.Parameters.Add("@sDest", DbType.String);
 
                     var getIdJourneyCmd = new SQLiteCommand(
-                        "SELECT LID FROM JOURNEY WHERE LROUTEID=@lRouteId AND TDEPARTURE=@tDept AND TRETURN=@tRet", 
+                        "SELECT LID FROM JOURNEY WHERE LROUTEID=@lRouteId AND TDEPARTURE=@tDept AND TRETURN=@tRet",
                         connection);
                     getIdJourneyCmd.Parameters.Add("@lRouteId", DbType.Int64);
                     getIdJourneyCmd.Parameters.Add("@tDept", DbType.String);
@@ -870,7 +867,7 @@ Packages: {4}", this.DataFileName, StringUtil.FormatSize(new FileInfo(this.DataF
 
                     var insertJourneyCmd =
                         new SQLiteCommand(
-                            "INSERT INTO JOURNEY(LID, LROUTEID, TDEPARTURE, TRETURN) " + "VALUES(@lId, @lRouteId, @tDept, @tRet)", 
+                            "INSERT INTO JOURNEY(LID, LROUTEID, TDEPARTURE, TRETURN) " + "VALUES(@lId, @lRouteId, @tDept, @tRet)",
                             connection);
                     insertJourneyCmd.Parameters.Add("@lId", DbType.Int64);
                     insertJourneyCmd.Parameters.Add("@lRouteId", DbType.Int64);
@@ -878,7 +875,7 @@ Packages: {4}", this.DataFileName, StringUtil.FormatSize(new FileInfo(this.DataF
                     insertJourneyCmd.Parameters.Add("@tRet", DbType.String);
 
                     var getIdJourneyDataCmd = new SQLiteCommand(
-                        "SELECT LID FROM JOURNEY_DATA WHERE LJOURNEYID=@lJourneyId AND TUPDATE=@tUpdate", 
+                        "SELECT LID FROM JOURNEY_DATA WHERE LJOURNEYID=@lJourneyId AND TUPDATE=@tUpdate",
                         connection);
                     getIdJourneyDataCmd.Parameters.Add("@lJourneyId", DbType.Int64);
                     getIdJourneyDataCmd.Parameters.Add("@tUpdate", DbType.String);
@@ -886,7 +883,7 @@ Packages: {4}", this.DataFileName, StringUtil.FormatSize(new FileInfo(this.DataF
                     var insertJourneyDataCmd =
                         new SQLiteCommand(
                             "INSERT INTO JOURNEY_DATA(LID, LJOURNEYID, SCURRENCY, TUPDATE, BFLIGHT) "
-                            + "VALUES(@lId, @lJourneyId, @sCurrency, @tUpdate, @bFlight)", 
+                            + "VALUES(@lId, @lJourneyId, @sCurrency, @tUpdate, @bFlight)",
                             connection);
                     insertJourneyDataCmd.Parameters.Add("@lId", DbType.Int64);
                     insertJourneyDataCmd.Parameters.Add("@lJourneyId", DbType.Int64);
@@ -906,8 +903,8 @@ Packages: {4}", this.DataFileName, StringUtil.FormatSize(new FileInfo(this.DataF
                         startCmd.ExecuteNonQuery(); // Begin transaction
                     }
 
-                    long nextRouteId = GetMaxRowId(connection, "ROUTE"), 
-                         nextJourneyId = GetMaxRowId(connection, "JOURNEY"), 
+                    long nextRouteId = GetMaxRowId(connection, "ROUTE"),
+                         nextJourneyId = GetMaxRowId(connection, "JOURNEY"),
                          nextDataId = GetMaxRowId(connection, "JOURNEY_DATA");
 
                     int totalJourneys = data.Sum(r => r.Journeys.Count);
@@ -1049,7 +1046,7 @@ Packages: {4}", this.DataFileName, StringUtil.FormatSize(new FileInfo(this.DataF
                         using (
                             var insertPkgCmd =
                                 new SQLiteCommand(
-                                    "INSERT INTO DATA_PACKAGE (SID, TCREATED, TINSERTED) " + " VALUES (@pkgId, @pkgCreatedAt, @pkgInsertedAt)", 
+                                    "INSERT INTO DATA_PACKAGE (SID, TCREATED, TINSERTED) " + " VALUES (@pkgId, @pkgCreatedAt, @pkgInsertedAt)",
                                     connection))
                         {
                             insertPkgCmd.Parameters.Add(new SQLiteParameter("@pkgId", packageId));

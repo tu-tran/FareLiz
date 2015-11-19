@@ -3,19 +3,16 @@
     using System.Globalization;
     using System.Windows.Forms;
 
-    using log4net;
-
     using SkyDean.FareLiz.Core;
     using SkyDean.FareLiz.Core.Config;
+    using SkyDean.FareLiz.Core.Utils;
     using SkyDean.FareLiz.WinForm.Presentation.Views;
 
     /// <summary>Helper class for editing a configuration by specifying the fields individually</summary>
     public class DefaultConfigBuilder : IConfigBuilder
     {
-        /// <summary>
-        /// The _logger.
-        /// </summary>
-        private readonly ILog _logger;
+        /// <summary>The _logger.</summary>
+        private readonly ILogger _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultConfigBuilder"/> class.
@@ -23,7 +20,7 @@
         /// <param name="logger">
         /// The logger.
         /// </param>
-        public DefaultConfigBuilder(ILog logger)
+        public DefaultConfigBuilder(ILogger logger)
         {
             this._logger = logger;
         }

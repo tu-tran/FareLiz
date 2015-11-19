@@ -38,7 +38,7 @@ namespace SkyDean.FareLiz.Core.Utils
 
         /// <summary>The get logger.</summary>
         /// <returns>The <see cref="ILog" />.</returns>
-        public static ILog GetLogger()
+        public static ILogger GetLogger()
         {
             return GetLogger(AppUtil.EntryModuleName);
         }
@@ -52,9 +52,9 @@ namespace SkyDean.FareLiz.Core.Utils
         /// <returns>
         /// The <see cref="ILog"/>.
         /// </returns>
-        public static ILog GetLogger(string name)
+        public static ILogger GetLogger(string name)
         {
-            return LogManager.GetLogger(name);
+            return new Log4NetWrapper(LogManager.GetLogger(name));
         }
 
         /// <summary>The configure log 4 net.</summary>

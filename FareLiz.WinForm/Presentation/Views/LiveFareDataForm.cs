@@ -10,14 +10,10 @@
     using SkyDean.FareLiz.WinForm.Components.Controls.ListView;
     using SkyDean.FareLiz.WinForm.Components.Dialog;
 
-    /// <summary>
-    /// The live fare data form.
-    /// </summary>
+    /// <summary>The live fare data form.</summary>
     internal partial class LiveFareDataForm : SmartForm
     {
-        /// <summary>
-        /// The _file storage.
-        /// </summary>
+        /// <summary>The _file storage.</summary>
         private readonly LiveFareFileStorage _fileStorage;
 
         /// <summary>
@@ -35,9 +31,7 @@
             this.lvFareData.AttachMenuStrip(this.lvFareDataContextMenuStrip);
         }
 
-        /// <summary>
-        /// The bind routes.
-        /// </summary>
+        /// <summary>The bind routes.</summary>
         private void BindRoutes()
         {
             var routes = this._fileStorage.GetRoutesInfo();
@@ -48,9 +42,7 @@
             }
         }
 
-        /// <summary>
-        /// The bind travel dates.
-        /// </summary>
+        /// <summary>The bind travel dates.</summary>
         private void BindTravelDates()
         {
             var selRoute = this.lbRoute.SelectedItem as RouteInfo;
@@ -65,9 +57,7 @@
             }
         }
 
-        /// <summary>
-        /// The bind data date.
-        /// </summary>
+        /// <summary>The bind data date.</summary>
         private void BindDataDate()
         {
             var selRoute = this.lbRoute.SelectedItem as RouteInfo;
@@ -83,9 +73,7 @@
             }
         }
 
-        /// <summary>
-        /// The bind fare data.
-        /// </summary>
+        /// <summary>The bind fare data.</summary>
         private void BindFareData()
         {
             var routeInfo = this.lbRoute.SelectedItem as RouteInfo;

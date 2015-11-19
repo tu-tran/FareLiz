@@ -1,15 +1,12 @@
 ﻿namespace SkyDean.FareLiz.Data.Config
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-
-    using log4net;
-
     using SkyDean.FareLiz.Core;
     using SkyDean.FareLiz.Core.Config;
     using SkyDean.FareLiz.Core.Data;
     using SkyDean.FareLiz.Core.Utils;
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
 
     /// <summary>Helper class used for storing configurations in a file</summary>
     public class FileConfigStore : IConfigStore
@@ -31,7 +28,7 @@
         /// <param name="logger">
         /// The logger.
         /// </param>
-        public FileConfigStore(string configFileName, IPluginResolver pluginResolver, ILog logger)
+        public FileConfigStore(string configFileName, IPluginResolver pluginResolver, ILogger logger)
             : this()
         {
             this.ConfigFile = configFileName;
@@ -54,7 +51,7 @@
         /// <summary>
         /// Gets or sets the logger.
         /// </summary>
-        public ILog Logger { get; set; }
+        public ILogger Logger { get; set; }
 
         /// <summary>
         /// The load env.
@@ -213,13 +210,13 @@
                     }
 
                     return new MonitorEnvironment(
-                        this, 
-                        this._pluginResolver, 
-                        fareDataProvider, 
-                        fareDatabase, 
-                        archiveManager, 
-                        currencyProvider, 
-                        backgroundServices, 
+                        this,
+                        this._pluginResolver,
+                        fareDataProvider,
+                        fareDatabase,
+                        archiveManager,
+                        currencyProvider,
+                        backgroundServices,
                         this.Logger);
                 }
             }

@@ -3,9 +3,7 @@
     using System.Collections;
     using System.ComponentModel;
 
-    /// <summary>
-    /// The collection to property converter.
-    /// </summary>
+    /// <summary>The collection to property converter.</summary>
     public abstract class CollectionToPropertyConverter : StringConverter
     {
         /// <summary>
@@ -52,12 +50,8 @@
             return new StandardValuesCollection(this.GetAllowedValues());
         }
 
-        /// <summary>
-        /// The get allowed values.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="ICollection"/>.
-        /// </returns>
+        /// <summary>The get allowed values.</summary>
+        /// <returns>The <see cref="ICollection" />.</returns>
         protected abstract ICollection GetAllowedValues();
     }
 }

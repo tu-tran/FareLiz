@@ -7,19 +7,13 @@
 
     using SkyDean.FareLiz.WinForm.Components.Utils;
 
-    /// <summary>
-    /// The win api.
-    /// </summary>
+    /// <summary>The win api.</summary>
     public static class WinApi
     {
-        /// <summary>
-        /// The featur e_ disabl e_ navigatio n_ sounds.
-        /// </summary>
+        /// <summary>The featur e_ disabl e_ navigatio n_ sounds.</summary>
         public const int FEATURE_DISABLE_NAVIGATION_SOUNDS = 21;
 
-        /// <summary>
-        /// The se t_ featur e_ o n_ process.
-        /// </summary>
+        /// <summary>The se t_ featur e_ o n_ process.</summary>
         public const int SET_FEATURE_ON_PROCESS = 0x00000002;
 
         /// <summary>
@@ -87,37 +81,23 @@
         }
     }
 
-    /// <summary>
-    /// The single instance.
-    /// </summary>
+    /// <summary>The single instance.</summary>
     public static class SingleInstance
     {
-        /// <summary>
-        /// The hwn d_ broadcast.
-        /// </summary>
+        /// <summary>The hwn d_ broadcast.</summary>
         public const int HWND_BROADCAST = 0xffff;
 
-        /// <summary>
-        /// The w m_ showfirstinstance.
-        /// </summary>
+        /// <summary>The w m_ showfirstinstance.</summary>
         public static readonly int WM_SHOWFIRSTINSTANCE = NativeMethods.RegisterWindowMessage("WM_SHOWFIRSTINSTANCE|" + ProgramInfo.AssemblyGuid);
 
-        /// <summary>
-        /// The mutex.
-        /// </summary>
+        /// <summary>The mutex.</summary>
         private static Mutex mutex;
 
-        /// <summary>
-        /// The started.
-        /// </summary>
+        /// <summary>The started.</summary>
         private static bool started;
 
-        /// <summary>
-        /// The start.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="bool"/>.
-        /// </returns>
+        /// <summary>The start.</summary>
+        /// <returns>The <see cref="bool" />.</returns>
         public static bool Start()
         {
             string mutexName = string.Format("Local\\{0}", ProgramInfo.AssemblyGuid);
@@ -133,17 +113,13 @@
             return started;
         }
 
-        /// <summary>
-        /// The show first instance.
-        /// </summary>
+        /// <summary>The show first instance.</summary>
         public static void ShowFirstInstance()
         {
             NativeMethods.PostMessage((IntPtr)HWND_BROADCAST, WM_SHOWFIRSTINSTANCE, IntPtr.Zero, IntPtr.Zero);
         }
 
-        /// <summary>
-        /// The stop.
-        /// </summary>
+        /// <summary>The stop.</summary>
         public static void Stop()
         {
             if (started)
@@ -153,14 +129,10 @@
         }
     }
 
-    /// <summary>
-    /// The program info.
-    /// </summary>
+    /// <summary>The program info.</summary>
     public static class ProgramInfo
     {
-        /// <summary>
-        /// Gets the assembly guid.
-        /// </summary>
+        /// <summary>Gets the assembly guid.</summary>
         public static string AssemblyGuid
         {
             get

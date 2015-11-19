@@ -3,16 +3,15 @@
     using System;
     using System.IO;
 
-    using log4net;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+    using SkyDean.FareLiz.Core.Utils;
     using SkyDean.FareLiz.Data;
     using SkyDean.FareLiz.Data.Config;
     using SkyDean.FareLiz.WinForm;
 
     /// <summary>
-    /// The object ini config test.
+    /// The object config test.
     /// </summary>
     [TestClass]
     public class ObjectIniConfigTest
@@ -24,7 +23,7 @@
         public void TestMethod1()
         {
             string fileName = "UnitTestLogger";
-            var logger = LogManager.GetLogger(fileName);
+            var logger = LogUtil.GetLogger(fileName);
             var target = new ObjectIniConfig("UnitTest.ini", logger);
             string dept = "Departure Test Location String";
             string dest = "Destination Test Location String";
@@ -34,10 +33,10 @@
 
             var obj = new ExecutionInfo
                           {
-                              Departure = AirportDataProvider.FromIATA("HEL"), 
-                              Destination = AirportDataProvider.FromIATA("SGN"), 
-                              IsMinimized = isMin, 
-                              DepartureDate = deptDate, 
+                              Departure = AirportDataProvider.FromIATA("HEL"),
+                              Destination = AirportDataProvider.FromIATA("SGN"),
+                              IsMinimized = isMin,
+                              DepartureDate = deptDate,
                               ReturnDate = retDate
                           };
             target.SaveData(obj);

@@ -1,13 +1,11 @@
 ﻿namespace SkyDean.FareLiz.InterFlight
 {
-    using System.ComponentModel;
-    using System.IO;
-
-    using log4net;
-
     using SkyDean.FareLiz.Core;
     using SkyDean.FareLiz.Core.Config;
     using SkyDean.FareLiz.Core.Data;
+    using SkyDean.FareLiz.Core.Utils;
+    using System.ComponentModel;
+    using System.IO;
 
     /// <summary>Data handler for International Flights (PT)</summary>
     [DisplayName("International Flight Data Handler (PT)")]
@@ -114,7 +112,7 @@
         /// <summary>
         /// Gets or sets the logger.
         /// </summary>
-        public ILog Logger { get; set; }
+        public ILogger Logger { get; set; }
 
         /// <summary>
         /// The initialize.

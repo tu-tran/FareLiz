@@ -1,5 +1,10 @@
 ﻿namespace SkyDean.FareLiz.IO
 {
+    using SkyDean.FareLiz.Core;
+    using SkyDean.FareLiz.Core.Config;
+    using SkyDean.FareLiz.Core.Data;
+    using SkyDean.FareLiz.Core.Presentation;
+    using SkyDean.FareLiz.Core.Utils;
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
@@ -7,14 +12,6 @@
     using System.IO;
     using System.Linq;
     using System.Text;
-
-    using log4net;
-
-    using SkyDean.FareLiz.Core;
-    using SkyDean.FareLiz.Core.Config;
-    using SkyDean.FareLiz.Core.Data;
-    using SkyDean.FareLiz.Core.Presentation;
-    using SkyDean.FareLiz.Core.Utils;
 
     /// <summary>The file archive manager.</summary>
     [DisplayName("File Archive Manager")]
@@ -60,7 +57,7 @@
         /// <param name="logger">
         /// The logger.
         /// </param>
-        public FileArchiveManager(IFareDataProvider dataProvider, IFareDatabase fareDatabase, ILog logger)
+        public FileArchiveManager(IFareDataProvider dataProvider, IFareDatabase fareDatabase, ILogger logger)
             : this()
         {
             this.FareDataProvider = dataProvider;
@@ -120,7 +117,7 @@
         }
 
         /// <summary>Gets or sets the logger.</summary>
-        public ILog Logger { get; set; }
+        public ILogger Logger { get; set; }
 
         #endregion
 
@@ -174,7 +171,7 @@
             else
             {
                 targetFile = Path.Combine(
-                    destinationPath, 
+                    destinationPath,
                     string.Format(CultureInfo.InvariantCulture, "Exp_{0}_{1}{2}", Guid.NewGuid(), data.Count, BIN_EXTENSION));
                 var formatter = new ProtoBufTransfer(this.Logger);
                 formatter.ToRaw(data, targetFile);
@@ -416,15 +413,15 @@
             }
 
             var fileName = string.Format(
-                CultureInfo.InvariantCulture, 
-                "{0}-{1}.[{2}]-[{3}]-({4}-{5}){6}({7})", 
-                this.FareDataProvider.ServiceName, 
-                route.Id, 
-                origin, 
-                dest, 
-                minId, 
-                maxId, 
-                DateTime.Now.ToString(NamingRule.DATE_FORMAT, CultureInfo.InvariantCulture), 
+                CultureInfo.InvariantCulture,
+                "{0}-{1}.[{2}]-[{3}]-({4}-{5}){6}({7})",
+                this.FareDataProvider.ServiceName,
+                route.Id,
+                origin,
+                dest,
+                minId,
+                maxId,
+                DateTime.Now.ToString(NamingRule.DATE_FORMAT, CultureInfo.InvariantCulture),
                 route.Journeys.Count);
             var processedName = PathUtil.RemoveInvalidFileNameChars(fileName);
             return processedName;

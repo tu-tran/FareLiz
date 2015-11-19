@@ -5,8 +5,6 @@
     using System.ComponentModel;
     using System.Threading;
 
-    using log4net;
-
     using SkyDean.FareLiz.Core;
     using SkyDean.FareLiz.Core.Data;
     using SkyDean.FareLiz.Core.Presentation;
@@ -20,12 +18,12 @@
         /// <summary>
         /// The stopped.
         /// </summary>
-        Stopped, 
+        Stopped,
 
         /// <summary>
         /// The stopping.
         /// </summary>
-        Stopping, 
+        Stopping,
 
         /// <summary>
         /// The running.
@@ -44,19 +42,19 @@
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        Unspecified, 
+        Unspecified,
 
         /// <summary>
         /// The show fare.
         /// </summary>
         [Description("Display the fare data on screen")]
-        ShowFare, 
+        ShowFare,
 
         /// <summary>
         /// The get fare and save.
         /// </summary>
         [Description("Export the data and then close the browser tab")]
-        GetFareAndSave, 
+        GetFareAndSave,
 
         /// <summary>
         /// The live monitor.
@@ -81,7 +79,7 @@
         /// <summary>
         /// The _logger.
         /// </summary>
-        private readonly ILog _logger;
+        private readonly ILogger _logger;
 
         /// <summary>
         /// The _pending queue.

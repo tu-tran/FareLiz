@@ -10,8 +10,6 @@
     using System.Threading;
     using System.Windows.Forms;
 
-    using log4net;
-
     using SkyDean.FareLiz.Core.Utils;
     using SkyDean.FareLiz.Data.Monitoring;
     using SkyDean.FareLiz.WinForm.Components.Controls;
@@ -24,34 +22,22 @@
     /// <summary>Provides GUI for scheduling an automated task</summary>
     internal partial class SchedulerForm : SmartForm
     {
-        /// <summary>
-        /// The _default param.
-        /// </summary>
+        /// <summary>The _default param.</summary>
         private readonly ExecutionParam _defaultParam;
 
-        /// <summary>
-        /// The _logger.
-        /// </summary>
-        private readonly ILog _logger;
+        /// <summary>The _logger.</summary>
+        private readonly ILogger _logger;
 
-        /// <summary>
-        /// The _removing tasks.
-        /// </summary>
+        /// <summary>The _removing tasks.</summary>
         private readonly HashSet<string> _removingTasks = new HashSet<string>();
 
-        /// <summary>
-        /// The _scheduler.
-        /// </summary>
+        /// <summary>The _scheduler.</summary>
         private readonly SchedulerManager _scheduler;
 
-        /// <summary>
-        /// The load progress.
-        /// </summary>
+        /// <summary>The load progress.</summary>
         private readonly ToolStripControl<Windows7ProgressBar> loadProgress = new ToolStripControl<Windows7ProgressBar> { Visible = false };
 
-        /// <summary>
-        /// The _binding object.
-        /// </summary>
+        /// <summary>The _binding object.</summary>
         private bool _bindingObject;
 
         /// <summary>
@@ -63,7 +49,7 @@
         /// <param name="logger">
         /// The logger.
         /// </param>
-        public SchedulerForm(ExecutionParam defaultParam, ILog logger)
+        public SchedulerForm(ExecutionParam defaultParam, ILogger logger)
         {
             this.InitializeComponent();
             this.InitializeImageList();
@@ -82,9 +68,7 @@
             this.loadProgress.VisibleChanged += this.LoadProgress_VisibleChanged;
         }
 
-        /// <summary>
-        /// The initialize image list.
-        /// </summary>
+        /// <summary>The initialize image list.</summary>
         private void InitializeImageList()
         {
             this.imgListSchedules.Images.Add("Add", Resources.Add);
@@ -92,9 +76,7 @@
             this.imgListSchedules.Images.Add("Error", Resources.Stop);
         }
 
-        /// <summary>
-        /// The resize status strip.
-        /// </summary>
+        /// <summary>The resize status strip.</summary>
         private void ResizeStatusStrip()
         {
             int minusWidth = (this.statusStrip.SizingGrip ? this.statusStrip.SizeGripBounds.Width : 0) + 5 + 2 * SystemInformation.BorderSize.Width
@@ -114,9 +96,7 @@
             }
         }
 
-        /// <summary>
-        /// The reload.
-        /// </summary>
+        /// <summary>The reload.</summary>
         private void Reload()
         {
             this.btnRefresh.Enabled = false;
@@ -206,9 +186,7 @@
                     });
         }
 
-        /// <summary>
-        /// The update buttons.
-        /// </summary>
+        /// <summary>The update buttons.</summary>
         private void UpdateButtons()
         {
             bool canSave = false;
@@ -230,14 +208,9 @@
             this.btnSave.Enabled = canSave;
         }
 
-        /// <summary>
-        /// The get execution param args.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="string"/>.
-        /// </returns>
-        /// <exception cref="ArgumentException">
-        /// </exception>
+        /// <summary>The get execution param args.</summary>
+        /// <returns>The <see cref="string" />.</returns>
+        /// <exception cref="ArgumentException"></exception>
         private string GetExecutionParamArgs()
         {
             string cmdLine = null;
@@ -255,9 +228,7 @@
             return cmdLine;
         }
 
-        /// <summary>
-        /// The set grid size.
-        /// </summary>
+        /// <summary>The set grid size.</summary>
         private void SetGridSize()
         {
             this.flightScannerProperties.SetLabelColumnWidth(150);
@@ -274,9 +245,7 @@
             this.btnSave.Enabled = this.btnAdd.Enabled = this.btnDelete.Enabled = this.btnDeleteAll.Enabled = enabled;
         }
 
-        /// <summary>
-        /// The bind schedule item property.
-        /// </summary>
+        /// <summary>The bind schedule item property.</summary>
         private void BindScheduleItemProperty()
         {
             if (this.lvSchedules.SelectedItems.Count == 1)
@@ -293,9 +262,7 @@
             }
         }
 
-        /// <summary>
-        /// Mark the active item as dirty (being edited) and returns the active item
-        /// </summary>
+        /// <summary>Mark the active item as dirty (being edited) and returns the active item</summary>
         private void MarkActiveItemDirty()
         {
             var activeItem = this.GetActiveItem();
@@ -312,12 +279,8 @@
             this.UpdateButtons();
         }
 
-        /// <summary>
-        /// The get active item.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="KeyValue"/>.
-        /// </returns>
+        /// <summary>The get active item.</summary>
+        /// <returns>The <see cref="KeyValue" />.</returns>
         private KeyValue<ListViewItem, ScheduleItem> GetActiveItem()
         {
             if (this.lvSchedules.SelectedItems.Count == 1)
@@ -936,9 +899,7 @@
         }
     }
 
-    /// <summary>
-    /// The property grid extension.
-    /// </summary>
+    /// <summary>The property grid extension.</summary>
     public static class PropertyGridExtension
     {
         /// <summary>

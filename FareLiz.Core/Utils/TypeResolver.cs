@@ -12,7 +12,7 @@
     public sealed class TypeResolver
     {
         /// <summary>The logger.</summary>
-        private readonly ILog Logger;
+        private readonly ILogger Logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TypeResolver"/> class.
@@ -20,7 +20,7 @@
         /// <param name="logger">
         /// The logger.
         /// </param>
-        public TypeResolver(ILog logger)
+        public TypeResolver(ILogger logger)
         {
             this.Logger = logger;
         }

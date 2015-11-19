@@ -6,6 +6,8 @@
 
     using log4net;
 
+    using SkyDean.FareLiz.Core.Utils;
+
     /// <summary>Standard object for managing multiple helper services object</summary>
     [Serializable]
     public sealed class BackgroundServiceManager : IServiceManager
@@ -20,13 +22,13 @@
         /// <param name="logger">
         /// Instance of Logger
         /// </param>
-        public BackgroundServiceManager(ILog logger)
+        public BackgroundServiceManager(ILogger logger)
         {
             this.Logger = logger;
         }
 
         /// <summary>Gets or sets the Logger instance</summary>
-        public ILog Logger { get; set; }
+        public ILogger Logger { get; set; }
 
         /// <summary>
         /// Add helper services to the manager

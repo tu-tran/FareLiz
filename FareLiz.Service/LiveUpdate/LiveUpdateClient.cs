@@ -1,5 +1,8 @@
 ﻿namespace SkyDean.FareLiz.Service.LiveUpdate
 {
+    using SkyDean.FareLiz.Core.Utils;
+    using SkyDean.FareLiz.Service.Utils;
+    using SkyDean.FareLiz.WinForm.Components.Dialog;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -7,12 +10,6 @@
     using System.Linq;
     using System.Text.RegularExpressions;
     using System.Windows.Forms;
-
-    using log4net;
-
-    using SkyDean.FareLiz.Core.Utils;
-    using SkyDean.FareLiz.Service.Utils;
-    using SkyDean.FareLiz.WinForm.Components.Dialog;
 
     /// <summary>Client used for retrieving version updates</summary>
     public class LiveUpdateClient
@@ -41,7 +38,7 @@
         /// <param name="logger">
         /// The logger.
         /// </param>
-        public LiveUpdateClient(IVersionRetriever versionRetriever, ILog logger)
+        public LiveUpdateClient(IVersionRetriever versionRetriever, ILogger logger)
         {
             this._versionRetriever = versionRetriever;
             this.Logger = logger;
@@ -50,7 +47,7 @@
         /// <summary>
         /// Gets or sets the logger.
         /// </summary>
-        public ILog Logger { get; set; }
+        public ILogger Logger { get; set; }
 
         /// <summary>Check for latest update</summary>
         /// <returns>The upgradable version. Returns null if there is no newer version</returns>
@@ -63,11 +60,11 @@
 
                 var param = new UpdateParameter
                                 {
-                                    BackupPath = Path.Combine(this.GetBackupRoot(), newRequest.FromVersion.VersionNumber.ToString()), 
-                                    PackageLocation = AppUtil.GetLocalDataPath(this.GetType().Name + "\\Packages\\" + Guid.NewGuid()), 
-                                    ProcessToEnd = curProcess, 
-                                    RestartProcess = curProcess, 
-                                    NotifyMsg = true, 
+                                    BackupPath = Path.Combine(this.GetBackupRoot(), newRequest.FromVersion.VersionNumber.ToString()),
+                                    PackageLocation = AppUtil.GetLocalDataPath(this.GetType().Name + "\\Packages\\" + Guid.NewGuid()),
+                                    ProcessToEnd = curProcess,
+                                    RestartProcess = curProcess,
+                                    NotifyMsg = true,
                                     TargetUpdatePath = this._baseAppPath
                                 };
                 newRequest.Parameters = param;
@@ -85,38 +82,38 @@
         public void RunUpdate(UpdateRequest request)
         {
             ProgressDialog.ExecuteTask(
-                null, 
-                "Live Update", 
-                "Downloading update package into local drive...", 
-                "RunLiveUpdate", 
-                ProgressBarStyle.Marquee, 
-                this.Logger, 
+                null,
+                "Live Update",
+                "Downloading update package into local drive...",
+                "RunLiveUpdate",
+                ProgressBarStyle.Marquee,
+                this.Logger,
 
                 // Run the actual update
                 callback =>
-                    {
-                        callback.Begin();
-                        this.Logger.InfoFormat(
-                            "Upgrading {0} from {1} to {2}...", 
-                            request.ProductName, 
-                            request.FromVersion.VersionNumber, 
-                            request.ToVersion.VersionNumber);
-                        callback.Text = "Downloading data package...";
-                        this.Logger.Info("Download version package for " + request.ToVersion.VersionNumber);
-                        this._versionRetriever.DownloadPackage(request, request.Parameters.PackageLocation);
-                        callback.Text = "Backing up current version...";
-                        this.Logger.Info("Backup current version " + request.FromVersion.VersionNumber);
-                        this.Backup(request);
-                        callback.Text = "Cleaning up old backups...";
-                        this.Logger.Info("Cleanup old version backups");
-                        this.CleanBackup(); // Clean old backups
-                        callback.Text = "Installing update...";
-                        ProcessStartInfo runnerProcessInfo = LiveUpdateRunner.GetUpdateRunnerProcessInfo(request.Parameters);
+                {
+                    callback.Begin();
+                    this.Logger.InfoFormat(
+                        "Upgrading {0} from {1} to {2}...",
+                        request.ProductName,
+                        request.FromVersion.VersionNumber,
+                        request.ToVersion.VersionNumber);
+                    callback.Text = "Downloading data package...";
+                    this.Logger.Info("Download version package for " + request.ToVersion.VersionNumber);
+                    this._versionRetriever.DownloadPackage(request, request.Parameters.PackageLocation);
+                    callback.Text = "Backing up current version...";
+                    this.Logger.Info("Backup current version " + request.FromVersion.VersionNumber);
+                    this.Backup(request);
+                    callback.Text = "Cleaning up old backups...";
+                    this.Logger.Info("Cleanup old version backups");
+                    this.CleanBackup(); // Clean old backups
+                    callback.Text = "Installing update...";
+                    ProcessStartInfo runnerProcessInfo = LiveUpdateRunner.GetUpdateRunnerProcessInfo(request.Parameters);
 
-                            // Prepare update runner process
-                        var runnerProcess = Process.Start(runnerProcessInfo);
-                        runnerProcess.WaitForExit();
-                    }, 
+                    // Prepare update runner process
+                    var runnerProcess = Process.Start(runnerProcessInfo);
+                    runnerProcess.WaitForExit();
+                },
                 request.Parameters.NotifyMsg);
         }
 

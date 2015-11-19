@@ -8,51 +8,33 @@
     using System.Threading;
     using System.Xml;
 
-    using log4net;
-
     using SkyDean.FareLiz.Core;
     using SkyDean.FareLiz.Core.Config;
     using SkyDean.FareLiz.Core.Data;
     using SkyDean.FareLiz.Core.Utils;
 
-    /// <summary>
-    /// The online currency provider.
-    /// </summary>
+    /// <summary>The online currency provider.</summary>
     public class OnlineCurrencyProvider : ICurrencyProvider
     {
-        /// <summary>
-        /// The rand.
-        /// </summary>
+        /// <summary>The rand.</summary>
         private static readonly Random Rand = new Random(DateTime.Now.Millisecond);
 
-        /// <summary>
-        /// The currency symbols.
-        /// </summary>
+        /// <summary>The currency symbols.</summary>
         private static readonly Dictionary<string, CurrencyInfo> CurrencySymbols;
 
-        /// <summary>
-        /// The _exchange rates.
-        /// </summary>
+        /// <summary>The _exchange rates.</summary>
         private static Dictionary<string, float> _exchangeRates = new Dictionary<string, float>();
 
-        /// <summary>
-        /// The _status.
-        /// </summary>
+        /// <summary>The _status.</summary>
         private static volatile HelperServiceStatus _status;
 
-        /// <summary>
-        /// The cache lock.
-        /// </summary>
+        /// <summary>The cache lock.</summary>
         private static readonly ReaderWriterLockSlim cacheLock = new ReaderWriterLockSlim();
 
-        /// <summary>
-        /// The _config.
-        /// </summary>
+        /// <summary>The _config.</summary>
         private CurrencyProviderConfig _config;
 
-        /// <summary>
-        /// Initializes static members of the <see cref="OnlineCurrencyProvider"/> class.
-        /// </summary>
+        /// <summary>Initializes static members of the <see cref="OnlineCurrencyProvider" /> class.</summary>
         static OnlineCurrencyProvider()
         {
             CurrencySymbols = new Dictionary<string, CurrencyInfo>();
@@ -73,24 +55,18 @@
             }
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="OnlineCurrencyProvider"/> class.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="OnlineCurrencyProvider" /> class.</summary>
         public OnlineCurrencyProvider()
         {
             this.Status = HelperServiceStatus.Stopped;
         }
 
-        /// <summary>
-        /// The initialize.
-        /// </summary>
+        /// <summary>The initialize.</summary>
         public void Initialize()
         {
         }
 
-        /// <summary>
-        /// Gets or sets the configuration.
-        /// </summary>
+        /// <summary>Gets or sets the configuration.</summary>
         public IConfig Configuration
         {
             get
@@ -104,9 +80,7 @@
             }
         }
 
-        /// <summary>
-        /// Gets the default config.
-        /// </summary>
+        /// <summary>Gets the default config.</summary>
         public IConfig DefaultConfig
         {
             get
@@ -115,9 +89,7 @@
             }
         }
 
-        /// <summary>
-        /// Gets the custom config builder.
-        /// </summary>
+        /// <summary>Gets the custom config builder.</summary>
         public IConfigBuilder CustomConfigBuilder
         {
             get
@@ -126,14 +98,10 @@
             }
         }
 
-        /// <summary>
-        /// Gets or sets the logger.
-        /// </summary>
-        public ILog Logger { get; set; }
+        /// <summary>Gets or sets the logger.</summary>
+        public ILogger Logger { get; set; }
 
-        /// <summary>
-        /// Gets or sets the allowed currencies.
-        /// </summary>
+        /// <summary>Gets or sets the allowed currencies.</summary>
         public List<string> AllowedCurrencies
         {
             get
@@ -152,9 +120,7 @@
             }
         }
 
-        /// <summary>
-        /// Gets the status.
-        /// </summary>
+        /// <summary>Gets the status.</summary>
         public HelperServiceStatus Status
         {
             get
@@ -194,12 +160,8 @@
             return result;
         }
 
-        /// <summary>
-        /// The get currencies.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="Dictionary"/>.
-        /// </returns>
+        /// <summary>The get currencies.</summary>
+        /// <returns>The <see cref="Dictionary" />.</returns>
         public Dictionary<string, CurrencyInfo> GetCurrencies()
         {
             return new Dictionary<string, CurrencyInfo>(CurrencySymbols);
@@ -244,9 +206,7 @@
             }
         }
 
-        /// <summary>
-        /// The start.
-        /// </summary>
+        /// <summary>The start.</summary>
         public void Start()
         {
             var delay = TimeSpan.FromHours(3);
@@ -291,17 +251,13 @@
                     });
         }
 
-        /// <summary>
-        /// The stop.
-        /// </summary>
+        /// <summary>The stop.</summary>
         public void Stop()
         {
             this.Status = HelperServiceStatus.Stopping;
         }
 
-        /// <summary>
-        /// The load data.
-        /// </summary>
+        /// <summary>The load data.</summary>
         private static void LoadData()
         {
             string url = "http://finance.yahoo.com/webservice/v1/symbols/allcurrencies/quote?format=xml&random="

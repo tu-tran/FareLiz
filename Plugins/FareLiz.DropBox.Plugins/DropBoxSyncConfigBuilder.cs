@@ -3,13 +3,10 @@
 #endif
 namespace SkyDean.FareLiz.DropBox
 {
-    using System.Windows.Forms;
-
-    using log4net;
-
     using SkyDean.FareLiz.Core;
     using SkyDean.FareLiz.Core.Config;
     using SkyDean.FareLiz.Core.Utils;
+    using System.Windows.Forms;
 
     /// <summary>Helper object for configuring and authorizing DropBox account</summary>
     public class DropBoxSyncConfigBuilder : IConfigBuilder
@@ -47,7 +44,7 @@ namespace SkyDean.FareLiz.DropBox
         /// <summary>
         /// The _logger.
         /// </summary>
-        private readonly ILog _logger;
+        private readonly ILogger _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DropBoxSyncConfigBuilder"/> class.
@@ -63,7 +60,7 @@ namespace SkyDean.FareLiz.DropBox
         /// <param name="logger">
         /// The logger.
         /// </param>
-        public DropBoxSyncConfigBuilder(ILog logger)
+        public DropBoxSyncConfigBuilder(ILogger logger)
         {
             this._logger = logger;
             this._dataGrep = new DataGrep(Seed);
@@ -82,10 +79,10 @@ namespace SkyDean.FareLiz.DropBox
         {
             using (
                 var configDialog = new DropBoxConfigDialog(
-                    ApiKey, 
-                    ApiSec, 
-                    targetPlugin.Configuration as DropBoxSyncerConfig, 
-                    this._dataGrep, 
+                    ApiKey,
+                    ApiSec,
+                    targetPlugin.Configuration as DropBoxSyncerConfig,
+                    this._dataGrep,
                     this._logger))
             {
                 var result = configDialog.ShowDialog();

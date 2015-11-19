@@ -6,9 +6,7 @@
 
     using SkyDean.FareLiz.Core;
 
-    /// <summary>
-    /// The date range diff converter.
-    /// </summary>
+    /// <summary>The date range diff converter.</summary>
     public class DateRangeDiffConverter : ExpandableObjectConverter
     {
         /// <summary>

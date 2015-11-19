@@ -7,32 +7,22 @@
     using System.Linq;
     using System.Reflection;
 
-    using log4net;
-
     using SkyDean.FareLiz.Core;
     using SkyDean.FareLiz.Core.Utils;
 
     /// <summary>Helper class used for resolving installed plugins</summary>
     public sealed class AssemblyPluginResolver : IPluginResolver
     {
-        /// <summary>
-        /// The _loaded plugins.
-        /// </summary>
+        /// <summary>The _loaded plugins.</summary>
         private static readonly HashSet<Assembly> _loadedPlugins = new HashSet<Assembly>();
 
-        /// <summary>
-        /// The _logger.
-        /// </summary>
-        private readonly ILog _logger;
+        /// <summary>The _logger.</summary>
+        private readonly ILogger _logger;
 
-        /// <summary>
-        /// The _type resolver.
-        /// </summary>
+        /// <summary>The _type resolver.</summary>
         private readonly TypeResolver _typeResolver;
 
-        /// <summary>
-        /// Initializes static members of the <see cref="AssemblyPluginResolver"/> class.
-        /// </summary>
+        /// <summary>Initializes static members of the <see cref="AssemblyPluginResolver" /> class.</summary>
         static AssemblyPluginResolver()
         {
             var exeAsm = Assembly.GetExecutingAssembly();
@@ -44,9 +34,7 @@
             }
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AssemblyPluginResolver"/> class.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="AssemblyPluginResolver" /> class.</summary>
         public AssemblyPluginResolver()
         {
         }
@@ -57,15 +45,13 @@
         /// <param name="logger">
         /// The logger.
         /// </param>
-        public AssemblyPluginResolver(ILog logger)
+        public AssemblyPluginResolver(ILogger logger)
         {
             this._logger = logger;
             this._typeResolver = new TypeResolver(this._logger);
         }
 
-        /// <summary>
-        /// Gets the loaded plugins.
-        /// </summary>
+        /// <summary>Gets the loaded plugins.</summary>
         public static HashSet<Assembly> LoadedPlugins
         {
             get
@@ -74,9 +60,7 @@
             }
         }
 
-        /// <summary>
-        /// The load plugins.
-        /// </summary>
+        /// <summary>The load plugins.</summary>
         public void LoadPlugins()
         {
             string[] pluginFiles = Directory.GetFiles(
@@ -104,34 +88,22 @@
             }
         }
 
-        /// <summary>
-        /// The get archive manager types.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="IList"/>.
-        /// </returns>
+        /// <summary>The get archive manager types.</summary>
+        /// <returns>The <see cref="IList" />.</returns>
         public IList<Type> GetArchiveManagerTypes()
         {
             return this._typeResolver.GetTypes(typeof(IArchiveManager), LoadedPlugins);
         }
 
-        /// <summary>
-        /// The get fare data provider types.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="IList"/>.
-        /// </returns>
+        /// <summary>The get fare data provider types.</summary>
+        /// <returns>The <see cref="IList" />.</returns>
         public IList<Type> GetFareDataProviderTypes()
         {
             return this._typeResolver.GetTypes(typeof(IFareDataProvider));
         }
 
-        /// <summary>
-        /// The get fare database types.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="IList"/>.
-        /// </returns>
+        /// <summary>The get fare database types.</summary>
+        /// <returns>The <see cref="IList" />.</returns>
         public IList<Type> GetFareDatabaseTypes()
         {
             return this._typeResolver.GetTypes(typeof(ISyncableDatabase));

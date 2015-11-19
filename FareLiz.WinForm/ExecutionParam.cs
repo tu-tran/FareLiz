@@ -6,8 +6,6 @@
     using System.Text;
     using System.Windows.Forms;
 
-    using log4net;
-
     using SkyDean.FareLiz.Core;
     using SkyDean.FareLiz.Core.Utils;
     using SkyDean.FareLiz.Data;
@@ -15,20 +13,14 @@
     using SkyDean.FareLiz.Data.Monitoring;
     using SkyDean.FareLiz.WinForm.Properties;
 
-    /// <summary>
-    /// The execution param.
-    /// </summary>
+    /// <summary>The execution param.</summary>
     [Serializable]
     internal class ExecutionParam : ExecutionInfo
     {
-        /// <summary>
-        /// The dat e_ forma t_ param.
-        /// </summary>
+        /// <summary>The dat e_ forma t_ param.</summary>
         private const string DATE_FORMAT_PARAM = "yyyyMMdd";
 
-        /// <summary>
-        /// The switches.
-        /// </summary>
+        /// <summary>The switches.</summary>
         private static readonly SwitchForm[] switches =
             {
                 new SwitchForm("m", SwitchType.Simple, false, "Start the application minimized to tray"), 
@@ -86,19 +78,13 @@
                 // 13- Exit
             };
 
-        /// <summary>
-        /// The _exit after done.
-        /// </summary>
+        /// <summary>The _exit after done.</summary>
         private bool _exitAfterDone;
 
-        /// <summary>
-        /// The _op mode.
-        /// </summary>
+        /// <summary>The _op mode.</summary>
         private OperationMode _opMode = OperationMode.Unspecified;
 
-        /// <summary>
-        /// Gets or sets the operation mode.
-        /// </summary>
+        /// <summary>Gets or sets the operation mode.</summary>
         [DisplayName("Operation mode")]
         [Description("Opearation mode")]
         [Category("Application Settings")]
@@ -116,9 +102,7 @@
             }
         }
 
-        /// <summary>
-        /// Gets or sets a value indicating whether exit after done.
-        /// </summary>
+        /// <summary>Gets or sets a value indicating whether exit after done.</summary>
         [DisplayName("Exit after done")]
         [Description("Exit the application after everything is done")]
         [Category("Application Settings")]
@@ -136,20 +120,14 @@
             }
         }
 
-        /// <summary>
-        /// Gets or sets the config handler.
-        /// </summary>
+        /// <summary>Gets or sets the config handler.</summary>
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public IObjectPersist ConfigHandler { get; set; }
 
-        /// <summary>
-        /// The generate command line.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="string"/>.
-        /// </returns>
+        /// <summary>The generate command line.</summary>
+        /// <returns>The <see cref="string" />.</returns>
         public string GenerateCommandLine()
         {
             this.Validate();
@@ -199,9 +177,7 @@
             return str.Contains(" ") ? string.Format("\"{0}\"", str) : str;
         }
 
-        /// <summary>
-        /// The show help.
-        /// </summary>
+        /// <summary>The show help.</summary>
         public static void ShowHelp()
         {
             StringBuilder sb = new StringBuilder();
@@ -253,7 +229,7 @@
         /// </returns>
         /// <exception cref="ApplicationException">
         /// </exception>
-        public static bool Parse(string[] paramArgs, string iniFilePath, ILog logger, out ExecutionParam param)
+        public static bool Parse(string[] paramArgs, string iniFilePath, ILogger logger, out ExecutionParam param)
         {
             paramArgs = paramArgs ?? new string[0];
             var result = new ExecutionParam();
@@ -374,11 +350,8 @@
             return true;
         }
 
-        /// <summary>
-        /// The validate.
-        /// </summary>
-        /// <exception cref="ApplicationException">
-        /// </exception>
+        /// <summary>The validate.</summary>
+        /// <exception cref="ApplicationException"></exception>
         public void Validate()
         {
             if (this.OperationMode != OperationMode.Unspecified)

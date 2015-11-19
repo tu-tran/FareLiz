@@ -8,19 +8,13 @@
     using SkyDean.FareLiz.WinForm.Components.Dialog;
     using SkyDean.FareLiz.WinForm.Properties;
 
-    /// <summary>
-    /// The intro form.
-    /// </summary>
+    /// <summary>The intro form.</summary>
     public partial class IntroForm : SmartForm
     {
-        /// <summary>
-        /// The _is navigate.
-        /// </summary>
+        /// <summary>The _is navigate.</summary>
         private bool _isNavigate;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="IntroForm"/> class.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="IntroForm" /> class.</summary>
         public IntroForm()
         {
             this.InitializeComponent();

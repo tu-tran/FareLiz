@@ -13,7 +13,7 @@
     public class ProtoBufTransfer
     {
         /// <summary>The _logger.</summary>
-        private readonly ILog _logger;
+        private readonly ILogger _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProtoBufTransfer"/> class.
@@ -21,7 +21,7 @@
         /// <param name="logger">
         /// The logger.
         /// </param>
-        public ProtoBufTransfer(ILog logger)
+        public ProtoBufTransfer(ILogger logger)
         {
             this._logger = logger;
         }

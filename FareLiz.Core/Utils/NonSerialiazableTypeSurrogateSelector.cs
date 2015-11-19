@@ -14,7 +14,7 @@
         private const BindingFlags BINDING_FLAG = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
         /// <summary>The _logger.</summary>
-        private readonly ILog _logger;
+        private readonly ILogger _logger;
 
         /// <summary>The _type resolver.</summary>
         private readonly TypeResolver _typeResolver;
@@ -28,7 +28,7 @@
         /// <param name="logger">
         /// The logger.
         /// </param>
-        public NonSerialiazableTypeSurrogateSelector(ILog logger)
+        public NonSerialiazableTypeSurrogateSelector(ILogger logger)
         {
             this._logger = logger;
             this._typeResolver = new TypeResolver(this._logger);

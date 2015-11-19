@@ -7,14 +7,10 @@
     using SkyDean.FareLiz.WinForm.Components.Dialog;
     using SkyDean.FareLiz.WinForm.Components.Utils;
 
-    /// <summary>
-    /// The about form.
-    /// </summary>
+    /// <summary>The about form.</summary>
     public sealed partial class AboutForm : SmartForm
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AboutForm"/> class.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="AboutForm" /> class.</summary>
         public AboutForm()
         {
             this.InitializeComponent();

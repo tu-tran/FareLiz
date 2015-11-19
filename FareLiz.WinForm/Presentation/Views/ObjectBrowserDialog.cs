@@ -2,29 +2,19 @@
 {
     using System;
 
-    using log4net;
-
     using SkyDean.FareLiz.Core.Utils;
     using SkyDean.FareLiz.WinForm.Components.Dialog;
 
-    /// <summary>
-    /// The object browser dialog.
-    /// </summary>
+    /// <summary>The object browser dialog.</summary>
     public partial class ObjectBrowserDialog : SmartForm
     {
-        /// <summary>
-        /// The _default object.
-        /// </summary>
+        /// <summary>The _default object.</summary>
         private readonly object _defaultObject;
 
-        /// <summary>
-        /// The _logger.
-        /// </summary>
-        private readonly ILog _logger;
+        /// <summary>The _logger.</summary>
+        private readonly ILogger _logger;
 
-        /// <summary>
-        /// The _original object.
-        /// </summary>
+        /// <summary>The _original object.</summary>
         private readonly object _originalObject;
 
         /// <summary>
@@ -42,7 +32,7 @@
         /// <param name="logger">
         /// The logger.
         /// </param>
-        public ObjectBrowserDialog(string title, object targetObject, object defaultObject, ILog logger)
+        public ObjectBrowserDialog(string title, object targetObject, object defaultObject, ILogger logger)
         {
             this.InitializeComponent();
             this._originalObject = targetObject;
@@ -54,9 +44,7 @@
             this.btnResetDefault.Visible = this._defaultObject != null;
         }
 
-        /// <summary>
-        /// Gets the result object.
-        /// </summary>
+        /// <summary>Gets the result object.</summary>
         public object ResultObject
         {
             get

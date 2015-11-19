@@ -7,9 +7,7 @@
     using SkyDean.FareLiz.Core.Utils;
     using SkyDean.FareLiz.Service;
 
-    /// <summary>
-    /// The program.
-    /// </summary>
+    /// <summary>The program.</summary>
     internal static class Program
     {
         /// <summary>

@@ -15,29 +15,19 @@
     using SkyDean.FareLiz.WinForm.Data;
     using SkyDean.FareLiz.WinForm.Presentation.Views;
 
-    /// <summary>
-    /// The check fare controller.
-    /// </summary>
+    /// <summary>The check fare controller.</summary>
     internal sealed class CheckFareController
     {
-        /// <summary>
-        /// The _live fare storage.
-        /// </summary>
+        /// <summary>The _live fare storage.</summary>
         private readonly LiveFareFileStorage _liveFareStorage;
 
-        /// <summary>
-        /// The _monitors.
-        /// </summary>
+        /// <summary>The _monitors.</summary>
         private readonly AggeratingFareRequestMonitor _monitors;
 
-        /// <summary>
-        /// The _execution param.
-        /// </summary>
+        /// <summary>The _execution param.</summary>
         private ExecutionParam _executionParam;
 
-        /// <summary>
-        /// The events.
-        /// </summary>
+        /// <summary>The events.</summary>
         internal CheckFareEvents Events = new CheckFareEvents();
 
         /// <summary>
@@ -54,17 +44,11 @@
             this._monitors = new AggeratingFareRequestMonitor();
         }
 
-        /// <summary>
-        /// Gets or sets the view.
-        /// </summary>
+        /// <summary>Gets or sets the view.</summary>
         public CheckFareForm View { get; set; }
 
-        /// <summary>
-        /// Get list of fare scanning requests based on the condition specified on the view
-        /// </summary>
-        /// <returns>
-        /// The <see cref="List"/>.
-        /// </returns>
+        /// <summary>Get list of fare scanning requests based on the condition specified on the view</summary>
+        /// <returns>The <see cref="List" />.</returns>
         internal List<FareMonitorRequest> GetRequests()
         {
             int minDuration = this.View.MinDuration;
@@ -213,9 +197,9 @@
                 else
                 {
                     string period = this.View.MinDuration == this.View.MaxDuration
-                                         ? this.View.MinDuration.ToString(CultureInfo.InvariantCulture)
-                                         : this.View.MinDuration.ToString(CultureInfo.InvariantCulture) + " and "
-                                           + this.View.MaxDuration.ToString(CultureInfo.InvariantCulture);
+                                        ? this.View.MinDuration.ToString(CultureInfo.InvariantCulture)
+                                        : this.View.MinDuration.ToString(CultureInfo.InvariantCulture) + " and "
+                                          + this.View.MaxDuration.ToString(CultureInfo.InvariantCulture);
 
                     string message =
                         string.Format(
@@ -241,17 +225,13 @@ Double-check the filter conditions and make sure that not all travel dates are i
             return newMon;
         }
 
-        /// <summary>
-        /// The show live fare.
-        /// </summary>
+        /// <summary>The show live fare.</summary>
         internal void ShowLiveFare()
         {
             new LiveFareDataForm(this._liveFareStorage).ShowDialog(this.View);
         }
 
-        /// <summary>
-        /// The clear monitors.
-        /// </summary>
+        /// <summary>The clear monitors.</summary>
         internal void ClearMonitors()
         {
             this._monitors.Clear();

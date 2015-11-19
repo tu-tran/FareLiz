@@ -2,27 +2,20 @@
 {
     using System;
 
-    using log4net;
-
     using SkyDean.FareLiz.Core;
+    using SkyDean.FareLiz.Core.Utils;
     using SkyDean.FareLiz.Service.LiveUpdate;
     using SkyDean.FareLiz.WinForm.Components.Dialog;
     using SkyDean.FareLiz.WinForm.Data;
     using SkyDean.FareLiz.WinForm.Properties;
 
-    /// <summary>
-    /// The win form global context.
-    /// </summary>
+    /// <summary>The win form global context.</summary>
     internal class WinFormGlobalContext : AppContext
     {
-        /// <summary>
-        /// The _instance.
-        /// </summary>
+        /// <summary>The _instance.</summary>
         private static WinFormGlobalContext _instance;
 
-        /// <summary>
-        /// The _is first start set.
-        /// </summary>
+        /// <summary>The _is first start set.</summary>
         private static bool _isFirstStartSet;
 
         /// <summary>
@@ -31,21 +24,17 @@
         /// <param name="logger">
         /// The logger.
         /// </param>
-        private WinFormGlobalContext(ILog logger)
+        private WinFormGlobalContext(ILogger logger)
         {
             this._logger = logger;
             this._progressCallback = new ProgressDialog();
         }
 
-        /// <summary>
-        /// The get instance.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="WinFormGlobalContext"/>.
-        /// </returns>
+        /// <summary>The get instance.</summary>
+        /// <returns>The <see cref="WinFormGlobalContext" />.</returns>
         internal static WinFormGlobalContext GetInstance()
         {
-            return GetInstance(LogManager.GetLogger("WinFormGlobalContext"));
+            return GetInstance(LogUtil.GetLogger("WinFormGlobalContext"));
         }
 
         /// <summary>
@@ -59,7 +48,7 @@
         /// </returns>
         /// <exception cref="ArgumentException">
         /// </exception>
-        internal static WinFormGlobalContext GetInstance(ILog logger)
+        internal static WinFormGlobalContext GetInstance(ILogger logger)
         {
             if (logger == null)
             {

@@ -6,8 +6,6 @@
     using System.Threading;
     using System.Windows.Forms;
 
-    using log4net;
-
     using SkyDean.FareLiz.Core;
     using SkyDean.FareLiz.Core.Data;
     using SkyDean.FareLiz.Core.Utils;
@@ -21,99 +19,61 @@
     using SkyDean.FareLiz.WinForm.Presentation.Controllers;
     using SkyDean.FareLiz.WinForm.Utils;
 
-    /// <summary>
-    /// The flight statistic form.
-    /// </summary>
+    /// <summary>The flight statistic form.</summary>
     internal sealed partial class FlightStatisticForm : SmartForm
     {
-        /// <summary>
-        /// The st r_ forma t_ dat e_ combo.
-        /// </summary>
+        /// <summary>The st r_ forma t_ dat e_ combo.</summary>
         private const string STR_FORMAT_DATE_COMBO = "dd/MM/yyyy ddd";
 
-        /// <summary>
-        /// The st r_ on e_ way.
-        /// </summary>
+        /// <summary>The st r_ on e_ way.</summary>
         private const string STR_ONE_WAY = "One-way trip";
 
-        /// <summary>
-        /// The _is main form.
-        /// </summary>
+        /// <summary>The _is main form.</summary>
         private readonly bool _isMainForm;
 
-        /// <summary>
-        /// The _lock obj.
-        /// </summary>
+        /// <summary>The _lock obj.</summary>
         private readonly object _lockObj = new object();
 
-        /// <summary>
-        /// The mnu check this date.
-        /// </summary>
+        /// <summary>The mnu check this date.</summary>
         private readonly ToolStripMenuItem mnuCheckThisDate = new ToolStripMenuItem("Check latest fare for this travel date");
 
-        /// <summary>
-        /// The mnu separator.
-        /// </summary>
+        /// <summary>The mnu separator.</summary>
         private readonly ToolStripSeparator mnuSeparator = new ToolStripSeparator();
 
-        /// <summary>
-        /// The mnu view this date.
-        /// </summary>
+        /// <summary>The mnu view this date.</summary>
         private readonly ToolStripMenuItem mnuViewThisDate = new ToolStripMenuItem("View fare history for this travel date");
 
-        /// <summary>
-        /// The _active route.
-        /// </summary>
+        /// <summary>The _active route.</summary>
         private TravelRoute _activeRoute;
 
-        /// <summary>
-        /// The _changing location.
-        /// </summary>
+        /// <summary>The _changing location.</summary>
         private bool _changingLocation;
 
-        /// <summary>
-        /// The _execution param.
-        /// </summary>
+        /// <summary>The _execution param.</summary>
         private ExecutionParam _executionParam;
 
-        /// <summary>
-        /// The _exiting.
-        /// </summary>
+        /// <summary>The _exiting.</summary>
         private bool _exiting;
 
-        /// <summary>
-        /// The _first close.
-        /// </summary>
+        /// <summary>The _first close.</summary>
         private bool _firstClose = true;
 
-        /// <summary>
-        /// The _form loaded.
-        /// </summary>
+        /// <summary>The _form loaded.</summary>
         private bool _formLoaded;
 
-        /// <summary>
-        /// The _loading routes.
-        /// </summary>
+        /// <summary>The _loading routes.</summary>
         private bool _loadingRoutes;
 
-        /// <summary>
-        /// The _lv change request date.
-        /// </summary>
+        /// <summary>The _lv change request date.</summary>
         private DateTime _lvChangeRequestDate;
 
-        /// <summary>
-        /// The _lv change requested.
-        /// </summary>
+        /// <summary>The _lv change requested.</summary>
         private bool _lvChangeRequested;
 
-        /// <summary>
-        /// The _route data.
-        /// </summary>
+        /// <summary>The _route data.</summary>
         private IList<TravelRoute> _routeData;
 
-        /// <summary>
-        /// The _suppress refresh data view.
-        /// </summary>
+        /// <summary>The _suppress refresh data view.</summary>
         private bool _suppressRefreshDataView;
 
         /// <summary>
@@ -143,9 +103,7 @@
             this.InitializeView();
         }
 
-        /// <summary>
-        /// Gets the fare data provider.
-        /// </summary>
+        /// <summary>Gets the fare data provider.</summary>
         public IFareDataProvider FareDataProvider
         {
             get
@@ -154,9 +112,7 @@
             }
         }
 
-        /// <summary>
-        /// Gets the archive manager.
-        /// </summary>
+        /// <summary>Gets the archive manager.</summary>
         public IArchiveManager ArchiveManager
         {
             get
@@ -165,9 +121,7 @@
             }
         }
 
-        /// <summary>
-        /// Gets the fare database.
-        /// </summary>
+        /// <summary>Gets the fare database.</summary>
         public IFareDatabase FareDatabase
         {
             get
@@ -176,10 +130,8 @@
             }
         }
 
-        /// <summary>
-        /// Gets the logger.
-        /// </summary>
-        public ILog Logger
+        /// <summary>Gets the logger.</summary>
+        public ILogger Logger
         {
             get
             {
@@ -187,9 +139,7 @@
             }
         }
 
-        /// <summary>
-        /// The initialize view.
-        /// </summary>
+        /// <summary>The initialize view.</summary>
         private void InitializeView()
         {
             this.trayIcon.Visible = this._isMainForm;
@@ -903,12 +853,8 @@
                 this._isMainForm);
         }
 
-        /// <summary>
-        /// Read the current filter based on the view
-        /// </summary>
-        /// <returns>
-        /// The <see cref="FilterCondition"/>.
-        /// </returns>
+        /// <summary>Read the current filter based on the view</summary>
+        /// <returns>The <see cref="FilterCondition" />.</returns>
         private FilterCondition ReadFilter()
         {
             DateTime departureDate = string.IsNullOrEmpty(this.cbDepartureDate.Text)
@@ -972,9 +918,7 @@
             g.Show(this);
         }
 
-        /// <summary>
-        /// The reload routes.
-        /// </summary>
+        /// <summary>The reload routes.</summary>
         private void ReloadRoutes()
         {
             if (this._isMainForm && this.FareDatabase == null)
@@ -1210,9 +1154,7 @@
             base.WndProc(ref message);
         }
 
-        /// <summary>
-        /// The show window.
-        /// </summary>
+        /// <summary>The show window.</summary>
         public void ShowWindow()
         {
             NativeMethods.ShowToFront(this.Handle);

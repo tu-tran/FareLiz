@@ -1,15 +1,12 @@
 ﻿namespace SkyDean.FareLiz.Service.Utils
 {
+    using SkyDean.FareLiz.Core.Utils;
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Net;
     using System.Text;
     using System.Threading;
-
-    using log4net;
-
-    using SkyDean.FareLiz.Core.Utils;
 
     /// <summary>Provides easy access to common operations against FTP servers</summary>
     public class FtpClient
@@ -47,7 +44,7 @@
         /// <param name="password">
         /// The password.
         /// </param>
-        public FtpClient(ILog logger, string host, int port, string proxyHost, int proxyPort, string userName, string password)
+        public FtpClient(ILogger logger, string host, int port, string proxyHost, int proxyPort, string userName, string password)
             : this()
         {
             this.Logger = logger;
@@ -62,7 +59,7 @@
         /// <summary>
         /// Gets or sets the logger.
         /// </summary>
-        public ILog Logger { get; set; }
+        public ILogger Logger { get; set; }
 
         /// <summary>
         /// Gets or sets the host.

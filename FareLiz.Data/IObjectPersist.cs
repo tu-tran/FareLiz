@@ -1,6 +1,6 @@
 ﻿namespace SkyDean.FareLiz.Data
 {
-    using log4net;
+    using SkyDean.FareLiz.Core.Utils;
 
     /// <summary>
     /// The ObjectPersist interface.
@@ -10,7 +10,7 @@
         /// <summary>
         /// Gets or sets the logger.
         /// </summary>
-        ILog Logger { get; set; }
+        ILogger Logger { get; set; }
 
         /// <summary>
         /// The apply data.

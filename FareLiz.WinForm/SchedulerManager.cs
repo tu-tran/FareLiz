@@ -5,20 +5,14 @@
     using System.IO;
     using System.Reflection;
 
-    using log4net;
-
     using Microsoft.Win32.TaskScheduler;
 
     using SkyDean.FareLiz.Core.Utils;
 
-    /// <summary>
-    /// The schedule item.
-    /// </summary>
+    /// <summary>The schedule item.</summary>
     internal class ScheduleItem
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ScheduleItem"/> class.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="ScheduleItem" /> class.</summary>
         public ScheduleItem()
         {
         }
@@ -59,46 +53,30 @@
             this.CreatedName = createdName;
         }
 
-        /// <summary>
-        /// Gets or sets the setting.
-        /// </summary>
+        /// <summary>Gets or sets the setting.</summary>
         public SchedulerSetting Setting { get; set; }
 
-        /// <summary>
-        /// Gets or sets the parameters.
-        /// </summary>
+        /// <summary>Gets or sets the parameters.</summary>
         public ExecutionParam Parameters { get; set; }
 
-        /// <summary>
-        /// Gets or sets a value indicating whether is created.
-        /// </summary>
+        /// <summary>Gets or sets a value indicating whether is created.</summary>
         public bool IsCreated { get; set; }
 
-        /// <summary>
-        /// Gets or sets a value indicating whether is dirty.
-        /// </summary>
+        /// <summary>Gets or sets a value indicating whether is dirty.</summary>
         public bool IsDirty { get; set; }
 
-        /// <summary>
-        /// Gets or sets the created name.
-        /// </summary>
+        /// <summary>Gets or sets the created name.</summary>
         public string CreatedName { get; set; }
     }
 
-    /// <summary>
-    /// The scheduler manager.
-    /// </summary>
+    /// <summary>The scheduler manager.</summary>
     internal sealed class SchedulerManager
     {
-        /// <summary>
-        /// The current exe.
-        /// </summary>
+        /// <summary>The current exe.</summary>
         public static readonly string CurrentExe = Assembly.GetEntryAssembly().Location;
 
-        /// <summary>
-        /// The _logger.
-        /// </summary>
-        private readonly ILog _logger;
+        /// <summary>The _logger.</summary>
+        private readonly ILogger _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SchedulerManager"/> class.
@@ -106,17 +84,13 @@
         /// <param name="logger">
         /// The logger.
         /// </param>
-        internal SchedulerManager(ILog logger)
+        internal SchedulerManager(ILogger logger)
         {
             this._logger = logger;
         }
 
-        /// <summary>
-        /// The get scheduled tasks.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="List"/>.
-        /// </returns>
+        /// <summary>The get scheduled tasks.</summary>
+        /// <returns>The <see cref="List" />.</returns>
         public List<ScheduleItem> GetScheduledTasks()
         {
             var result = new List<ScheduleItem>();
@@ -219,15 +193,15 @@
                     item.Parameters.DepartureDateRange.Plus, 
                     item.Parameters.DepartureDateRange.Minus);
                 string retRangeStr = item.Parameters.ReturnDate.IsUndefined()
-                                          ? null
-                                          : string.Format(
-                                              "{0}(+{1} -{2})", 
-                                              item.Parameters.ReturnDate.ToShortDayAndDateString(), 
-                                              item.Parameters.ReturnDateRange.Plus, 
-                                              item.Parameters.ReturnDateRange.Minus);
+                                         ? null
+                                         : string.Format(
+                                             "{0}(+{1} -{2})", 
+                                             item.Parameters.ReturnDate.ToShortDayAndDateString(), 
+                                             item.Parameters.ReturnDateRange.Plus, 
+                                             item.Parameters.ReturnDateRange.Minus);
                 string stayDurationStr = item.Parameters.ReturnDate.IsUndefined()
-                                              ? "0"
-                                              : item.Parameters.MinStayDuration + " <-> " + item.Parameters.MaxStayDuration;
+                                             ? "0"
+                                             : item.Parameters.MinStayDuration + " <-> " + item.Parameters.MaxStayDuration;
 
                 td.RegistrationInfo.Description = string.Format(
                     @"{0} {1} | 

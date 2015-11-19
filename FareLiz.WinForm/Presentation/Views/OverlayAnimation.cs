@@ -9,59 +9,38 @@
     /// <summary>Provide overlay form with animating arrow</summary>
     public partial class OverlayAnimation : Form
     {
-        /// <summary>
-        /// The _script.
-        /// </summary>
+        /// <summary>The _script.</summary>
         private readonly IDictionary<Control, string> _script;
 
-        /// <summary>
-        /// The _border.
-        /// </summary>
+        /// <summary>The _border.</summary>
         private int _border = 5;
 
-        /// <summary>
-        /// The _border step.
-        /// </summary>
+        /// <summary>The _border step.</summary>
         private int _borderStep = 1;
 
-        /// <summary>
-        /// The _control rect.
-        /// </summary>
+        /// <summary>The _control rect.</summary>
         private Rectangle _controlRect;
 
-        /// <summary>
-        /// The _cur border.
-        /// </summary>
+        /// <summary>The _cur border.</summary>
         private int _curBorder;
 
-        /// <summary>
-        /// The _host control.
-        /// </summary>
+        /// <summary>The _host control.</summary>
         private Control _hostControl;
 
-        /// <summary>
-        /// The _img offset.
-        /// </summary>
+        /// <summary>The _img offset.</summary>
         private int _imgOffset = 30;
 
-        /// <summary>
-        /// The _img step.
-        /// </summary>
+        /// <summary>The _img step.</summary>
         private int _imgStep = 1;
 
-        /// <summary>
-        /// The _img top limit.
-        /// </summary>
+        /// <summary>The _img top limit.</summary>
         private int _imgTopLimit;
 
-        /// <summary>
-        /// The _parent form.
-        /// </summary>
+        /// <summary>The _parent form.</summary>
         private Form _parentForm;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OverlayAnimation"/> class. 
-        /// Initialize a new instance of overlay animator form with the scripts
+        /// Initializes a new instance of the <see cref="OverlayAnimation"/> class. Initialize a new instance of overlay animator form with the scripts
         /// </summary>
         /// <param name="script">
         /// The script.

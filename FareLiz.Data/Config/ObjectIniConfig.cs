@@ -1,12 +1,9 @@
 ﻿namespace SkyDean.FareLiz.Data.Config
 {
+    using SkyDean.FareLiz.Core.Utils;
     using System;
     using System.IO;
     using System.Reflection;
-
-    using log4net;
-
-    using SkyDean.FareLiz.Core.Utils;
 
     /// <summary>Class for storing object data in INI Config file</summary>
     public class ObjectIniConfig : IniConfig, IObjectPersist
@@ -27,7 +24,7 @@
         /// </param>
         /// <exception cref="ArgumentException">
         /// </exception>
-        public ObjectIniConfig(string filePath, ILog logger)
+        public ObjectIniConfig(string filePath, ILogger logger)
         {
             if (string.IsNullOrEmpty(filePath))
             {
@@ -46,7 +43,7 @@
         /// <summary>
         /// Gets or sets the logger.
         /// </summary>
-        public ILog Logger { get; set; }
+        public ILogger Logger { get; set; }
 
         /// <summary>
         /// The apply data.
@@ -98,11 +95,11 @@
                                 catch (Exception ex)
                                 {
                                     this.Logger.WarnFormat(
-                                        "Failed to load INI config [{0}][{1}] [{2}][{3}]: {4}", 
-                                        type.Name, 
-                                        prop.Name, 
-                                        prop.PropertyType.Name, 
-                                        storedValue, 
+                                        "Failed to load INI config [{0}][{1}] [{2}][{3}]: {4}",
+                                        type.Name,
+                                        prop.Name,
+                                        prop.PropertyType.Name,
+                                        storedValue,
                                         ex.Message);
                                 }
                             }

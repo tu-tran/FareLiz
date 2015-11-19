@@ -4,8 +4,6 @@
     using System.IO;
     using System.Windows.Forms;
 
-    using log4net;
-
     using SkyDean.FareLiz.Core;
     using SkyDean.FareLiz.Core.Utils;
     using SkyDean.FareLiz.Data.Config;
@@ -14,30 +12,20 @@
     using SkyDean.FareLiz.WinForm.Presentation.Views;
     using SkyDean.FareLiz.WinForm.Utils;
 
-    /// <summary>
-    /// The boot strap.
-    /// </summary>
+    /// <summary>The boot strap.</summary>
     internal class BootStrap
     {
-        /// <summary>
-        /// The en v_ confi g_ filename.
-        /// </summary>
+        /// <summary>The en v_ confi g_ filename.</summary>
         private readonly string ENV_CONFIG_FILENAME = "Environment.bin";
 
-        /// <summary>
-        /// The gu i_ in i_ filename.
-        /// </summary>
+        /// <summary>The gu i_ in i_ filename.</summary>
         private readonly string GUI_INI_FILENAME = AppUtil.ProductName + ".ini";
 
-        /// <summary>
-        /// The histor y_ filename.
-        /// </summary>
+        /// <summary>The histor y_ filename.</summary>
         private readonly string HISTORY_FILENAME = "History.txt";
 
-        /// <summary>
-        /// The logger.
-        /// </summary>
-        private readonly ILog Logger;
+        /// <summary>The logger.</summary>
+        private readonly ILogger Logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BootStrap"/> class.
@@ -47,7 +35,7 @@
         /// </param>
         /// <exception cref="ArgumentException">
         /// </exception>
-        internal BootStrap(ILog logger)
+        internal BootStrap(ILogger logger)
         {
             if (logger == null)
             {
@@ -176,9 +164,7 @@
             return env;
         }
 
-        /// <summary>
-        /// The mute application volume.
-        /// </summary>
+        /// <summary>The mute application volume.</summary>
         private void MuteApplicationVolume()
         {
             try

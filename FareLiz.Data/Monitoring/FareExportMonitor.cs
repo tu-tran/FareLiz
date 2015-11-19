@@ -4,8 +4,6 @@
     using System.Collections.Generic;
     using System.IO;
 
-    using log4net;
-
     using SkyDean.FareLiz.Core;
     using SkyDean.FareLiz.Core.Data;
     using SkyDean.FareLiz.Core.Presentation;
@@ -42,7 +40,7 @@
         /// <summary>
         /// The _logger.
         /// </summary>
-        private readonly ILog _logger;
+        private readonly ILogger _logger;
 
         /// <summary>
         /// The _lock obj.

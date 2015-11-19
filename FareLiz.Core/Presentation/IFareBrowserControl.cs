@@ -5,6 +5,7 @@ namespace SkyDean.FareLiz.Core.Presentation
     using log4net;
 
     using SkyDean.FareLiz.Core.Data;
+    using SkyDean.FareLiz.Core.Utils;
 
     /// <summary>The journey browser delegate.</summary>
     /// <param name="sender">The sender.</param>
@@ -36,7 +37,7 @@ namespace SkyDean.FareLiz.Core.Presentation
         Exception LastException { get; }
 
         /// <summary>Gets the logger.</summary>
-        ILog Logger { get; }
+        ILogger Logger { get; }
 
         /// <summary>Gets the last retrieved route.</summary>
         TravelRoute LastRetrievedRoute { get; }

@@ -1,11 +1,8 @@
 ﻿namespace SkyDean.FareLiz.Service
 {
+    using SkyDean.FareLiz.Core.Utils;
     using System;
     using System.Windows.Forms;
-
-    using log4net;
-
-    using SkyDean.FareLiz.Core.Utils;
 
     /// <summary>
     /// The program.
@@ -66,7 +63,7 @@
         /// <returns>
         /// The <see cref="IServiceRunner"/>.
         /// </returns>
-        private static IServiceRunner GetService(string name, ILog logger)
+        private static IServiceRunner GetService(string name, ILogger logger)
         {
             var targetType = Type.GetType(name);
             if (targetType == null)

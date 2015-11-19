@@ -1,6 +1,6 @@
 ﻿namespace SkyDean.FareLiz.Service.LiveUpdate
 {
-    using log4net;
+    using SkyDean.FareLiz.Core.Utils;
 
     /// <summary>Interface for retrieving the distributed versions</summary>
     public interface IVersionRetriever
@@ -12,7 +12,7 @@
         string PublisherName { get; }
 
         /// <summary>The logger</summary>
-        ILog Logger { get; set; }
+        ILogger Logger { get; set; }
 
         /// <summary>
         /// Get current version of the product (which is running or installed)

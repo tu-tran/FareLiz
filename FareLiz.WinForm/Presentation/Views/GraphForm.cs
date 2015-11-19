@@ -12,29 +12,19 @@ namespace SkyDean.FareLiz.WinForm.Presentation.Views
     using SkyDean.FareLiz.WinForm.Components.Controls.ListView;
     using SkyDean.FareLiz.WinForm.Components.Dialog;
 
-    /// <summary>
-    /// The graph form.
-    /// </summary>
+    /// <summary>The graph form.</summary>
     internal partial class GraphForm : SmartForm
     {
-        /// <summary>
-        /// The _graph data.
-        /// </summary>
+        /// <summary>The _graph data.</summary>
         private readonly Dictionary<Journey, PointPairList> _graphData = new Dictionary<Journey, PointPairList>();
 
-        /// <summary>
-        /// The _hidden curves.
-        /// </summary>
+        /// <summary>The _hidden curves.</summary>
         private readonly CurveList _hiddenCurves = new CurveList();
 
-        /// <summary>
-        /// The _journey data.
-        /// </summary>
+        /// <summary>The _journey data.</summary>
         private readonly IEnumerable<Journey> _journeyData;
 
-        /// <summary>
-        /// The _suppress draw.
-        /// </summary>
+        /// <summary>The _suppress draw.</summary>
         private bool _suppressDraw;
 
         /// <summary>
@@ -56,9 +46,7 @@ namespace SkyDean.FareLiz.WinForm.Presentation.Views
             this.lvTravelPeriod.ItemCheck += this.lvFilter_ItemCheck;
         }
 
-        /// <summary>
-        /// The initialize view.
-        /// </summary>
+        /// <summary>The initialize view.</summary>
         private void InitializeView()
         {
             GraphPane graphPane = this.graph.GraphPane;
@@ -85,9 +73,7 @@ namespace SkyDean.FareLiz.WinForm.Presentation.Views
             this.PopulateData();
         }
 
-        /// <summary>
-        /// The populate data.
-        /// </summary>
+        /// <summary>The populate data.</summary>
         private void PopulateData()
         {
             Dictionary<string, object> travelPeriod = new Dictionary<string, object>();
@@ -125,9 +111,7 @@ namespace SkyDean.FareLiz.WinForm.Presentation.Views
             this.PopulateListView(dataDate, this.lvDataDate, true);
         }
 
-        /// <summary>
-        /// The render graph.
-        /// </summary>
+        /// <summary>The render graph.</summary>
         private void RenderGraph()
         {
             GraphPane graphPane = this.graph.GraphPane;
@@ -328,9 +312,7 @@ namespace SkyDean.FareLiz.WinForm.Presentation.Views
             }
         }
 
-        /// <summary>
-        /// The refresh graph.
-        /// </summary>
+        /// <summary>The refresh graph.</summary>
         private void RefreshGraph()
         {
             this.graph.RestoreScale(this.graph.GraphPane);
@@ -456,9 +438,7 @@ namespace SkyDean.FareLiz.WinForm.Presentation.Views
         }
     }
 
-    /// <summary>
-    /// The date comparer.
-    /// </summary>
+    /// <summary>The date comparer.</summary>
     internal class DateComparer : ListViewColumnSorter
     {
         /// <summary>
@@ -481,9 +461,7 @@ namespace SkyDean.FareLiz.WinForm.Presentation.Views
         }
     }
 
-    /// <summary>
-    /// The travel period compare.
-    /// </summary>
+    /// <summary>The travel period compare.</summary>
     internal class TravelPeriodCompare : ListViewColumnSorter
     {
         /// <summary>

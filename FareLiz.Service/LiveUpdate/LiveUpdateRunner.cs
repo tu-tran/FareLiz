@@ -1,16 +1,13 @@
 ﻿namespace SkyDean.FareLiz.Service.LiveUpdate
 {
+    using SkyDean.FareLiz.Core.Utils;
+    using SkyDean.FareLiz.Service.Utils;
+    using SkyDean.FareLiz.WinForm.Components.Dialog;
     using System;
     using System.Diagnostics;
     using System.IO;
     using System.Reflection;
     using System.Windows.Forms;
-
-    using log4net;
-
-    using SkyDean.FareLiz.Core.Utils;
-    using SkyDean.FareLiz.Service.Utils;
-    using SkyDean.FareLiz.WinForm.Components.Dialog;
 
     /// <summary>
     /// This class plays the role of a third party application: It will update another application and restart it later on. In order to make use of this
@@ -26,7 +23,7 @@
         /// <summary>
         /// The _logger.
         /// </summary>
-        private readonly ILog _logger;
+        private readonly ILogger _logger;
 
         /// <summary>
         /// The _param.
@@ -42,7 +39,7 @@
         /// <param name="logger">
         /// The logger.
         /// </param>
-        public LiveUpdateRunner(UpdateParameter parameters, ILog logger)
+        public LiveUpdateRunner(UpdateParameter parameters, ILogger logger)
         {
             this._param = parameters;
             this._logger = logger;
@@ -53,42 +50,42 @@
         {
             this._logger.Info("Applying updates...");
             ProgressDialog.ExecuteTask(
-                null, 
-                "Applying Updates", 
-                "Please wait...", 
-                "ApplyUpdate", 
-                ProgressBarStyle.Marquee, 
-                this._logger, 
+                null,
+                "Applying Updates",
+                "Please wait...",
+                "ApplyUpdate",
+                ProgressBarStyle.Marquee,
+                this._logger,
                 callback =>
-                    {
-                        callback.Begin();
+                {
+                    callback.Begin();
 
-                        // First, kill the running process
-                        this._logger.DebugFormat("Killing process [{0}]...", this._param.ProcessToEnd);
-                        callback.Text = "Closing active application...";
-                        ProcessUtils.KillProcess(this._param.ProcessToEnd, 3, 3);
+                    // First, kill the running process
+                    this._logger.DebugFormat("Killing process [{0}]...", this._param.ProcessToEnd);
+                    callback.Text = "Closing active application...";
+                    ProcessUtils.KillProcess(this._param.ProcessToEnd, 3, 3);
 
-                        callback.Text = "Applying updates...";
-                        IOUtils.CopyFolder(this._param.PackageLocation, this._param.TargetUpdatePath, true, false);
-                        IOUtils.DeleteDirectory(this._param.PackageLocation); // Clean package folder
-                    }, 
+                    callback.Text = "Applying updates...";
+                    IOUtils.CopyFolder(this._param.PackageLocation, this._param.TargetUpdatePath, true, false);
+                    IOUtils.DeleteDirectory(this._param.PackageLocation); // Clean package folder
+                },
 
                 // Handle exception delegate
                 (callback, ex) =>
-                    {
-                        this.HandleException(ex);
-                        string message = "Update failed! Restoring application backup...";
-                        this._logger.Error(message);
-                        callback.Text = message;
-                        IOUtils.CopyFolder(this._param.BackupPath, this._param.TargetUpdatePath, true, false);
-                    }, 
+                {
+                    this.HandleException(ex);
+                    string message = "Update failed! Restoring application backup...";
+                    this._logger.Error(message);
+                    callback.Text = message;
+                    IOUtils.CopyFolder(this._param.BackupPath, this._param.TargetUpdatePath, true, false);
+                },
 
                 // Final delegate
                 (callback, ex) =>
-                    {
-                        this._logger.Info("Live Update ended. Running post-process...");
-                        this.StartPostProcess();
-                    });
+                {
+                    this._logger.Info("Live Update ended. Running post-process...");
+                    this.StartPostProcess();
+                });
         }
 
         /// <summary>
@@ -137,7 +134,7 @@
             var cmdLine = parameters.ToCommandLine();
             var startInfo = new ProcessStartInfo(runnerPath, typeof(LiveUpdateService) + " " + cmdLine) { UseShellExecute = false };
 
-                // Signal that we want to use LiveUpdateService
+            // Signal that we want to use LiveUpdateService
             return startInfo;
         }
     }

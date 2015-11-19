@@ -1,18 +1,15 @@
 ﻿namespace SkyDean.FareLiz.Service.LiveUpdate
 {
+    using SkyDean.FareLiz.Core;
+    using SkyDean.FareLiz.Core.Config;
+    using SkyDean.FareLiz.Core.Utils;
+    using SkyDean.FareLiz.Service.Versioning;
     using System;
     using System.Collections.Generic;
     using System.Drawing;
     using System.Threading;
     using System.Timers;
     using System.Windows.Forms;
-
-    using log4net;
-
-    using SkyDean.FareLiz.Core;
-    using SkyDean.FareLiz.Core.Config;
-    using SkyDean.FareLiz.Service.Versioning;
-
     using Timer = System.Timers.Timer;
 
     /// <summary>Service providing live update functionality</summary>
@@ -46,7 +43,7 @@
         /// <summary>
         /// The _logger.
         /// </summary>
-        private ILog _logger;
+        private ILogger _logger;
 
         /// <summary>
         /// The _update timer.
@@ -163,7 +160,7 @@
         /// <summary>
         /// Gets or sets the logger.
         /// </summary>
-        public ILog Logger
+        public ILogger Logger
         {
             get
             {

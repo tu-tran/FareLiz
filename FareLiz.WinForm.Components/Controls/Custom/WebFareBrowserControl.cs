@@ -1,17 +1,14 @@
 ﻿namespace SkyDean.FareLiz.WinForm.Components.Controls.Custom
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Threading;
-    using System.Windows.Forms;
-
-    using log4net;
-
     using SkyDean.FareLiz.Core;
     using SkyDean.FareLiz.Core.Data;
     using SkyDean.FareLiz.Core.Presentation;
     using SkyDean.FareLiz.Core.Utils;
     using SkyDean.FareLiz.WinForm.Components.Controls.ListView;
+    using System;
+    using System.Collections.Generic;
+    using System.Threading;
+    using System.Windows.Forms;
 
     /// <summary>
     /// The web fare browser control.
@@ -104,7 +101,7 @@
         /// <summary>
         /// Gets the logger.
         /// </summary>
-        public ILog Logger
+        public ILogger Logger
         {
             get
             {
@@ -157,10 +154,10 @@
         {
             ThreadPool.QueueUserWorkItem(
                 o =>
-                    {
-                        AppUtil.NameCurrentThread(this.GetType().Name + "-RequestDataAsync");
-                        this.DoRequestData(request);
-                    });
+                {
+                    AppUtil.NameCurrentThread(this.GetType().Name + "-RequestDataAsync");
+                    this.DoRequestData(request);
+                });
 
             return this.LastRetrievedRoute;
         }
@@ -210,25 +207,25 @@
                 this.lvFlightData.SafeInvoke(
                     new Action(
                         () =>
-                            {
-                                this.lvFlightData.Name = reqName;
-                                this.lvFlightData.SetWatermark("Requesting data... Please wait...");
-                            }));
+                        {
+                            this.lvFlightData.Name = reqName;
+                            this.lvFlightData.SetWatermark("Requesting data... Please wait...");
+                        }));
 
                 // Create a thread to get the data
                 DataRequestResult dataRequestResult = DataRequestResult.Empty;
                 var workResult = BackgroundThread.DoWork(
                     () =>
-                        {
-                            this.lvFlightData.SetWatermark(
-                                "Data request was started on " + DateTime.Now + Environment.NewLine
-                                + "Please wait while the application retrieves fare data...");
-                            this.RequestState = DataRequestState.Requested;
-                            this.LastRequestStartedDate = DateTime.Now;
-                            dataRequestResult = this.DataHandler.QueryData(request, this.OnProgressChanged);
-                        }, 
-                    this.TimeoutInSeconds, 
-                    reqName, 
+                    {
+                        this.lvFlightData.SetWatermark(
+                            "Data request was started on " + DateTime.Now + Environment.NewLine
+                            + "Please wait while the application retrieves fare data...");
+                        this.RequestState = DataRequestState.Requested;
+                        this.LastRequestStartedDate = DateTime.Now;
+                        dataRequestResult = this.DataHandler.QueryData(request, this.OnProgressChanged);
+                    },
+                    this.TimeoutInSeconds,
+                    reqName,
                     AppContext.Logger);
 
                 if (workResult.Succeeded)
@@ -301,10 +298,10 @@
                 this.lvFlightData.SafeInvoke(
                     new Action(
                         () =>
-                            {
-                                this.BindData(e.ResultRoute);
-                                this.lvFlightData.Enabled = e.ProgressPercentage < 100;
-                            }));
+                        {
+                            this.BindData(e.ResultRoute);
+                            this.lvFlightData.Enabled = e.ProgressPercentage < 100;
+                        }));
             }
         }
 

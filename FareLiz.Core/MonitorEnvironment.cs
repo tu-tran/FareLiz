@@ -39,7 +39,7 @@
         /// <param name="logger">
         /// The logger.
         /// </param>
-        public MonitorEnvironment(IConfigStore configStore, IPluginResolver pluginResolver, IServiceManager servicesManager, ILog logger)
+        public MonitorEnvironment(IConfigStore configStore, IPluginResolver pluginResolver, IServiceManager servicesManager, ILogger logger)
             : this(configStore, pluginResolver, null, null, null, null, servicesManager, logger)
         {
         }
@@ -79,7 +79,7 @@
             IArchiveManager archiveManager, 
             ICurrencyProvider currencyProvider, 
             IServiceManager servicesManager, 
-            ILog logger)
+            ILogger logger)
         {
             this.Logger = logger;
             this.ConfigStore = configStore;
@@ -118,7 +118,7 @@
         public IServiceManager BackgroundServices { get; set; }
 
         /// <summary>Gets or sets the logger.</summary>
-        public ILog Logger { get; set; }
+        public ILogger Logger { get; set; }
 
         /// <summary>Initialize the working environment and all configured helper objects</summary>
         /// <returns>The <see cref="ValidateResult" />.</returns>

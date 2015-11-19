@@ -3,23 +3,15 @@
     using System;
     using System.Reflection;
 
-    using log4net;
-
     using SkyDean.FareLiz.Core.Utils;
 
-    /// <summary>
-    /// The assembly loader.
-    /// </summary>
+    /// <summary>The assembly loader.</summary>
     public class AssemblyLoader : MarshalByRefObject
     {
-        /// <summary>
-        /// The _logger.
-        /// </summary>
-        private readonly ILog _logger;
+        /// <summary>The _logger.</summary>
+        private readonly ILogger _logger;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AssemblyLoader"/> class.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="AssemblyLoader" /> class.</summary>
         public AssemblyLoader()
         {
         }
@@ -30,7 +22,7 @@
         /// <param name="logger">
         /// The logger.
         /// </param>
-        public AssemblyLoader(ILog logger)
+        public AssemblyLoader(ILogger logger)
         {
             this._logger = logger;
         }

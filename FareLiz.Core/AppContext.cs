@@ -7,6 +7,7 @@
     using log4net;
 
     using SkyDean.FareLiz.Core.Presentation;
+    using SkyDean.FareLiz.Core.Utils;
 
     #endregion
 
@@ -61,7 +62,7 @@
         protected bool _firstStart = true;
 
         /// <summary>The _logger.</summary>
-        protected ILog _logger = null;
+        protected ILogger _logger = null;
 
         /// <summary> The progress callback. </summary>
         protected IProgressCallback _progressCallback = null;
@@ -89,7 +90,7 @@
         }
 
         /// <summary>Gets the logger.</summary>
-        public static ILog Logger
+        public static ILogger Logger
         {
             get
             {

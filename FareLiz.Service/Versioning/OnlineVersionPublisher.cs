@@ -1,5 +1,7 @@
 ﻿namespace SkyDean.FareLiz.Service.Versioning
 {
+    using SkyDean.FareLiz.Core.Utils;
+    using SkyDean.FareLiz.Service.Utils;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -10,11 +12,6 @@
 
     using Ionic.Zip;
     using Ionic.Zlib;
-
-    using log4net;
-
-    using SkyDean.FareLiz.Core.Utils;
-    using SkyDean.FareLiz.Service.Utils;
 
     /// <summary>Helper service used for creating distribution package and version installer</summary>
     internal class OnlineVersionPublisher
@@ -28,11 +25,11 @@
         /// The date format string.
         /// </summary>
         internal static readonly string DateFormatString = "yyyyMMddHHmmss";
-
+        
         /// <summary>
         /// The _logger.
         /// </summary>
-        internal ILog _logger;
+        internal ILogger _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OnlineVersionPublisher"/> class.
@@ -40,7 +37,7 @@
         /// <param name="logger">
         /// The logger.
         /// </param>
-        internal OnlineVersionPublisher(ILog logger)
+        internal OnlineVersionPublisher(ILogger logger)
         {
             this._logger = logger;
         }
@@ -69,17 +66,17 @@
             {
                 this._logger.Info("Creating x86 installer into " + parameters.X86InstallerFile);
                 this.CreateInstaller(
-                    parameters.InnoExecutable, 
-                    parameters.InnoScriptPath, 
-                    parameters.InnoExtraParams, 
-                    parameters.X86BuildLocation, 
+                    parameters.InnoExecutable,
+                    parameters.InnoScriptPath,
+                    parameters.InnoExtraParams,
+                    parameters.X86BuildLocation,
                     parameters.X86InstallerFile);
                 this._logger.Info("Creating x64 installer into " + parameters.X64InstallerFile);
                 this.CreateInstaller(
-                    parameters.InnoExecutable, 
-                    parameters.InnoScriptPath, 
-                    parameters.InnoExtraParams, 
-                    parameters.X64BuildLocation, 
+                    parameters.InnoExecutable,
+                    parameters.InnoScriptPath,
+                    parameters.InnoExtraParams,
+                    parameters.X64BuildLocation,
                     parameters.X64InstallerFile);
             }
             else
@@ -94,16 +91,16 @@
             {
                 // If parameters for FTP were specified
                 this._logger.InfoFormat(
-                    "Using FTP server {0} [{1}]", 
-                    parameters.FtpServerUrl, 
+                    "Using FTP server {0} [{1}]",
+                    parameters.FtpServerUrl,
                     string.IsNullOrEmpty(parameters.FtpProxyHost) ? null : parameters.FtpProxyHost + ":" + parameters.FtpProxyPort);
                 var client = new FtpClient(
-                    this._logger, 
-                    parameters.FtpServer, 
-                    parameters.FtpPort, 
-                    parameters.FtpProxyHost, 
-                    parameters.FtpProxyPort, 
-                    parameters.FtpUser, 
+                    this._logger,
+                    parameters.FtpServer,
+                    parameters.FtpPort,
+                    parameters.FtpProxyHost,
+                    parameters.FtpProxyPort,
+                    parameters.FtpUser,
                     parameters.FtpPassword);
 
                 this._logger.Info("Uploading x86 package into " + parameters.FtpFullX86PackagePath);
@@ -186,7 +183,7 @@
                 if (versions.Count > 1)
                 {
                     var sortedVersions = versions.OrderBy(p => p.Key).ToList();
-                    
+
                     for (int i = 0; i < sortedVersions.Count - 1; i++)
                     {
                         var pair = sortedVersions[i];
@@ -274,20 +271,20 @@
                 Console.WriteLine("Starting process [{0}] with argument: {1}", innoExe, args);
                 var startInfo = new ProcessStartInfo(innoExe, args)
                                     {
-                                        UseShellExecute = false, 
-                                        RedirectStandardOutput = true, 
-                                        RedirectStandardError = true, 
-                                        CreateNoWindow = true, 
+                                        UseShellExecute = false,
+                                        RedirectStandardOutput = true,
+                                        RedirectStandardError = true,
+                                        CreateNoWindow = true,
                                         WindowStyle = ProcessWindowStyle.Hidden
                                     };
                 var innoProc = new Process { StartInfo = startInfo };
                 var sb = new StringBuilder();
                 var outputHandler = new DataReceivedEventHandler(
                     (o, e) =>
-                        {
-                            Console.WriteLine(e.Data);
-                            sb.AppendLine(e.Data);
-                        });
+                    {
+                        Console.WriteLine(e.Data);
+                        sb.AppendLine(e.Data);
+                    });
                 innoProc.OutputDataReceived += outputHandler; // Catch the console output
                 innoProc.ErrorDataReceived += outputHandler;
                 innoProc.Start();

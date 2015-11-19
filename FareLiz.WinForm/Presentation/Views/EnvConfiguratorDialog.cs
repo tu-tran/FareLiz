@@ -5,8 +5,6 @@
     using System.Linq;
     using System.Windows.Forms;
 
-    using log4net;
-
     using SkyDean.FareLiz.Core;
     using SkyDean.FareLiz.Core.Config;
     using SkyDean.FareLiz.Core.Data;
@@ -16,44 +14,28 @@
     using SkyDean.FareLiz.WinForm.Config;
     using SkyDean.FareLiz.WinForm.Properties;
 
-    /// <summary>
-    /// The env configurator dialog.
-    /// </summary>
+    /// <summary>The env configurator dialog.</summary>
     internal partial class EnvConfiguratorDialog : SmartForm
     {
-        /// <summary>
-        /// The _execution param.
-        /// </summary>
+        /// <summary>The _execution param.</summary>
         private readonly ExecutionParam _executionParam;
 
-        /// <summary>
-        /// The _instance data.
-        /// </summary>
+        /// <summary>The _instance data.</summary>
         private readonly Dictionary<Type, IPlugin> _instanceData = new Dictionary<Type, IPlugin>();
 
-        /// <summary>
-        /// The _logger.
-        /// </summary>
-        private readonly ILog _logger;
+        /// <summary>The _logger.</summary>
+        private readonly ILogger _logger;
 
-        /// <summary>
-        /// The _type resolver.
-        /// </summary>
+        /// <summary>The _type resolver.</summary>
         private readonly TypeResolver _typeResolver;
 
-        /// <summary>
-        /// The _env.
-        /// </summary>
+        /// <summary>The _env.</summary>
         private MonitorEnvironment _env;
 
-        /// <summary>
-        /// The _initialized.
-        /// </summary>
+        /// <summary>The _initialized.</summary>
         private volatile bool _initialized;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EnvConfiguratorDialog"/> class.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="EnvConfiguratorDialog" /> class.</summary>
         protected EnvConfiguratorDialog()
         {
             this.InitializeComponent();
@@ -111,9 +93,7 @@
             this.InitializeData();
         }
 
-        /// <summary>
-        /// Gets the result environment.
-        /// </summary>
+        /// <summary>Gets the result environment.</summary>
         internal MonitorEnvironment ResultEnvironment
         {
             get
@@ -122,9 +102,7 @@
             }
         }
 
-        /// <summary>
-        /// Gets the result param.
-        /// </summary>
+        /// <summary>Gets the result param.</summary>
         internal ExecutionParam ResultParam
         {
             get
@@ -133,9 +111,7 @@
             }
         }
 
-        /// <summary>
-        /// The initialize data.
-        /// </summary>
+        /// <summary>The initialize data.</summary>
         private void InitializeData()
         {
             this._initialized = false;
@@ -188,12 +164,8 @@
             }
         }
 
-        /// <summary>
-        /// The get active db syncer.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="object"/>.
-        /// </returns>
+        /// <summary>The get active db syncer.</summary>
+        /// <returns>The <see cref="object" />.</returns>
         private object GetActiveDbSyncer()
         {
             if (this._env.FareDatabase != null)
@@ -286,9 +258,7 @@
             }
         }
 
-        /// <summary>
-        /// The apply changes.
-        /// </summary>
+        /// <summary>The apply changes.</summary>
         private void ApplyChanges()
         {
             if (!this._initialized)
@@ -373,21 +343,17 @@
             }
         }
 
-        /// <summary>
-        /// The update buttons.
-        /// </summary>
+        /// <summary>The update buttons.</summary>
         private void UpdateButtons()
         {
             this.btnImportToDatabase.Enabled =
                 this.btnExportDatabase.Enabled = this.ResultEnvironment.FareDatabase != null && this.ResultEnvironment.ArchiveManager != null;
             this.btnRepairDatabase.Enabled = this.btnResetDatabase.Enabled = this.btnDbStat.Enabled = this.ResultEnvironment.FareDatabase != null;
             this.grpDatabaseSync.Enabled = this.ResultEnvironment.FareDatabase != null && this.cbDbSyncer.SelectedValue != null
-                                            && this.imgSyncerStatus.Tag != null && (bool)this.imgSyncerStatus.Tag;
+                                           && this.imgSyncerStatus.Tag != null && (bool)this.imgSyncerStatus.Tag;
         }
 
-        /// <summary>
-        /// The validate environment.
-        /// </summary>
+        /// <summary>The validate environment.</summary>
         private void ValidateEnvironment()
         {
             this.Validate(this.ResultEnvironment.ArchiveManager, this.imgArchiveStatus);
@@ -674,12 +640,8 @@
             }
         }
 
-        /// <summary>
-        /// The get sync database.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="ISyncableDatabase"/>.
-        /// </returns>
+        /// <summary>The get sync database.</summary>
+        /// <returns>The <see cref="ISyncableDatabase" />.</returns>
         private ISyncableDatabase GetSyncDatabase()
         {
             this.ApplyChanges();
@@ -1147,9 +1109,7 @@
         }
     }
 
-    /// <summary>
-    /// The plugin info holder.
-    /// </summary>
+    /// <summary>The plugin info holder.</summary>
     public class PluginInfoHolder
     {
         /// <summary>
@@ -1170,9 +1130,7 @@
             this.Type = targetType;
         }
 
-        /// <summary>
-        /// Gets the name.
-        /// </summary>
+        /// <summary>Gets the name.</summary>
         public string Name
         {
             get
@@ -1181,17 +1139,11 @@
             }
         }
 
-        /// <summary>
-        /// Gets the type.
-        /// </summary>
+        /// <summary>Gets the type.</summary>
         public Type Type { get; private set; }
 
-        /// <summary>
-        /// The to string.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="string"/>.
-        /// </returns>
+        /// <summary>The to string.</summary>
+        /// <returns>The <see cref="string" />.</returns>
         public override string ToString()
         {
             return this.Name;

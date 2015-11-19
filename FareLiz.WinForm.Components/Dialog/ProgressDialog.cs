@@ -1,5 +1,9 @@
 ﻿namespace SkyDean.FareLiz.WinForm.Components.Dialog
 {
+    using SkyDean.FareLiz.Core.Presentation;
+    using SkyDean.FareLiz.Core.Utils;
+    using SkyDean.FareLiz.WinForm.Components.Controls;
+    using SkyDean.FareLiz.WinForm.Components.Utils;
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
@@ -7,13 +11,6 @@
     using System.Globalization;
     using System.Threading;
     using System.Windows.Forms;
-
-    using log4net;
-
-    using SkyDean.FareLiz.Core.Presentation;
-    using SkyDean.FareLiz.Core.Utils;
-    using SkyDean.FareLiz.WinForm.Components.Controls;
-    using SkyDean.FareLiz.WinForm.Components.Utils;
 
     /// <summary>Showing progress dialog and running an asynchronous task</summary>
     public partial class ProgressDialog : SmartForm, IProgressCallback
@@ -544,12 +541,12 @@
         /// The action.
         /// </param>
         public static void ExecuteTask(
-            IWin32Window target, 
-            string title, 
-            string text, 
-            string threadName, 
-            ProgressBarStyle style, 
-            ILog logger, 
+            IWin32Window target,
+            string title,
+            string text,
+            string threadName,
+            ProgressBarStyle style,
+            ILogger logger,
             CallbackDelegate action)
         {
             ExecuteTask(target, title, text, threadName, style, logger, action, true);
@@ -583,13 +580,13 @@
         /// The notify error in msg box.
         /// </param>
         public static void ExecuteTask(
-            IWin32Window target, 
-            string title, 
-            string text, 
-            string threadName, 
-            ProgressBarStyle style, 
-            ILog logger, 
-            CallbackDelegate action, 
+            IWin32Window target,
+            string title,
+            string text,
+            string threadName,
+            ProgressBarStyle style,
+            ILogger logger,
+            CallbackDelegate action,
             bool notifyErrorInMsgBox)
         {
             ExecuteTask(target, title, text, threadName, style, logger, action, null, null, notifyErrorInMsgBox, true);
@@ -626,14 +623,14 @@
         /// The final handler.
         /// </param>
         public static void ExecuteTask(
-            IWin32Window target, 
-            string title, 
-            string text, 
-            string threadName, 
-            ProgressBarStyle style, 
-            ILog logger, 
-            CallbackDelegate action, 
-            CallbackExceptionDelegate exceptionHandler, 
+            IWin32Window target,
+            string title,
+            string text,
+            string threadName,
+            ProgressBarStyle style,
+            ILogger logger,
+            CallbackDelegate action,
+            CallbackExceptionDelegate exceptionHandler,
             CallbackExceptionDelegate finalHandler)
         {
             ExecuteTask(target, title, text, threadName, style, logger, action, exceptionHandler, finalHandler, true, true);
@@ -676,16 +673,16 @@
         /// The visible.
         /// </param>
         public static void ExecuteTask(
-            IWin32Window target, 
-            string title, 
-            string text, 
-            string threadName, 
-            ProgressBarStyle style, 
-            ILog logger, 
-            CallbackDelegate action, 
-            CallbackExceptionDelegate exceptionHandler, 
-            CallbackExceptionDelegate finalHandler, 
-            bool notifyErrorInMsgBox, 
+            IWin32Window target,
+            string title,
+            string text,
+            string threadName,
+            ProgressBarStyle style,
+            ILogger logger,
+            CallbackDelegate action,
+            CallbackExceptionDelegate exceptionHandler,
+            CallbackExceptionDelegate finalHandler,
+            bool notifyErrorInMsgBox,
             bool visible)
         {
             using (var progressDialog = new ProgressDialog(title, text, style, true))
@@ -697,59 +694,59 @@
 
                 ThreadPool.QueueUserWorkItem(
                     delegate(object param)
+                    {
+                        threadName = string.IsNullOrEmpty(threadName) ? title.Replace(" ", string.Empty) : threadName;
+                        AppUtil.NameCurrentThread(threadName);
+                        var callback = param as ProgressDialog;
+                        Exception actionException = null;
+
+                        try
                         {
-                            threadName = string.IsNullOrEmpty(threadName) ? title.Replace(" ", string.Empty) : threadName;
-                            AppUtil.NameCurrentThread(threadName);
-                            var callback = param as ProgressDialog;
-                            Exception actionException = null;
-
-                            try
+                            action(callback);
+                        }
+                        catch (Exception ex)
+                        {
+                            actionException = ex;
+                            if (!callback.IsAborting)
                             {
-                                action(callback);
-                            }
-                            catch (Exception ex)
-                            {
-                                actionException = ex;
-                                if (!callback.IsAborting)
+                                if (logger != null)
                                 {
-                                    if (logger != null)
+                                    string currentTitle = callback.Title;
+                                    logger.Error((string.IsNullOrEmpty(currentTitle) ? null : currentTitle + ": ") + ex);
+                                    if (notifyErrorInMsgBox)
                                     {
-                                        string currentTitle = callback.Title;
-                                        logger.Error((string.IsNullOrEmpty(currentTitle) ? null : currentTitle + ": ") + ex);
-                                        if (notifyErrorInMsgBox)
-                                        {
-                                            ExMessageBox.Show(
-                                                target, 
-                                                "An error occured: " + ex.Message, 
-                                                currentTitle, 
-                                                MessageBoxButtons.OK, 
-                                                MessageBoxIcon.Error);
-                                        }
-                                    }
-
-                                    if (exceptionHandler != null)
-                                    {
-                                        exceptionHandler(callback, ex);
-                                    }
-                                    else
-                                    {
-                                        throw;
+                                        ExMessageBox.Show(
+                                            target,
+                                            "An error occured: " + ex.Message,
+                                            currentTitle,
+                                            MessageBoxButtons.OK,
+                                            MessageBoxIcon.Error);
                                     }
                                 }
-                            }
-                            finally
-                            {
-                                if (callback != null)
-                                {
-                                    callback.End();
-                                }
 
-                                if (finalHandler != null)
+                                if (exceptionHandler != null)
                                 {
-                                    finalHandler(callback, actionException);
+                                    exceptionHandler(callback, ex);
+                                }
+                                else
+                                {
+                                    throw;
                                 }
                             }
-                        }, 
+                        }
+                        finally
+                        {
+                            if (callback != null)
+                            {
+                                callback.End();
+                            }
+
+                            if (finalHandler != null)
+                            {
+                                finalHandler(callback, actionException);
+                            }
+                        }
+                    },
                     progressDialog);
                 progressDialog.ShowDialog(target);
             }
@@ -909,8 +906,8 @@
         {
             this.Text = this.titleRoot
                         + string.Format(
-                            CultureInfo.InvariantCulture, 
-                            " - {0}% complete", 
+                            CultureInfo.InvariantCulture,
+                            " - {0}% complete",
                             (this.progressBar.Value * 100) / (this.progressBar.Maximum - this.progressBar.Minimum));
         }
 

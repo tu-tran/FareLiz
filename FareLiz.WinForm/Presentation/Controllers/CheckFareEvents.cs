@@ -6,14 +6,10 @@
 
     using SkyDean.FareLiz.Data.Monitoring;
 
-    /// <summary>
-    /// The check fare events.
-    /// </summary>
+    /// <summary>The check fare events.</summary>
     internal class CheckFareEvents
     {
-        /// <summary>
-        /// The all events.
-        /// </summary>
+        /// <summary>The all events.</summary>
         internal readonly Dictionary<OperationMode, FareMonitorEvents> AllEvents = new Dictionary<OperationMode, FareMonitorEvents>
                                                                                        {
                                                                                            {
@@ -53,9 +49,7 @@
             }
         }
 
-        /// <summary>
-        /// The monitor starting.
-        /// </summary>
+        /// <summary>The monitor starting.</summary>
         internal event FareMonitorHandler MonitorStarting
         {
             add
@@ -75,9 +69,7 @@
             }
         }
 
-        /// <summary>
-        /// The monitor stopping.
-        /// </summary>
+        /// <summary>The monitor stopping.</summary>
         internal event FareMonitorHandler MonitorStopping
         {
             add
@@ -98,34 +90,22 @@
         }
     }
 
-    /// <summary>
-    /// The fare monitor events.
-    /// </summary>
+    /// <summary>The fare monitor events.</summary>
     internal class FareMonitorEvents
     {
-        /// <summary>
-        /// The monitor starting.
-        /// </summary>
+        /// <summary>The monitor starting.</summary>
         internal event FareMonitorHandler MonitorStarting;
 
-        /// <summary>
-        /// The monitor stopping.
-        /// </summary>
+        /// <summary>The monitor stopping.</summary>
         internal event FareMonitorHandler MonitorStopping;
 
-        /// <summary>
-        /// The request starting.
-        /// </summary>
+        /// <summary>The request starting.</summary>
         internal event FareRequestHandler RequestStarting;
 
-        /// <summary>
-        /// The request stopping.
-        /// </summary>
+        /// <summary>The request stopping.</summary>
         internal event FareRequestHandler RequestStopping;
 
-        /// <summary>
-        /// The request completed.
-        /// </summary>
+        /// <summary>The request completed.</summary>
         internal event FareRequestHandler RequestCompleted;
 
         /// <summary>
@@ -209,9 +189,7 @@
         }
     }
 
-    /// <summary>
-    /// The fare monitor events extensions.
-    /// </summary>
+    /// <summary>The fare monitor events extensions.</summary>
     public static class FareMonitorEventsExtensions
     {
         /// <summary>

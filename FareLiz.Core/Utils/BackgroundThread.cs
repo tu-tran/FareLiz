@@ -28,7 +28,7 @@
         /// <returns>
         /// The <see cref="ThreadResult"/>.
         /// </returns>
-        public static ThreadResult DoWork(Action action, int timeoutInSeconds, string threadName, ILog _logger)
+        public static ThreadResult DoWork(Action action, int timeoutInSeconds, string threadName, ILogger _logger)
         {
             ThreadResult result = null;
             Thread workerThread = new Thread(
@@ -105,7 +105,7 @@
             string text, 
             string threadName, 
             IProgressCallback callback, 
-            ILog logger, 
+            ILogger logger, 
             CallbackDelegate action, 
             CallbackExceptionDelegate exceptionHandler, 
             CallbackExceptionDelegate finalHandler, 

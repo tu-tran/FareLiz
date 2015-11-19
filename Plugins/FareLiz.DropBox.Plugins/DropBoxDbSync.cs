@@ -1,25 +1,21 @@
 ﻿namespace SkyDean.FareLiz.DropBox
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Text;
-    using System.Windows.Forms;
-
     using DropNet;
     using DropNet.Models;
-
-    using Ionic.Zip;
-    using Ionic.Zlib;
-
-    using log4net;
-
     using SkyDean.FareLiz.Core;
     using SkyDean.FareLiz.Core.Config;
     using SkyDean.FareLiz.Core.Data;
     using SkyDean.FareLiz.Core.Presentation;
     using SkyDean.FareLiz.Core.Utils;
     using SkyDean.FareLiz.WinForm.Components.Dialog;
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Text;
+    using System.Windows.Forms;
+
+    using Ionic.Zip;
+    using Ionic.Zlib;
 
     /// <summary>
     /// Abstract class used for synchronizing object with DropBox
@@ -128,7 +124,7 @@
         /// <summary>
         /// Gets or sets the logger.
         /// </summary>
-        public ILog Logger { get; set; }
+        public ILogger Logger { get; set; }
 
         /// <summary>
         /// The initialize.
@@ -204,11 +200,11 @@
                         }
 
                         ConfirmationType confirm = callback.Confirm(
-                            callback, 
+                            callback,
                             string.Format(
-                                "The last data was updated on {0} ({1}). Do you want to download and install this database?", 
-                                fileMeta.ModifiedDate, 
-                                fileMeta.Size), 
+                                "The last data was updated on {0} ({1}). Do you want to download and install this database?",
+                                fileMeta.ModifiedDate,
+                                fileMeta.Size),
                             "Download Confirmation");
 
                         if (confirm != ConfirmationType.Yes)
@@ -280,10 +276,10 @@
                             if (!callback.IsAborting)
                             {
                                 callback.Inform(
-                                    callback, 
+                                    callback,
                                     "Failed to download database. The previous database will now be restored. The error message was:"
-                                    + Environment.NewLine + actualErr, 
-                                    "DropBox Database Download", 
+                                    + Environment.NewLine + actualErr,
+                                    "DropBox Database Download",
                                     NotificationType.Error);
                             }
 
@@ -310,10 +306,10 @@
                         }
 
                         if (callback.Confirm(
-                            callback, 
+                            callback,
                             string.Format(
-                                "The current data size is {0}. Do you want to proceed ? (Data will be compressed)", 
-                                StringUtil.FormatSize(new FileInfo(dataFilePath).Length)), 
+                                "The current data size is {0}. Do you want to proceed ? (Data will be compressed)",
+                                StringUtil.FormatSize(new FileInfo(dataFilePath).Length)),
                             "Backup database to DropBox") != ConfirmationType.Yes)
                         {
                             return false;
@@ -396,12 +392,12 @@
             IList<DataPackage<TravelRoute>> result = null;
             this.Logger.Info("Receiving packages from DropBox");
             ProgressDialog.ExecuteTask(
-                null, 
-                "DropBox Synchronization", 
-                "Retrieving data packages from configured DropBox account...", 
-                this.GetType().Name + "-Receive", 
-                ProgressBarStyle.Marquee, 
-                this.Logger, 
+                null,
+                "DropBox Synchronization",
+                "Retrieving data packages from configured DropBox account...",
+                this.GetType().Name + "-Receive",
+                ProgressBarStyle.Marquee,
+                this.Logger,
                 cb => { result = this.DoReceive(cb as ProgressDialog, importedPackages); });
 
             return result;
@@ -562,7 +558,7 @@
             if (isError)
             {
                 throw new ConfigurationException(
-                    this, 
+                    this,
                     "The plugin has not been properly configured. Please make sure that you have authenticated with DropBox");
             }
 
@@ -606,7 +602,7 @@
 
             try
             {
-                rootMeta = dropBoxClient.GetMetaData(this.DropBoxPath);
+                rootMeta = dropBoxClient.GetMetaData(this.DropBoxPath, string.Empty);
                 if (rootMeta.Is_Deleted)
                 {
                     rootMeta = null;

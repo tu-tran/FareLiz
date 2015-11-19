@@ -1,17 +1,14 @@
 ﻿namespace SkyDean.FareLiz.Service
 {
+    using SkyDean.FareLiz.Core;
+    using SkyDean.FareLiz.Core.Utils;
+    using SkyDean.FareLiz.WinForm.Components.Dialog;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Reflection;
     using System.Threading;
     using System.Windows.Forms;
-
-    using log4net;
-
-    using SkyDean.FareLiz.Core;
-    using SkyDean.FareLiz.Core.Utils;
-    using SkyDean.FareLiz.WinForm.Components.Dialog;
 
     /// <summary>
     /// The exception helper.
@@ -21,7 +18,7 @@
         /// <summary>
         /// The _logger.
         /// </summary>
-        private readonly ILog _logger;
+        private readonly ILogger _logger;
 
         /// <summary>
         /// The entry assembly location.
@@ -40,7 +37,7 @@
         /// <param name="silentMode">
         /// The silent mode.
         /// </param>
-        public ExceptionHelper(ILog logger, bool autoRestartProcess, bool silentMode)
+        public ExceptionHelper(ILogger logger, bool autoRestartProcess, bool silentMode)
         {
             this._logger = logger;
             this.AutoRestartProcess = autoRestartProcess;
@@ -134,12 +131,12 @@
                                       };
 
                 var dlgResult = ExMessageBox.Show(
-                    null, 
-                    msg, 
-                    "Oops. This is weird...", 
-                    MessageBoxButtons.YesNoCancel, 
-                    MessageBoxIcon.Exclamation, 
-                    MessageBoxDefaultButton.Button1, 
+                    null,
+                    msg,
+                    "Oops. This is weird...",
+                    MessageBoxButtons.YesNoCancel,
+                    MessageBoxIcon.Exclamation,
+                    MessageBoxDefaultButton.Button1,
                     translation);
 
                 shouldRestart = dlgResult == DialogResult.Yes;

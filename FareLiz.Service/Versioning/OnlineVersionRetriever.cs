@@ -1,5 +1,7 @@
 ﻿namespace SkyDean.FareLiz.Service.Versioning
 {
+    using SkyDean.FareLiz.Core.Utils;
+    using SkyDean.FareLiz.Service.LiveUpdate;
     using System;
     using System.Globalization;
     using System.IO;
@@ -7,11 +9,6 @@
     using System.Text;
 
     using Ionic.Zip;
-
-    using log4net;
-
-    using SkyDean.FareLiz.Core.Utils;
-    using SkyDean.FareLiz.Service.LiveUpdate;
 
     /// <summary>Retrieve new version information from online repository. This class handles the version distributed by OnlineVersionPublisher</summary>
     public class OnlineVersionRetriever : IVersionRetriever
@@ -28,7 +25,7 @@
         /// <param name="logger">
         /// The logger.
         /// </param>
-        public OnlineVersionRetriever(ILog logger)
+        public OnlineVersionRetriever(ILogger logger)
         {
             this.Logger = logger;
         }
@@ -58,7 +55,7 @@
         /// <summary>
         /// Gets or sets the logger.
         /// </summary>
-        public ILog Logger { get; set; }
+        public ILogger Logger { get; set; }
 
         /// <summary>
         /// The get current version.
@@ -102,10 +99,10 @@
 
                                 if (string.IsNullOrEmpty(version) || string.IsNullOrEmpty(x86) || string.IsNullOrEmpty(x64)
                                     || !DateTime.TryParseExact(
-                                        dateStr, 
-                                        OnlineVersionPublisher.DateFormatString, 
-                                        CultureInfo.InvariantCulture, 
-                                        DateTimeStyles.AssumeUniversal, 
+                                        dateStr,
+                                        OnlineVersionPublisher.DateFormatString,
+                                        CultureInfo.InvariantCulture,
+                                        DateTimeStyles.AssumeUniversal,
                                         out createdDate))
                                 {
                                     return null;

@@ -22,7 +22,7 @@
         /// <param name="logger">
         /// The logger.
         /// </param>
-        public TolerantBinaryFormatter(ILog logger)
+        public TolerantBinaryFormatter(ILogger logger)
         {
             this._formatter = new BinaryFormatter { AssemblyFormat = FormatterAssemblyStyle.Simple, Binder = new TolerantBinder() };
             this._formatter.SurrogateSelector = new SurrogateSelector();

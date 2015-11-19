@@ -1,8 +1,8 @@
 ﻿namespace SkyDean.FareLiz.Service.Versioning
 {
-    using log4net;
 
     using SkyDean.FareLiz.Core.Config;
+    using SkyDean.FareLiz.Core.Utils;
 
     /// <summary>Service used for publishing a new version</summary>
     public partial class VersionPublishService : IServiceRunner
@@ -37,7 +37,7 @@
         /// <summary>
         /// Gets or sets the logger.
         /// </summary>
-        public ILog Logger { get; set; }
+        public ILogger Logger { get; set; }
 
         /// <summary>
         /// The initialize.
