@@ -1,91 +1,141 @@
-﻿using Ionic.Zip;
-using Ionic.Zlib;
-using log4net;
-using SkyDean.FareLiz.Core.Utils;
-using SkyDean.FareLiz.Service.Utils;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-
-namespace SkyDean.FareLiz.Service.Versioning
+﻿namespace SkyDean.FareLiz.Service.Versioning
 {
-    /// <summary>
-    /// Helper service used for creating distribution package and version installer
-    /// </summary>
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.IO;
+    using System.Linq;
+    using System.Text;
+    using System.Text.RegularExpressions;
+
+    using Ionic.Zip;
+    using Ionic.Zlib;
+
+    using log4net;
+
+    using SkyDean.FareLiz.Core.Utils;
+    using SkyDean.FareLiz.Service.Utils;
+
+    /// <summary>Helper service used for creating distribution package and version installer</summary>
     internal class OnlineVersionPublisher
     {
+        /// <summary>
+        /// The manifest file name.
+        /// </summary>
         internal static readonly string ManifestFileName = "Version.manifest";
+
+        /// <summary>
+        /// The date format string.
+        /// </summary>
         internal static readonly string DateFormatString = "yyyyMMddHHmmss";
+
+        /// <summary>
+        /// The _logger.
+        /// </summary>
         internal ILog _logger;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OnlineVersionPublisher"/> class.
+        /// </summary>
+        /// <param name="logger">
+        /// The logger.
+        /// </param>
         internal OnlineVersionPublisher(ILog logger)
         {
-            _logger = logger;
+            this._logger = logger;
         }
 
         /// <summary>
         /// Publish a new distribution version
         /// </summary>
+        /// <param name="parameters">
+        /// The parameters.
+        /// </param>
         internal void Publish(PublishParameter parameters)
         {
             if (!Directory.Exists(parameters.OutputLocation))
+            {
                 Directory.CreateDirectory(parameters.OutputLocation);
+            }
 
             // Comrpess Zip package
-            _logger.Info("Creating x86 distribtution package into " + parameters.X86PackageFile);
-            CompressBinariesDir(parameters.X86BuildLocation, parameters.X86PackageFile);
-            _logger.Info("Creating x64 distribtution package into " + parameters.X64PackageFile);
-            CompressBinariesDir(parameters.X64BuildLocation, parameters.X64PackageFile);
+            this._logger.Info("Creating x86 distribtution package into " + parameters.X86PackageFile);
+            this.CompressBinariesDir(parameters.X86BuildLocation, parameters.X86PackageFile);
+            this._logger.Info("Creating x64 distribtution package into " + parameters.X64PackageFile);
+            this.CompressBinariesDir(parameters.X64BuildLocation, parameters.X64PackageFile);
 
             bool hasInstaller = parameters.HasInstallers;
             if (hasInstaller)
             {
-                _logger.Info("Creating x86 installer into " + parameters.X86InstallerFile);
-                CreateInstaller(parameters.InnoExecutable, parameters.InnoScriptPath, parameters.InnoExtraParams, parameters.X86BuildLocation, parameters.X86InstallerFile);
-                _logger.Info("Creating x64 installer into " + parameters.X64InstallerFile);
-                CreateInstaller(parameters.InnoExecutable, parameters.InnoScriptPath, parameters.InnoExtraParams, parameters.X64BuildLocation, parameters.X64InstallerFile);
+                this._logger.Info("Creating x86 installer into " + parameters.X86InstallerFile);
+                this.CreateInstaller(
+                    parameters.InnoExecutable, 
+                    parameters.InnoScriptPath, 
+                    parameters.InnoExtraParams, 
+                    parameters.X86BuildLocation, 
+                    parameters.X86InstallerFile);
+                this._logger.Info("Creating x64 installer into " + parameters.X64InstallerFile);
+                this.CreateInstaller(
+                    parameters.InnoExecutable, 
+                    parameters.InnoScriptPath, 
+                    parameters.InnoExtraParams, 
+                    parameters.X64BuildLocation, 
+                    parameters.X64InstallerFile);
             }
             else
-                _logger.Info("There is no parameter for creating Installers... Skipped");
+            {
+                this._logger.Info("There is no parameter for creating Installers... Skipped");
+            }
 
             // Write version manifest file locally
-            WriteManifest(parameters, null);
+            this.WriteManifest(parameters, null);
 
-            if (!String.IsNullOrEmpty(parameters.FtpServer))    // If parameters for FTP were specified
+            if (!string.IsNullOrEmpty(parameters.FtpServer))
             {
-                _logger.InfoFormat("Using FTP server {0} [{1}]", parameters.FtpServerUrl, (String.IsNullOrEmpty(parameters.FtpProxyHost) ? null : parameters.FtpProxyHost + ":" + parameters.FtpProxyPort));
-                var client = new FtpClient(_logger, parameters.FtpServer, parameters.FtpPort, parameters.FtpProxyHost, parameters.FtpProxyPort, parameters.FtpUser, parameters.FtpPassword);
+                // If parameters for FTP were specified
+                this._logger.InfoFormat(
+                    "Using FTP server {0} [{1}]", 
+                    parameters.FtpServerUrl, 
+                    string.IsNullOrEmpty(parameters.FtpProxyHost) ? null : parameters.FtpProxyHost + ":" + parameters.FtpProxyPort);
+                var client = new FtpClient(
+                    this._logger, 
+                    parameters.FtpServer, 
+                    parameters.FtpPort, 
+                    parameters.FtpProxyHost, 
+                    parameters.FtpProxyPort, 
+                    parameters.FtpUser, 
+                    parameters.FtpPassword);
 
-                _logger.Info("Uploading x86 package into " + parameters.FtpFullX86PackagePath);
+                this._logger.Info("Uploading x86 package into " + parameters.FtpFullX86PackagePath);
                 client.Upload(parameters.X86PackageFile, parameters.FtpFullX86PackagePath);
-                _logger.Info("Uploading x64 package into " + parameters.FtpFullX64PackagePath);
+                this._logger.Info("Uploading x64 package into " + parameters.FtpFullX64PackagePath);
                 client.Upload(parameters.X64PackageFile, parameters.FtpFullX64PackagePath);
 
                 if (hasInstaller)
                 {
-                    _logger.Info("Uploading x86 installer into " + parameters.FtpFullX86InstallerPath);
+                    this._logger.Info("Uploading x86 installer into " + parameters.FtpFullX86InstallerPath);
                     client.Upload(parameters.X86InstallerFile, parameters.FtpFullX86InstallerPath);
-                    _logger.Info("Uploading x64 installer into " + parameters.FtpFullX64InstallerPath);
+                    this._logger.Info("Uploading x64 installer into " + parameters.FtpFullX64InstallerPath);
                     client.Upload(parameters.X64InstallerFile, parameters.FtpFullX64InstallerPath);
                 }
 
                 // Write version manifest file to server
-                WriteManifest(parameters, client);
+                this.WriteManifest(parameters, client);
 
                 // Remove old versions
-                RemoveOldVersions(client, parameters);
+                this.RemoveOldVersions(client, parameters);
             }
         }
 
         /// <summary>
         /// Write the manifest file
         /// </summary>
-        /// <param name="parameters">Publish parameter</param>
-        /// <param name="client">FTP client. If this parameter is null, the file will only be stored locally according to the publish parameter</param>
+        /// <param name="parameters">
+        /// Publish parameter
+        /// </param>
+        /// <param name="client">
+        /// FTP client. If this parameter is null, the file will only be stored locally according to the publish parameter
+        /// </param>
         private void WriteManifest(PublishParameter parameters, FtpClient client)
         {
             // Write version manifest file
@@ -95,15 +145,15 @@ namespace SkyDean.FareLiz.Service.Versioning
             sb.AppendLine(AppUtil.ProductWriteDate.ToUniversalTime().ToString(DateFormatString));
             sb.AppendLine(parameters.FtpX86PackageRelativePath);
             sb.AppendLine(parameters.FtpX64PackageRelativePath);
-            sb.AppendLine(parameters.HasInstallers ? parameters.FtpX86InstallerRelativePath : "");
-            sb.AppendLine(parameters.HasInstallers ? parameters.FtpX64InstallerRelativePath : "");
+            sb.AppendLine(parameters.HasInstallers ? parameters.FtpX86InstallerRelativePath : string.Empty);
+            sb.AppendLine(parameters.HasInstallers ? parameters.FtpX64InstallerRelativePath : string.Empty);
             var manifestContent = sb.ToString();
             File.WriteAllText(manifest, manifestContent);
 
             if (client != null)
             {
                 string remoteManifest = parameters.FtpProductBasePath + "/" + ManifestFileName;
-                _logger.Info("Creating version manifest for version " + AppUtil.ProductVersion + " at " + remoteManifest);
+                this._logger.Info("Creating version manifest for version " + AppUtil.ProductVersion + " at " + remoteManifest);
                 client.Upload(manifest, remoteManifest);
             }
         }
@@ -111,6 +161,12 @@ namespace SkyDean.FareLiz.Service.Versioning
         /// <summary>
         /// Remove older versions and only keep the latest version
         /// </summary>
+        /// <param name="client">
+        /// The client.
+        /// </param>
+        /// <param name="parameters">
+        /// The parameters.
+        /// </param>
         private void RemoveOldVersions(FtpClient client, PublishParameter parameters)
         {
             var dirs = client.ListDirectory(parameters.FtpProductBasePath);
@@ -129,12 +185,13 @@ namespace SkyDean.FareLiz.Service.Versioning
 
                 if (versions.Count > 1)
                 {
-                    var sortedVersions = versions.OrderBy(p => p.Key).ToList(); ;
+                    var sortedVersions = versions.OrderBy(p => p.Key).ToList();
+                    
                     for (int i = 0; i < sortedVersions.Count - 1; i++)
                     {
                         var pair = sortedVersions[i];
                         var delDir = parameters.FtpProductBasePath + "/" + pair.Value;
-                        _logger.Info("Removing all version folder at: " + delDir);
+                        this._logger.Info("Removing all version folder at: " + delDir);
                         client.RemoveDirectory(delDir);
                     }
                 }
@@ -144,18 +201,26 @@ namespace SkyDean.FareLiz.Service.Versioning
         /// <summary>
         /// Compress the binaries into ZIP file
         /// </summary>
+        /// <param name="path">
+        /// The path.
+        /// </param>
+        /// <param name="outFile">
+        /// The out File.
+        /// </param>
         private void CompressBinariesDir(string path, string outFile)
         {
             var dir = Path.GetDirectoryName(outFile);
             Directory.CreateDirectory(dir);
             if (File.Exists(outFile))
+            {
                 File.Delete(outFile);
+            }
 
             string inDir = Path.GetFullPath(path);
             using (var zip = new ZipFile())
             {
                 zip.CompressionLevel = CompressionLevel.BestCompression;
-                zip.AddSelectedFiles("name != *.pdb", inDir, "", true);
+                zip.AddSelectedFiles("name != *.pdb", inDir, string.Empty, true);
                 zip.Save(outFile);
             }
         }
@@ -163,13 +228,28 @@ namespace SkyDean.FareLiz.Service.Versioning
         /// <summary>
         /// Create innoSetup installer
         /// </summary>
+        /// <param name="innoExe">
+        /// The inno Exe.
+        /// </param>
+        /// <param name="innoScript">
+        /// The inno Script.
+        /// </param>
+        /// <param name="innoExtraParams">
+        /// The inno Extra Params.
+        /// </param>
+        /// <param name="inputPath">
+        /// The input Path.
+        /// </param>
+        /// <param name="outFile">
+        /// The out File.
+        /// </param>
         private void CreateInstaller(string innoExe, string innoScript, string innoExtraParams, string inputPath, string outFile)
         {
             // Start innoSetup and pass the dynamic paramters as preprocessor directives
             var icon = VersionPublishService.InstallerIcon;
             var tempIconDir = AppUtil.GetLocalDataPath("Temp");
             Directory.CreateDirectory(tempIconDir);
-            var tempIconPath = tempIconDir + "\\" + Guid.NewGuid().ToString() + ".ico";
+            var tempIconPath = tempIconDir + "\\" + Guid.NewGuid() + ".ico";
             using (var iconStream = File.Open(tempIconPath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite))
             {
                 icon.Save(iconStream);
@@ -180,59 +260,68 @@ namespace SkyDean.FareLiz.Service.Versioning
                 var outDir = Path.GetDirectoryName(outFile);
                 Directory.CreateDirectory(outDir);
                 if (File.Exists(outFile))
-                    File.Delete(outFile);
-
-                string args = "/dICON_PATH=" + Wrap(tempIconPath)
-                            + " /dINPUT_PATH=" + Wrap(inputPath)
-                            + " /dOUTPUT_PATH=" + Wrap(outDir)
-                            + " /dOUTPUT_FILENAME=" + Wrap(Path.GetFileNameWithoutExtension(outFile))
-                            + " /dAPP_COMPANY=" + Wrap(AppUtil.CompanyName)
-                            + " /dAPP_COPYRIGHT=" + Wrap(AppUtil.ProductCopyright)
-                            + " /dAPP_NAME=" + Wrap(AppUtil.ProductName)
-                            + " /dAPP_VERSION=" + Wrap(AppUtil.ProductVersion)
-                            + " /dAPP_URL=" + Wrap(AppUtil.PublisherUrl)
-                            + " /dAPP_EMAIL=" + Wrap(AppUtil.PublisherEmail)
-                            + (String.IsNullOrEmpty(innoExtraParams) ? null : " " + innoExtraParams)
-                            + " " + Wrap(innoScript);
-
-                Console.WriteLine(String.Format("Starting process [{0}] with argument: {1}", innoExe, args));
-                var startInfo = new ProcessStartInfo(innoExe, args)
                 {
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    CreateNoWindow = true,
-                    WindowStyle = ProcessWindowStyle.Hidden
-                };
+                    File.Delete(outFile);
+                }
+
+                string args = "/dICON_PATH=" + this.Wrap(tempIconPath) + " /dINPUT_PATH=" + this.Wrap(inputPath) + " /dOUTPUT_PATH="
+                              + this.Wrap(outDir) + " /dOUTPUT_FILENAME=" + this.Wrap(Path.GetFileNameWithoutExtension(outFile)) + " /dAPP_COMPANY="
+                              + this.Wrap(AppUtil.CompanyName) + " /dAPP_COPYRIGHT=" + this.Wrap(AppUtil.ProductCopyright) + " /dAPP_NAME="
+                              + this.Wrap(AppUtil.ProductName) + " /dAPP_VERSION=" + this.Wrap(AppUtil.ProductVersion) + " /dAPP_URL="
+                              + this.Wrap(AppUtil.PublisherUrl) + " /dAPP_EMAIL=" + this.Wrap(AppUtil.PublisherEmail)
+                              + (string.IsNullOrEmpty(innoExtraParams) ? null : " " + innoExtraParams) + " " + this.Wrap(innoScript);
+
+                Console.WriteLine("Starting process [{0}] with argument: {1}", innoExe, args);
+                var startInfo = new ProcessStartInfo(innoExe, args)
+                                    {
+                                        UseShellExecute = false, 
+                                        RedirectStandardOutput = true, 
+                                        RedirectStandardError = true, 
+                                        CreateNoWindow = true, 
+                                        WindowStyle = ProcessWindowStyle.Hidden
+                                    };
                 var innoProc = new Process { StartInfo = startInfo };
                 var sb = new StringBuilder();
-                var outputHandler = new DataReceivedEventHandler((o, e) =>
-                    {
-                        Console.WriteLine(e.Data);
-                        sb.AppendLine(e.Data);
-                    });
-                innoProc.OutputDataReceived += outputHandler;   // Catch the console output
+                var outputHandler = new DataReceivedEventHandler(
+                    (o, e) =>
+                        {
+                            Console.WriteLine(e.Data);
+                            sb.AppendLine(e.Data);
+                        });
+                innoProc.OutputDataReceived += outputHandler; // Catch the console output
                 innoProc.ErrorDataReceived += outputHandler;
                 innoProc.Start();
                 innoProc.BeginOutputReadLine();
                 innoProc.BeginErrorReadLine();
                 innoProc.WaitForExit();
                 if (innoProc.ExitCode != 0)
-                    throw new ApplicationException(String.Format("InnoSetup [{0}][{1}] failed for [{2}]: {3}", innoExe, innoScript, inputPath, sb.ToString()));
+                {
+                    throw new ApplicationException(string.Format("InnoSetup [{0}][{1}] failed for [{2}]: {3}", innoExe, innoScript, inputPath, sb));
+                }
 
                 if (!File.Exists(outFile))
+                {
                     throw new ApplicationException("Double-check the script. Installer did not exist at: " + outFile);
+                }
             }
             finally
             {
                 if (File.Exists(tempIconPath))
+                {
                     File.Delete(tempIconPath);
+                }
             }
         }
 
         /// <summary>
         /// Wrap stirng in double-quotation mark as necessary
         /// </summary>
+        /// <param name="input">
+        /// The input.
+        /// </param>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
         private string Wrap(string input)
         {
             return "\"" + input.Trim('"') + "\"";

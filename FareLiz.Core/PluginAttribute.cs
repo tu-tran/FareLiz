@@ -1,29 +1,48 @@
-﻿using System;
-
-namespace SkyDean.FareLiz.Core
+﻿namespace SkyDean.FareLiz.Core
 {
-    /// <summary>
-    /// Attribute used for storing the plugin details
-    /// </summary>
+    using System;
+
+    /// <summary>Attribute used for storing the plugin details</summary>
     [AttributeUsage(AttributeTargets.Class)]
     public sealed class PluginAttribute : Attribute
     {
-        /// <summary>
-        /// Name of the plugin
-        /// </summary>
-        public string Name { get { return _name; } }
+        /// <summary>The _description.</summary>
+        private readonly string _description;
+
+        /// <summary>The _name.</summary>
         private readonly string _name;
 
         /// <summary>
-        /// Plugin's description
+        /// Initializes a new instance of the <see cref="PluginAttribute"/> class.
         /// </summary>
-        public string Description { get { return _description; } }
-        private readonly string _description;
-
+        /// <param name="name">
+        /// The name.
+        /// </param>
+        /// <param name="description">
+        /// The description.
+        /// </param>
         public PluginAttribute(string name, string description)
         {
-            _name = name;
-            _description = description;
+            this._name = name;
+            this._description = description;
+        }
+
+        /// <summary>Name of the plugin</summary>
+        public string Name
+        {
+            get
+            {
+                return this._name;
+            }
+        }
+
+        /// <summary>Plugin's description</summary>
+        public string Description
+        {
+            get
+            {
+                return this._description;
+            }
         }
     }
 }

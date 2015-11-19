@@ -1,32 +1,57 @@
-﻿using System.Windows.Forms;
-using SkyDean.FareLiz.Core.Utils;
-using SkyDean.FareLiz.WinForm.Components.Dialog;
-using SkyDean.FareLiz.WinForm.Components.Utils;
-
-namespace SkyDean.FareLiz.WinForm.Presentation.Views
+﻿namespace SkyDean.FareLiz.WinForm.Presentation.Views
 {
+    using System.ComponentModel;
+    using System.Windows.Forms;
+
+    using SkyDean.FareLiz.Core.Utils;
+    using SkyDean.FareLiz.WinForm.Components.Dialog;
+    using SkyDean.FareLiz.WinForm.Components.Utils;
+
+    /// <summary>
+    /// The about form.
+    /// </summary>
     public sealed partial class AboutForm : SmartForm
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AboutForm"/> class.
+        /// </summary>
         public AboutForm()
         {
-            InitializeComponent();
+            this.InitializeComponent();
 
-            Text = lblProduct.Text = AppUtil.CompanyName + " " + AppUtil.ProductName;
-            lblVersion.Text = "Version: " + AppUtil.ProductVersion;
-            lblCopyright.Text = AppUtil.ProductCopyright;
+            this.Text = this.lblProduct.Text = AppUtil.CompanyName + " " + AppUtil.ProductName;
+            this.lblVersion.Text = "Version: " + AppUtil.ProductVersion;
+            this.lblCopyright.Text = AppUtil.ProductCopyright;
 
-            lnkEmail.Text = AppUtil.PublisherEmail;
-            lnkEmail.Tag = "mailto:" + lnkEmail.Text;
-            lnkWebsite.Text = AppUtil.PublisherUrl;
-            lnkWebsite.Tag = lnkWebsite.Text;
+            this.lnkEmail.Text = AppUtil.PublisherEmail;
+            this.lnkEmail.Tag = "mailto:" + this.lnkEmail.Text;
+            this.lnkWebsite.Text = AppUtil.PublisherUrl;
+            this.lnkWebsite.Tag = this.lnkWebsite.Text;
         }
 
-        private void AboutForm_HelpButtonClicked(object sender, System.ComponentModel.CancelEventArgs e)
+        /// <summary>
+        /// The about form_ help button clicked.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
+        private void AboutForm_HelpButtonClicked(object sender, CancelEventArgs e)
         {
-            using (var intro = new IntroForm())
-                intro.ShowDialog();
+            using (var intro = new IntroForm()) intro.ShowDialog();
         }
 
+        /// <summary>
+        /// The lnk email_ link clicked.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void lnkEmail_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             var lbl = sender as Label;

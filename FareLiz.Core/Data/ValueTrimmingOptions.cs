@@ -1,13 +1,21 @@
-﻿using System;
-
-namespace SkyDean.FareLiz.Core.Data
+﻿namespace SkyDean.FareLiz.Core.Data
 {
-	[Flags]
-	public enum ValueTrimmingOptions
-	{
-		None = 0,
-		UnquotedOnly = 1,
-		QuotedOnly = 2,
-		All = UnquotedOnly | QuotedOnly
-	}
+    using System;
+
+    /// <summary>The value trimming options.</summary>
+    [Flags]
+    public enum ValueTrimmingOptions
+    {
+        /// <summary>The none.</summary>
+        None = 0, 
+
+        /// <summary>The unquoted only.</summary>
+        UnquotedOnly = 1, 
+
+        /// <summary>The quoted only.</summary>
+        QuotedOnly = 2, 
+
+        /// <summary>The all.</summary>
+        All = UnquotedOnly | QuotedOnly
+    }
 }

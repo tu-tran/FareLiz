@@ -1,66 +1,175 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Windows.Forms;
-using DropNet;
-using DropNet.Models;
-using Ionic.Zip;
-using Ionic.Zlib;
-using log4net;
-using SkyDean.FareLiz.Core;
-using SkyDean.FareLiz.Core.Config;
-using SkyDean.FareLiz.Core.Data;
-using SkyDean.FareLiz.Core.Presentation;
-using SkyDean.FareLiz.Core.Utils;
-using SkyDean.FareLiz.WinForm.Components.Dialog;
-
-namespace SkyDean.FareLiz.DropBox
+﻿namespace SkyDean.FareLiz.DropBox
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Text;
+    using System.Windows.Forms;
+
+    using DropNet;
+    using DropNet.Models;
+
+    using Ionic.Zip;
+    using Ionic.Zlib;
+
+    using log4net;
+
+    using SkyDean.FareLiz.Core;
+    using SkyDean.FareLiz.Core.Config;
+    using SkyDean.FareLiz.Core.Data;
+    using SkyDean.FareLiz.Core.Presentation;
+    using SkyDean.FareLiz.Core.Utils;
+    using SkyDean.FareLiz.WinForm.Components.Dialog;
+
     /// <summary>
     /// Abstract class used for synchronizing object with DropBox
     /// </summary>
-    /// <typeparam name="T">The type of the target fare database.</typeparam>
-    public abstract class DropBoxDbSync<T> : IDatabaseSyncer<T> where T : IFareDatabase, ISyncable
+    /// <typeparam name="T">
+    /// The type of the target fare database.
+    /// </typeparam>
+    public abstract class DropBoxDbSync<T> : IDatabaseSyncer<T>
+        where T : IFareDatabase, ISyncable
     {
-        private const string PKG_EXT = ".dbpkg",
-                             PKG_DATEFORMAT = "yyyyMMddHHmmss";
+        /// <summary>
+        /// The pk g_ ext.
+        /// </summary>
+        private const string PKG_EXT = ".dbpkg";
+
+        /// <summary>
+        /// The pk g_ dateformat.
+        /// </summary>
+        private const string PKG_DATEFORMAT = "yyyyMMddHHmmss";
+
+        /// <summary>
+        /// The pk g_ separator.
+        /// </summary>
         private const char PKG_SEPARATOR = '_';
+
+        /// <summary>
+        /// The _config.
+        /// </summary>
+        private DropBoxSyncerConfig _config = new DropBoxSyncerConfig();
+
+        /// <summary>
+        /// The _formatter.
+        /// </summary>
         private StringFormatter _formatter = new StringFormatter(DropBoxSyncConfigBuilder.Seed);
 
-        public event SyncEventHandler<T> OnValidateData;
-
-        public ISyncable SyncTargetObject { get; set; }
+        /// <summary>
+        /// Gets the sync target.
+        /// </summary>
         public T SyncTarget
         {
-            get { return (T)SyncTargetObject; }
+            get
+            {
+                return (T)this.SyncTargetObject;
+            }
         }
 
-        private DropBoxSyncerConfig _config = new DropBoxSyncerConfig();
+        /// <summary>
+        /// Gets the drop box path.
+        /// </summary>
+        public string DropBoxPath
+        {
+            get
+            {
+                return this._config.DropBoxBaseFolder;
+            }
+        }
+
+        /// <summary>
+        /// The on validate data.
+        /// </summary>
+        public event SyncEventHandler<T> OnValidateData;
+
+        /// <summary>
+        /// Gets or sets the sync target object.
+        /// </summary>
+        public ISyncable SyncTargetObject { get; set; }
+
+        /// <summary>
+        /// Gets or sets the configuration.
+        /// </summary>
         public IConfig Configuration
         {
-            get { return _config; }
-            set { _config = value as DropBoxSyncerConfig; }
+            get
+            {
+                return this._config;
+            }
+
+            set
+            {
+                this._config = value as DropBoxSyncerConfig;
+            }
         }
 
-        public IConfig DefaultConfig { get { return new DropBoxSyncerConfig(); } }
-        public IConfigBuilder CustomConfigBuilder { get { return new DropBoxSyncConfigBuilder(Logger); } }
+        /// <summary>
+        /// Gets the default config.
+        /// </summary>
+        public IConfig DefaultConfig
+        {
+            get
+            {
+                return new DropBoxSyncerConfig();
+            }
+        }
+
+        /// <summary>
+        /// Gets the custom config builder.
+        /// </summary>
+        public IConfigBuilder CustomConfigBuilder
+        {
+            get
+            {
+                return new DropBoxSyncConfigBuilder(this.Logger);
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the logger.
+        /// </summary>
         public ILog Logger { get; set; }
 
-        public string DropBoxPath { get { return _config.DropBoxBaseFolder; } }
-
+        /// <summary>
+        /// The initialize.
+        /// </summary>
         public virtual void Initialize()
         {
-            if (Configuration == null)
-                Configuration = DefaultConfig;
+            if (this.Configuration == null)
+            {
+                this.Configuration = this.DefaultConfig;
+            }
         }
 
+        /// <summary>
+        /// The synchronize.
+        /// </summary>
+        /// <param name="operation">
+        /// The operation.
+        /// </param>
+        /// <param name="data">
+        /// The data.
+        /// </param>
+        /// <param name="callback">
+        /// The callback.
+        /// </param>
+        /// <returns>
+        /// The <see cref="bool"/>.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// </exception>
+        /// <exception cref="ApplicationException">
+        /// </exception>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
         public bool Synchronize(SyncOperation operation, object data, IProgressCallback callback)
         {
             if (data == null)
+            {
                 throw new ArgumentException("Synchronize data cannot be null");
+            }
 
-            Logger.InfoFormat("Synchronizing data [{0}]: {1}", operation, data);
+            this.Logger.InfoFormat("Synchronizing data [{0}]: {1}", operation, data);
 
             bool success = false;
             try
@@ -69,66 +178,78 @@ namespace SkyDean.FareLiz.DropBox
                 callback.Text = "Retrieving DropBox metadata...";
                 string dataFilePath = data.ToString();
                 string dropBoxDbFileName = Path.GetFileName(data.ToString()) + ".compressed";
-                string dropBoxDbFilePath = String.Format("{0}/{1}", DropBoxPath, dropBoxDbFileName);
-                DropNetClient client = GetClient();
-                MetaData baseMeta = GetOrCreateBaseMetaData(client),
-                         fileMeta = null;
+                string dropBoxDbFilePath = string.Format("{0}/{1}", this.DropBoxPath, dropBoxDbFileName);
+                DropNetClient client = this.GetClient();
+                MetaData baseMeta = this.GetOrCreateBaseMetaData(client), fileMeta = null;
 
                 if (baseMeta.Contents != null)
+                {
                     foreach (MetaData m in baseMeta.Contents)
-                        if (String.Compare(m.Name, dropBoxDbFileName, StringComparison.OrdinalIgnoreCase) == 0 && !m.Is_Dir)
-                        // File already exists
+                    {
+                        if (string.Compare(m.Name, dropBoxDbFileName, StringComparison.OrdinalIgnoreCase) == 0 && !m.Is_Dir)
                         {
+                            // File already exists
                             fileMeta = m;
                             break;
                         }
+                    }
+                }
 
                 switch (operation)
                 {
                     case SyncOperation.Download: // Download and Decompress from DropBox
                         if (fileMeta == null)
+                        {
                             throw new ApplicationException("There is no data available from DropBox!");
+                        }
 
                         ConfirmationType confirm = callback.Confirm(
-                                    callback,
-                                    String.Format(
-                                        "The last data was updated on {0} ({1}). Do you want to download and install this database?",
-                                        fileMeta.ModifiedDate, fileMeta.Size),
-                                    "Download Confirmation");
+                            callback, 
+                            string.Format(
+                                "The last data was updated on {0} ({1}). Do you want to download and install this database?", 
+                                fileMeta.ModifiedDate, 
+                                fileMeta.Size), 
+                            "Download Confirmation");
 
                         if (confirm != ConfirmationType.Yes)
+                        {
                             return false;
+                        }
 
                         callback.Title = "Restore Database from DropBox";
-                        string message = String.Format("Downloading data from DropBox ({0})...", fileMeta.Size);
-                        Logger.Info(message);
+                        string message = string.Format("Downloading data from DropBox ({0})...", fileMeta.Size);
+                        this.Logger.Info(message);
                         callback.Text = message;
 
-                        string backupFile = String.Format("{0}.bak.{1}", dataFilePath, DateTime.Now.ToString("yyyyMMddHHmmss"));
+                        string backupFile = string.Format("{0}.bak.{1}", dataFilePath, DateTime.Now.ToString("yyyyMMddHHmmss"));
                         try
                         {
                             byte[] dataBytes = client.GetFile(dropBoxDbFilePath);
                             File.WriteAllBytes(dropBoxDbFileName, dataBytes);
                             if (File.Exists(dataFilePath))
                             {
-                                Logger.InfoFormat("Backup existing data file: [{0}] to [{1}]", dataFilePath, backupFile);
+                                this.Logger.InfoFormat("Backup existing data file: [{0}] to [{1}]", dataFilePath, backupFile);
                                 File.Move(dataFilePath, backupFile);
                             }
                             else
-                                Logger.InfoFormat("Data file [{0}] does not exist... Skip backup", dataFilePath);
+                            {
+                                this.Logger.InfoFormat("Data file [{0}] does not exist... Skip backup", dataFilePath);
+                            }
 
                             message = "Processing received data...";
-                            Logger.Info(message);
+                            this.Logger.Info(message);
                             callback.Text = message;
-                            Logger.Debug("Decompressing received file: " + dropBoxDbFileName);
+                            this.Logger.Debug("Decompressing received file: " + dropBoxDbFileName);
                             using (var zip = ZipFile.Read(dropBoxDbFileName))
                             {
                                 zip.ExtractExistingFile = ExtractExistingFileAction.OverwriteSilently;
                                 zip.ExtractProgress += (o, e) =>
-                                {
-                                    if (e.TotalBytesToTransfer > 0)
-                                        callback.StepTo((int)(100 * e.BytesTransferred / e.TotalBytesToTransfer));
-                                };
+                                    {
+                                        if (e.TotalBytesToTransfer > 0)
+                                        {
+                                            callback.StepTo((int)(100 * e.BytesTransferred / e.TotalBytesToTransfer));
+                                        }
+                                    };
 
                                 callback.Style = ProgressStyle.Continuous;
                                 callback.SetRange(0, 100);
@@ -140,49 +261,70 @@ namespace SkyDean.FareLiz.DropBox
                                 }
                             }
 
-                            Logger.Info("Delete temporary compressed file: " + dropBoxDbFileName);
+                            this.Logger.Info("Delete temporary compressed file: " + dropBoxDbFileName);
                             callback.Text = "Post-processing data...";
                             callback.Style = ProgressStyle.Marquee;
                             File.Delete(dropBoxDbFileName);
 
-                            if (OnValidateData != null)
-                                OnValidateData(SyncTarget, new SyncEventArgs<T>(this, data));
+                            if (this.OnValidateData != null)
+                            {
+                                this.OnValidateData(this.SyncTarget, new SyncEventArgs<T>(this, data));
+                            }
 
-                            Logger.Info("Delete backup file: " + backupFile);
+                            this.Logger.Info("Delete backup file: " + backupFile);
                             File.Delete(backupFile);
                         }
                         catch (Exception ex)
                         {
-                            string actualErr = LogException(ex);
+                            string actualErr = this.LogException(ex);
                             if (!callback.IsAborting)
-                                callback.Inform(callback, "Failed to download database. The previous database will now be restored. The error message was:" + Environment.NewLine + actualErr, "DropBox Database Download", NotificationType.Error);
+                            {
+                                callback.Inform(
+                                    callback, 
+                                    "Failed to download database. The previous database will now be restored. The error message was:"
+                                    + Environment.NewLine + actualErr, 
+                                    "DropBox Database Download", 
+                                    NotificationType.Error);
+                            }
 
                             // Restore the backup and then rethrow the exception to the outer loop
                             if (File.Exists(backupFile))
                             {
                                 if (File.Exists(dataFilePath))
+                                {
                                     File.Delete(dataFilePath);
-                                Logger.InfoFormat("Restore backup file [{0}] to [{1}]", backupFile, dataFilePath);
+                                }
+
+                                this.Logger.InfoFormat("Restore backup file [{0}] to [{1}]", backupFile, dataFilePath);
                                 File.Move(backupFile, dataFilePath);
                             }
                         }
+
                         break;
 
                     case SyncOperation.Upload: // Compress and Upload to DropBox
-                        Logger.Info("Upload data to DropBox");
+                        this.Logger.Info("Upload data to DropBox");
                         if (!File.Exists(dataFilePath))
+                        {
                             throw new ApplicationException("There is no local data available");
+                        }
 
-                        if (callback.Confirm(callback, String.Format("The current data size is {0}. Do you want to proceed ? (Data will be compressed)", StringUtil.FormatSize(new FileInfo(dataFilePath).Length)),
-                                            "Backup database to DropBox") != ConfirmationType.Yes)
+                        if (callback.Confirm(
+                            callback, 
+                            string.Format(
+                                "The current data size is {0}. Do you want to proceed ? (Data will be compressed)", 
+                                StringUtil.FormatSize(new FileInfo(dataFilePath).Length)), 
+                            "Backup database to DropBox") != ConfirmationType.Yes)
+                        {
                             return false;
+                        }
 
                         callback.Title = "Database Compression";
                         message = "Processing offline data for uploading...";
-                        Logger.Info(message);
+                        this.Logger.Info(message);
                         callback.Text = message;
                         string tempDataFile = dropBoxDbFileName + DateTime.Now.ToString(".yyyyMMddHHmmss");
-                        Logger.InfoFormat("Compress [{0}] into [{1}]", dataFilePath, tempDataFile);
+                        this.Logger.InfoFormat("Compress [{0}] into [{1}]", dataFilePath, tempDataFile);
                         callback.Style = ProgressStyle.Continuous;
                         callback.SetRange(0, 100);
                         using (var zip = new ZipFile(tempDataFile))
@@ -191,30 +333,32 @@ namespace SkyDean.FareLiz.DropBox
                             zip.CompressionMethod = CompressionMethod.BZip2;
                             zip.AddFile(dataFilePath);
                             zip.SaveProgress += (o, e) =>
-                            {
-                                if (e.TotalBytesToTransfer > 0)
-                                    callback.StepTo((int)(100 * e.BytesTransferred / e.TotalBytesToTransfer));
-                            };
+                                {
+                                    if (e.TotalBytesToTransfer > 0)
+                                    {
+                                        callback.StepTo((int)(100 * e.BytesTransferred / e.TotalBytesToTransfer));
+                                    }
+                                };
                             zip.Save();
                         }
 
-                        message = String.Format("Sending data ({0})...", StringUtil.FormatSize(new FileInfo(tempDataFile).Length));
-                        Logger.Info(message);
+                        message = string.Format("Sending data ({0})...", StringUtil.FormatSize(new FileInfo(tempDataFile).Length));
+                        this.Logger.Info(message);
                         callback.Title = "Backup Database to DropBox";
                         callback.Text = message;
                         callback.Style = ProgressStyle.Marquee;
-                        client.UploadFile(DropBoxPath, tempDataFile, File.ReadAllBytes(tempDataFile));
-                        Logger.Info("Delete temporary file: " + tempDataFile);
+                        client.UploadFile(this.DropBoxPath, tempDataFile, File.ReadAllBytes(tempDataFile));
+                        this.Logger.Info("Delete temporary file: " + tempDataFile);
                         File.Delete(tempDataFile);
 
                         if (fileMeta != null)
                         {
-                            Logger.Info("Delete DropBox online file: " + dropBoxDbFilePath);
+                            this.Logger.Info("Delete DropBox online file: " + dropBoxDbFilePath);
                             client.Delete(dropBoxDbFilePath);
                         }
 
-                        string dropBoxTempFile = String.Format("{0}/{1}", DropBoxPath, tempDataFile);
-                        Logger.InfoFormat("Move DropBox online file: [{0}] -> [{1}]", dropBoxTempFile, dropBoxDbFilePath);
+                        string dropBoxTempFile = string.Format("{0}/{1}", this.DropBoxPath, tempDataFile);
+                        this.Logger.InfoFormat("Move DropBox online file: [{0}] -> [{1}]", dropBoxTempFile, dropBoxDbFilePath);
                         client.Move(dropBoxTempFile, dropBoxDbFilePath);
                         break;
 
@@ -222,48 +366,114 @@ namespace SkyDean.FareLiz.DropBox
                         throw new NotImplementedException("This operation is not implemented!");
                 }
 
-                Logger.InfoFormat("DropBox {0} completed", operation);
+                this.Logger.InfoFormat("DropBox {0} completed", operation);
                 success = true;
             }
             catch (Exception ex)
             {
-                var message = LogException(ex);
+                var message = this.LogException(ex);
                 callback.Inform(callback, message, "DropBox Database Synchronizing", NotificationType.Error);
             }
 
-            Logger.InfoFormat("Synchronization [{0}] ended", operation);
+            this.Logger.InfoFormat("Synchronization [{0}] ended", operation);
             return success;
         }
 
+        /// <summary>
+        /// The receive.
+        /// </summary>
+        /// <param name="importedPackages">
+        /// The imported packages.
+        /// </param>
+        /// <param name="callback">
+        /// The callback.
+        /// </param>
+        /// <returns>
+        /// The <see cref="IList"/>.
+        /// </returns>
         public IList<DataPackage<TravelRoute>> Receive(IList<string> importedPackages, IProgressCallback callback)
         {
             IList<DataPackage<TravelRoute>> result = null;
-            Logger.Info("Receiving packages from DropBox");
-            ProgressDialog.ExecuteTask(null, "DropBox Synchronization", "Retrieving data packages from configured DropBox account...", GetType().Name + "-Receive", ProgressBarStyle.Marquee, Logger, cb =>
-                        {
-                            result = DoReceive(cb as ProgressDialog, importedPackages);
-                        });
+            this.Logger.Info("Receiving packages from DropBox");
+            ProgressDialog.ExecuteTask(
+                null, 
+                "DropBox Synchronization", 
+                "Retrieving data packages from configured DropBox account...", 
+                this.GetType().Name + "-Receive", 
+                ProgressBarStyle.Marquee, 
+                this.Logger, 
+                cb => { result = this.DoReceive(cb as ProgressDialog, importedPackages); });
 
             return result;
         }
 
+        /// <summary>
+        /// The send.
+        /// </summary>
+        /// <param name="data">
+        /// The data.
+        /// </param>
+        /// <param name="callback">
+        /// The callback.
+        /// </param>
+        public void Send(DataPackage<TravelRoute> data, IProgressCallback callback)
+        {
+            this.Logger.InfoFormat("Send data to DropBox");
+            var client = this.GetClient();
+            MetaData baseData = this.GetOrCreateBaseMetaData(client);
+            if (baseData == null)
+            {
+                this.Logger.Warn("There is no data to be sent");
+            }
+            else
+            {
+                var formatter = new ProtoBufTransfer(this.Logger);
+                byte[] rawData = formatter.ToRaw(data);
+                if (rawData != null)
+                {
+                    byte[] compressedRaw = this.Compress(rawData, data.Id);
+                    if (compressedRaw != null)
+                    {
+                        this.Logger.InfoFormat("Upload package [{0}] to DropBox", data.Id);
+                        string newFile = data.CreatedDate.ToString(PKG_DATEFORMAT) + PKG_SEPARATOR + data.Id + PKG_EXT;
+                        client.UploadFile(baseData.Path, newFile, compressedRaw);
+                        this.Logger.InfoFormat("Package [{0}] was uploaded ({1})", data.Id, StringUtil.FormatSize(compressedRaw.LongLength));
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// The do receive.
+        /// </summary>
+        /// <param name="callback">
+        /// The callback.
+        /// </param>
+        /// <param name="importedPackages">
+        /// The imported packages.
+        /// </param>
+        /// <returns>
+        /// The <see cref="IList"/>.
+        /// </returns>
         private IList<DataPackage<TravelRoute>> DoReceive(ProgressDialog callback, IList<string> importedPackages)
         {
-            Logger.Info("Receive DropBox packages");
+            this.Logger.Info("Receive DropBox packages");
             IList<DataPackage<TravelRoute>> result = null;
             callback.Begin();
             callback.Text = "Retrieving DropBox metadata...";
-            var client = GetClient();
-            MetaData baseData = GetOrCreateBaseMetaData(client);
+            var client = this.GetClient();
+            MetaData baseData = this.GetOrCreateBaseMetaData(client);
             if (baseData != null && baseData.Contents != null)
             {
                 callback.Text = "Processing DropBox metadata...";
                 var pkgIds = new List<string>();
                 foreach (MetaData m in baseData.Contents)
+                {
                     if (!m.Is_Dir && m.Extension == PKG_EXT)
                     {
                         pkgIds.Add(m.Path);
                     }
+                }
 
                 // Remove imported packages from the list
                 if (importedPackages != null && importedPackages.Count > 0)
@@ -278,7 +488,7 @@ namespace SkyDean.FareLiz.DropBox
                             string curId = parts[1];
                             for (int j = 0; j < importedPackages.Count; j++)
                             {
-                                if (String.Equals(curId, importedPackages[j], StringComparison.OrdinalIgnoreCase))
+                                if (string.Equals(curId, importedPackages[j], StringComparison.OrdinalIgnoreCase))
                                 {
                                     // Package was already imported: Flag it to be removed
                                     exist = true;
@@ -287,11 +497,13 @@ namespace SkyDean.FareLiz.DropBox
                             }
                         }
                         else
-                            exist = true;   // Invalid file name: Consider it to be exist and remove it later
+                        {
+                            exist = true; // Invalid file name: Consider it to be exist and remove it later
+                        }
 
                         if (exist)
                         {
-                            Logger.DebugFormat("Package [{0}] already existed", pkgIds[i]);
+                            this.Logger.DebugFormat("Package [{0}] already existed", pkgIds[i]);
                             pkgIds.RemoveAt(i--);
                         }
                     }
@@ -306,17 +518,22 @@ namespace SkyDean.FareLiz.DropBox
                     {
                         callback.Text = f;
                         byte[] rawData = client.GetFile(f);
-                        byte[] extractData = Decompress(rawData);
+                        byte[] extractData = this.Decompress(rawData);
                         if (extractData == null)
-                            Logger.WarnFormat("Package [{0}] is corrupted", f);
+                        {
+                            this.Logger.WarnFormat("Package [{0}] is corrupted", f);
+                        }
                         else
                         {
-                            Logger.InfoFormat("Import package [{0}] from DropBox", f);
-                            var formatter = new ProtoBufTransfer(Logger);
+                            this.Logger.InfoFormat("Import package [{0}] from DropBox", f);
+                            var formatter = new ProtoBufTransfer(this.Logger);
                             var newPkg = formatter.FromRaw<DataPackage<TravelRoute>>(extractData);
                             if (newPkg != null && newPkg.Data != null && newPkg.Data.Count > 0)
+                            {
                                 result.Add(newPkg);
+                            }
                         }
+
                         callback.Increment(1);
                     }
                 }
@@ -325,77 +542,90 @@ namespace SkyDean.FareLiz.DropBox
             return result;
         }
 
-        public void Send(DataPackage<TravelRoute> data, IProgressCallback callback)
-        {
-            Logger.InfoFormat("Send data to DropBox");
-            var client = GetClient();
-            MetaData baseData = GetOrCreateBaseMetaData(client);
-            if (baseData == null)
-                Logger.Warn("There is no data to be sent");
-            else
-            {
-                var formatter = new ProtoBufTransfer(Logger);
-                byte[] rawData = formatter.ToRaw(data);
-                if (rawData != null)
-                {
-                    byte[] compressedRaw = Compress(rawData, data.Id);
-                    if (compressedRaw != null)
-                    {
-                        Logger.InfoFormat("Upload package [{0}] to DropBox", data.Id);
-                        string newFile = data.CreatedDate.ToString(PKG_DATEFORMAT) + PKG_SEPARATOR + data.Id + PKG_EXT;
-                        client.UploadFile(baseData.Path, newFile, compressedRaw);
-                        Logger.InfoFormat("Package [{0}] was uploaded ({1})", data.Id, StringUtil.FormatSize(compressedRaw.LongLength));
-                    }
-                }
-            }
-        }
-
+        /// <summary>
+        /// The get client.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="DropNetClient"/>.
+        /// </returns>
+        /// <exception cref="ConfigurationException">
+        /// </exception>
         private DropNetClient GetClient()
         {
-            string apiKey = Convert(_config.ApiKey);
-            string apiSecret = Convert(_config.ApiSecret);
-            string userToken = Convert(_config.UserToken);
-            string userSecret = Convert(_config.UserSecret);
+            string apiKey = this.Convert(this._config.ApiKey);
+            string apiSecret = this.Convert(this._config.ApiSecret);
+            string userToken = this.Convert(this._config.UserToken);
+            string userSecret = this.Convert(this._config.UserSecret);
 
-            bool isError = (String.IsNullOrEmpty(apiKey) || String.IsNullOrEmpty(apiSecret) || String.IsNullOrEmpty(userToken) || String.IsNullOrEmpty(userSecret));
+            bool isError = string.IsNullOrEmpty(apiKey) || string.IsNullOrEmpty(apiSecret) || string.IsNullOrEmpty(userToken)
+                            || string.IsNullOrEmpty(userSecret);
             if (isError)
-                throw new ConfigurationException(this, "The plugin has not been properly configured. Please make sure that you have authenticated with DropBox");
+            {
+                throw new ConfigurationException(
+                    this, 
+                    "The plugin has not been properly configured. Please make sure that you have authenticated with DropBox");
+            }
 
             var result = new DropNetClient(apiKey, apiSecret, userToken, userSecret) { UseSandbox = true };
             return result;
         }
 
+        /// <summary>
+        /// The convert.
+        /// </summary>
+        /// <param name="data">
+        /// The data.
+        /// </param>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
         private string Convert(byte[] data)
         {
             if (data == null)
+            {
                 return null;
+            }
 
             var hexStr = Encoding.UTF8.GetString(data);
-            return _formatter.Untag(hexStr);
+            return this._formatter.Untag(hexStr);
         }
 
-        MetaData GetOrCreateBaseMetaData(DropNetClient dropBoxClient)
+        /// <summary>
+        /// The get or create base meta data.
+        /// </summary>
+        /// <param name="dropBoxClient">
+        /// The drop box client.
+        /// </param>
+        /// <returns>
+        /// The <see cref="MetaData"/>.
+        /// </returns>
+        private MetaData GetOrCreateBaseMetaData(DropNetClient dropBoxClient)
         {
-            Logger.Info("Check DropBox folder status");
+            this.Logger.Info("Check DropBox folder status");
             MetaData rootMeta = null;
 
             try
             {
-                rootMeta = dropBoxClient.GetMetaData(DropBoxPath);
+                rootMeta = dropBoxClient.GetMetaData(this.DropBoxPath);
                 if (rootMeta.Is_Deleted)
+                {
                     rootMeta = null;
+                }
             }
             catch (Exception ex)
             {
                 var realEx = DropBoxExceptionHandler.HandleException(ex);
                 if (realEx != null)
-                    Logger.Warn("Could not get DropBox base data path: " + realEx.Message);
+                {
+                    this.Logger.Warn("Could not get DropBox base data path: " + realEx.Message);
+                }
             }
 
             if (rootMeta == null)
+            {
                 try
                 {
-                    rootMeta = dropBoxClient.CreateFolder(DropBoxPath);
+                    rootMeta = dropBoxClient.CreateFolder(this.DropBoxPath);
                 }
                 catch (Exception ex)
                 {
@@ -404,17 +634,32 @@ namespace SkyDean.FareLiz.DropBox
                     {
                         string err = "Failed to access DropBox: " + realEx.Message;
                         MessageBox.Show(err, "DropBox Sync Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        Logger.Error(err);
+                        this.Logger.Error(err);
                     }
                 }
+            }
 
             return rootMeta;
         }
 
+        /// <summary>
+        /// The compress.
+        /// </summary>
+        /// <param name="input">
+        /// The input.
+        /// </param>
+        /// <param name="entryName">
+        /// The entry name.
+        /// </param>
+        /// <returns>
+        /// The <see cref="byte[]"/>.
+        /// </returns>
         private byte[] Compress(byte[] input, string entryName)
         {
             if (input == null)
+            {
                 return null;
+            }
 
             using (var outStream = new MemoryStream())
             {
@@ -430,6 +675,15 @@ namespace SkyDean.FareLiz.DropBox
             }
         }
 
+        /// <summary>
+        /// The decompress.
+        /// </summary>
+        /// <param name="input">
+        /// The input.
+        /// </param>
+        /// <returns>
+        /// The <see cref="byte[]"/>.
+        /// </returns>
         private byte[] Decompress(byte[] input)
         {
             using (var inputStream = new MemoryStream(input))
@@ -448,16 +702,27 @@ namespace SkyDean.FareLiz.DropBox
             return null;
         }
 
+        /// <summary>
+        /// The log exception.
+        /// </summary>
+        /// <param name="ex">
+        /// The ex.
+        /// </param>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
         private string LogException(Exception ex)
         {
             var realEx = DropBoxExceptionHandler.HandleException(ex);
             string err = "Failed to synchronize data with DropBox: ";
             if (realEx == null)
+            {
                 err += ex.Message;
+            }
             else
             {
                 err += realEx.Message;
-                Logger.Error(err);
+                this.Logger.Error(err);
             }
 
             return err;

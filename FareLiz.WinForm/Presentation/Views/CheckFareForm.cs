@@ -1,248 +1,412 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Globalization;
-using System.Linq;
-using System.Windows.Forms;
-using SkyDean.FareLiz.Core;
-using SkyDean.FareLiz.Core.Data;
-using SkyDean.FareLiz.Core.Presentation;
-using SkyDean.FareLiz.Core.Utils;
-using SkyDean.FareLiz.Data.Monitoring;
-using SkyDean.FareLiz.WinForm.Components;
-using SkyDean.FareLiz.WinForm.Components.Controls;
-using SkyDean.FareLiz.WinForm.Components.Controls.Button;
-using SkyDean.FareLiz.WinForm.Components.Controls.Custom;
-using SkyDean.FareLiz.WinForm.Components.Controls.DatePicker.EventClasses;
-using SkyDean.FareLiz.WinForm.Components.Dialog;
-using SkyDean.FareLiz.WinForm.Components.Utils;
-using SkyDean.FareLiz.WinForm.Presentation.Controllers;
-using SkyDean.FareLiz.WinForm.Properties;
-using SkyDean.FareLiz.WinForm.Utils;
-
-namespace SkyDean.FareLiz.WinForm.Presentation.Views
+﻿namespace SkyDean.FareLiz.WinForm.Presentation.Views
 {
-    /// <summary>
-    /// Windows Form used for checking flexible fare data
-    /// </summary>
+    using System;
+    using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.Drawing;
+    using System.Linq;
+    using System.Windows.Forms;
+
+    using SkyDean.FareLiz.Core;
+    using SkyDean.FareLiz.Core.Data;
+    using SkyDean.FareLiz.Core.Presentation;
+    using SkyDean.FareLiz.Core.Utils;
+    using SkyDean.FareLiz.Data.Monitoring;
+    using SkyDean.FareLiz.WinForm.Components;
+    using SkyDean.FareLiz.WinForm.Components.Controls;
+    using SkyDean.FareLiz.WinForm.Components.Controls.Button;
+    using SkyDean.FareLiz.WinForm.Components.Controls.Custom;
+    using SkyDean.FareLiz.WinForm.Components.Controls.DatePicker.EventClasses;
+    using SkyDean.FareLiz.WinForm.Components.Dialog;
+    using SkyDean.FareLiz.WinForm.Components.Utils;
+    using SkyDean.FareLiz.WinForm.Presentation.Controllers;
+    using SkyDean.FareLiz.WinForm.Properties;
+    using SkyDean.FareLiz.WinForm.Utils;
+
+    /// <summary>Windows Form used for checking flexible fare data</summary>
     internal partial class CheckFareForm : SmartForm
     {
-        private readonly INotifier notifier = new TaskbarTextNotifier();
-        private readonly ToolStripControl<Windows7ProgressBar> loadProgress = new ToolStripControl<Windows7ProgressBar> { Visible = false };
-        private readonly ToolStripStatusLabel springLabelStrip = new ToolStripStatusLabel { Spring = true };
+        /// <summary>
+        /// The browser starting color.
+        /// </summary>
+        private readonly Color BrowserStartingColor = Color.FromArgb(255, 255, 245);
+
+        /// <summary>
+        /// The browser success color.
+        /// </summary>
+        private readonly Color BrowserSuccessColor = Color.FromArgb(237, 255, 237);
+
+        /// <summary>
+        /// The browser failed color.
+        /// </summary>
+        private readonly Color BrowserFailedColor = Color.FromArgb(255, 240, 240);
+
+        /// <summary>
+        /// The chk auto focus tab strip.
+        /// </summary>
         private readonly ToolStripControl<CheckBox> chkAutoFocusTabStrip = new ToolStripControl<CheckBox>();
+
+        /// <summary>
+        /// The chk auto sync strip.
+        /// </summary>
         private readonly ToolStripControl<CheckBox> chkAutoSyncStrip = new ToolStripControl<CheckBox>();
+
+        /// <summary>
+        /// The chk exit after done strip.
+        /// </summary>
         private readonly ToolStripControl<CheckBox> chkExitAfterDoneStrip = new ToolStripControl<CheckBox>();
 
-        private bool _isChangingButtonState = false;
+        /// <summary>
+        /// The load progress.
+        /// </summary>
+        private readonly ToolStripControl<Windows7ProgressBar> loadProgress = new ToolStripControl<Windows7ProgressBar> { Visible = false };
 
-        private readonly Color BrowserStartingColor = Color.FromArgb(255, 255, 245),
-                               BrowserSuccessColor = Color.FromArgb(237, 255, 237),
-                               BrowserFailedColor = Color.FromArgb(255, 240, 240);
+        /// <summary>
+        /// The notifier.
+        /// </summary>
+        private readonly INotifier notifier = new TaskbarTextNotifier();
 
-        private bool _firstCloseForLiveMonitor = true;
+        /// <summary>
+        /// The spring label strip.
+        /// </summary>
+        private readonly ToolStripStatusLabel springLabelStrip = new ToolStripStatusLabel { Spring = true };
+
+        /// <summary>
+        /// The _controller.
+        /// </summary>
         private CheckFareController _controller;
+
+        /// <summary>
+        /// The _execution param.
+        /// </summary>
         private ExecutionParam _executionParam;
 
+        /// <summary>
+        /// The _first close for live monitor.
+        /// </summary>
+        private bool _firstCloseForLiveMonitor = true;
+
+        /// <summary>
+        /// The _is changing button state.
+        /// </summary>
+        private bool _isChangingButtonState;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CheckFareForm"/> class.
+        /// </summary>
+        /// <param name="param">
+        /// The param.
+        /// </param>
+        public CheckFareForm(ExecutionParam param)
+        {
+            this.InitializeComponent();
+            this.Text = AppUtil.ProductName + " " + this.Text;
+
+            this.Initialize(param);
+            this.trayIcon.Icon = this.Icon;
+            GUIBuilder.AttachMenuToTrayIcon(this, this.trayIcon, true);
+            this.fareBrowserTabs.ImageList = new ImageList { ImageSize = new Size(6, 6) }; // Get extra empty space on tab header
+        }
+
+        /// <summary>
+        /// Gets the min duration.
+        /// </summary>
         internal int MinDuration
         {
             get
             {
-                return this.InvokeIfNeeded(() =>
-                    numMinDuration.Enabled ? Decimal.ToInt32(numMinDuration.Value) : int.MinValue);
+                return this.InvokeIfNeeded(() => this.numMinDuration.Enabled ? decimal.ToInt32(this.numMinDuration.Value) : int.MinValue);
             }
         }
 
+        /// <summary>
+        /// Gets the max duration.
+        /// </summary>
         internal int MaxDuration
         {
             get
             {
-                return this.InvokeIfNeeded(() =>
-                    numMaxDuration.Enabled ? Decimal.ToInt32(numMaxDuration.Value) : int.MaxValue);
+                return this.InvokeIfNeeded(() => this.numMaxDuration.Enabled ? decimal.ToInt32(this.numMaxDuration.Value) : int.MaxValue);
             }
         }
 
+        /// <summary>
+        /// Gets a value indicating whether is round trip.
+        /// </summary>
         internal bool IsRoundTrip
         {
-            get { return this.InvokeIfNeeded(() => chkReturnDate.Checked); }
+            get
+            {
+                return this.InvokeIfNeeded(() => this.chkReturnDate.Checked);
+            }
         }
 
+        /// <summary>
+        /// Gets the departure date range.
+        /// </summary>
         internal DateRangeDiff DepartureDateRange
         {
             get
             {
-                return this.InvokeIfNeeded(() =>
-                    new DateRangeDiff((int)numDepartDateRangePlus.Value, (int)numDepartDateRangeMinus.Value));
+                return this.InvokeIfNeeded(() => new DateRangeDiff((int)this.numDepartDateRangePlus.Value, (int)this.numDepartDateRangeMinus.Value));
             }
         }
 
+        /// <summary>
+        /// Gets the departure date.
+        /// </summary>
         internal DateTime DepartureDate
         {
-            get { return this.InvokeIfNeeded(() => departureDatePicker.Value); }
+            get
+            {
+                return this.InvokeIfNeeded(() => this.departureDatePicker.Value);
+            }
         }
 
+        /// <summary>
+        /// Gets the return date.
+        /// </summary>
         internal DateTime ReturnDate
         {
-            get { return this.InvokeIfNeeded(() => departureDatePicker.Value); }
+            get
+            {
+                return this.InvokeIfNeeded(() => this.departureDatePicker.Value);
+            }
         }
 
+        /// <summary>
+        /// Gets the departure.
+        /// </summary>
         internal Airport Departure
         {
-            get { return this.InvokeIfNeeded(() => txtDeparture.SelectedAirport); }
+            get
+            {
+                return this.InvokeIfNeeded(() => this.txtDeparture.SelectedAirport);
+            }
         }
+
+        /// <summary>
+        /// Gets the destination.
+        /// </summary>
         internal Airport Destination
         {
-            get { return this.InvokeIfNeeded(() => txtDestination.SelectedAirport); }
+            get
+            {
+                return this.InvokeIfNeeded(() => this.txtDestination.SelectedAirport);
+            }
         }
+
+        /// <summary>
+        /// Gets a value indicating whether auto sync.
+        /// </summary>
         internal bool AutoSync
         {
-            get { return this.InvokeIfNeeded(() => chkAutoSyncStrip.ControlItem.Checked); }
+            get
+            {
+                return this.InvokeIfNeeded(() => this.chkAutoSyncStrip.ControlItem.Checked);
+            }
         }
 
-        internal INotifier Notifier { get { return notifier; } }
-
-        public CheckFareForm(ExecutionParam param)
+        /// <summary>
+        /// Gets the notifier.
+        /// </summary>
+        internal INotifier Notifier
         {
-            InitializeComponent();
-            Text = AppUtil.ProductName + " " + Text;
-
-            Initialize(param);
-            trayIcon.Icon = Icon;
-            GUIBuilder.AttachMenuToTrayIcon(this, trayIcon, true);
-            fareBrowserTabs.ImageList = new ImageList { ImageSize = new Size(6, 6) }; // Get extra empty space on tab header
+            get
+            {
+                return this.notifier;
+            }
         }
 
+        /// <summary>
+        /// The attach.
+        /// </summary>
+        /// <param name="controller">
+        /// The controller.
+        /// </param>
         internal void Attach(CheckFareController controller)
         {
-            _controller = controller;
-            _controller.View = this;
+            this._controller = controller;
+            this._controller.View = this;
 
-            _controller.Events.MonitorStarting += OnMonitorStarting;
+            this._controller.Events.MonitorStarting += this.OnMonitorStarting;
 
-            _controller.Events[OperationMode.ShowFare].RequestStarting += FareMonitor_RequestStarting;
-            _controller.Events[OperationMode.ShowFare].RequestStopping += FareMonitor_RequestCompleted;
-            _controller.Events[OperationMode.ShowFare].RequestCompleted += ShowFare_RequestCompleted;
+            this._controller.Events[OperationMode.ShowFare].RequestStarting += this.FareMonitor_RequestStarting;
+            this._controller.Events[OperationMode.ShowFare].RequestStopping += this.FareMonitor_RequestCompleted;
+            this._controller.Events[OperationMode.ShowFare].RequestCompleted += this.ShowFare_RequestCompleted;
 
-            _controller.Events[OperationMode.GetFareAndSave].RequestStarting += FareMonitor_RequestStarting;
-            _controller.Events[OperationMode.GetFareAndSave].RequestStopping += FareMonitor_RequestCompleted;
-            _controller.Events[OperationMode.GetFareAndSave].RequestCompleted += CloseAndExport_RequestCompleted;
+            this._controller.Events[OperationMode.GetFareAndSave].RequestStarting += this.FareMonitor_RequestStarting;
+            this._controller.Events[OperationMode.GetFareAndSave].RequestStopping += this.FareMonitor_RequestCompleted;
+            this._controller.Events[OperationMode.GetFareAndSave].RequestCompleted += this.CloseAndExport_RequestCompleted;
 
-            _controller.Events[OperationMode.LiveMonitor].RequestStarting += LiveFare_RequestStarting;
-            _controller.Events[OperationMode.LiveMonitor].MonitorStopping += LiveFareMonitorStopping;
+            this._controller.Events[OperationMode.LiveMonitor].RequestStarting += this.LiveFare_RequestStarting;
+            this._controller.Events[OperationMode.LiveMonitor].MonitorStopping += this.LiveFareMonitorStopping;
         }
 
+        /// <summary>
+        /// The on monitor starting.
+        /// </summary>
+        /// <param name="monitor">
+        /// The monitor.
+        /// </param>
         private void OnMonitorStarting(FareRequestMonitor monitor)
         {
-            SetScanner(false);
-            loadProgress.ControlItem.Value = loadProgress.ControlItem.Maximum = 0;
-            loadProgress.ControlItem.ShowInTaskbar = false;
+            this.SetScanner(false);
+            this.loadProgress.ControlItem.Value = this.loadProgress.ControlItem.Maximum = 0;
+            this.loadProgress.ControlItem.ShowInTaskbar = false;
             if (monitor.Mode == OperationMode.ShowFare)
-                SetDataProcessor(false);
+            {
+                this.SetDataProcessor(false);
+            }
 
             if (monitor.Mode == OperationMode.LiveMonitor)
             {
-                trayIcon.Visible = true;
+                this.trayIcon.Visible = true;
             }
             else
             {
-                ClearBrowserTabs();
-                loadProgress.ControlItem.Maximum = monitor.PendingRequests.Count;
-                loadProgress.ControlItem.Style = (monitor.PendingRequests.Count == 1 ? ProgressBarStyle.Marquee : ProgressBarStyle.Continuous);
-                loadProgress.Visible = loadProgress.ControlItem.ShowInTaskbar = true;
+                this.ClearBrowserTabs();
+                this.loadProgress.ControlItem.Maximum = monitor.PendingRequests.Count;
+                this.loadProgress.ControlItem.Style = monitor.PendingRequests.Count == 1 ? ProgressBarStyle.Marquee : ProgressBarStyle.Continuous;
+                this.loadProgress.Visible = this.loadProgress.ControlItem.ShowInTaskbar = true;
             }
 
             this.SetScanner(true);
         }
 
+        /// <summary>
+        /// The initialize.
+        /// </summary>
+        /// <param name="param">
+        /// The param.
+        /// </param>
         private void Initialize(ExecutionParam param)
         {
             // Update the view based on Execution parameters
-            _executionParam = param.ReflectionDeepClone(AppContext.Logger);
+            this._executionParam = param.ReflectionDeepClone(AppContext.Logger);
 
-            txtDeparture.SelectedAirport = param.Departure;
-            txtDestination.SelectedAirport = param.Destination;
-            if (param.MinStayDuration == Int32.MinValue || param.MinStayDuration == Int32.MaxValue)
+            this.txtDeparture.SelectedAirport = param.Departure;
+            this.txtDestination.SelectedAirport = param.Destination;
+            if (param.MinStayDuration == int.MinValue || param.MinStayDuration == int.MaxValue)
+            {
                 param.MinStayDuration = Settings.Default.DefaultDurationMin;
-            if (param.MaxStayDuration == Int32.MinValue || param.MaxStayDuration == Int32.MaxValue)
+            }
+
+            if (param.MaxStayDuration == int.MinValue || param.MaxStayDuration == int.MaxValue)
+            {
                 param.MaxStayDuration = Settings.Default.DefaultDurationMax;
+            }
+
             if (param.DepartureDate.IsUndefined() || param.DepartureDate < DateTime.Now)
+            {
                 param.DepartureDate = DateTime.Now.AddDays(1);
+            }
+
             if (param.ReturnDate.IsUndefined() || param.ReturnDate < param.DepartureDate)
+            {
                 param.ReturnDate = param.DepartureDate.AddDays(param.MaxStayDuration);
-            departureDatePicker.MinDate = returnDatePicker.MinDate = DateTime.Now.Date;
-            departureDatePicker.Value = param.DepartureDate;
-            returnDatePicker.Value = param.ReturnDate;
-            numDepartDateRangePlus.Value = param.DepartureDateRange.Plus;
-            numDepartDateRangeMinus.Value = param.DepartureDateRange.Minus;
-            numReturnDateRangePlus.Value = param.ReturnDateRange.Plus;
-            numReturnDateRangeMinus.Value = param.ReturnDateRange.Minus;
-            numMinDuration.Value = param.MinStayDuration;
-            numMaxDuration.Value = param.MaxStayDuration;
-            numPriceLimit.Value = param.PriceLimit > 0 ? param.PriceLimit : 1;
+            }
 
-            loadProgress.ControlItem.ContainerControl = this;
-            loadProgress.ControlItem.ShowInTaskbar = false;
-            statusStrip.Items.Add(loadProgress);
+            this.departureDatePicker.MinDate = this.returnDatePicker.MinDate = DateTime.Now.Date;
+            this.departureDatePicker.Value = param.DepartureDate;
+            this.returnDatePicker.Value = param.ReturnDate;
+            this.numDepartDateRangePlus.Value = param.DepartureDateRange.Plus;
+            this.numDepartDateRangeMinus.Value = param.DepartureDateRange.Minus;
+            this.numReturnDateRangePlus.Value = param.ReturnDateRange.Plus;
+            this.numReturnDateRangeMinus.Value = param.ReturnDateRange.Minus;
+            this.numMinDuration.Value = param.MinStayDuration;
+            this.numMaxDuration.Value = param.MaxStayDuration;
+            this.numPriceLimit.Value = param.PriceLimit > 0 ? param.PriceLimit : 1;
 
-            statusStrip.Items.Add(springLabelStrip);
+            this.loadProgress.ControlItem.ContainerControl = this;
+            this.loadProgress.ControlItem.ShowInTaskbar = false;
+            this.statusStrip.Items.Add(this.loadProgress);
 
-            chkAutoFocusTabStrip.Control.Text = "Auto-focus completed tab";
-            chkAutoFocusTabStrip.Alignment = ToolStripItemAlignment.Right;
-            statusStrip.Items.Add(chkAutoFocusTabStrip);
+            this.statusStrip.Items.Add(this.springLabelStrip);
 
-            chkAutoSyncStrip.Control.Text = "Auto-sync exported data";
-            chkAutoSyncStrip.Alignment = ToolStripItemAlignment.Right;
-            chkAutoSyncStrip.ControlItem.DataBindings.Clear();
-            chkAutoSyncStrip.ControlItem.DataBindings.Add("Checked", _executionParam, "AutoSync");
-            statusStrip.Items.Add(chkAutoSyncStrip);
+            this.chkAutoFocusTabStrip.Control.Text = "Auto-focus completed tab";
+            this.chkAutoFocusTabStrip.Alignment = ToolStripItemAlignment.Right;
+            this.statusStrip.Items.Add(this.chkAutoFocusTabStrip);
 
-            chkExitAfterDoneStrip.ControlItem.Text = "Exit after done";
-            chkExitAfterDoneStrip.ControlItem.DataBindings.Clear();
-            chkExitAfterDoneStrip.ControlItem.DataBindings.Add("Checked", _executionParam, "ExitAfterDone");
-            chkExitAfterDoneStrip.Alignment = ToolStripItemAlignment.Right;
-            statusStrip.Items.Add(chkExitAfterDoneStrip);
-            foreach (ToolStripItem item in statusStrip.Items)
+            this.chkAutoSyncStrip.Control.Text = "Auto-sync exported data";
+            this.chkAutoSyncStrip.Alignment = ToolStripItemAlignment.Right;
+            this.chkAutoSyncStrip.ControlItem.DataBindings.Clear();
+            this.chkAutoSyncStrip.ControlItem.DataBindings.Add("Checked", this._executionParam, "AutoSync");
+            this.statusStrip.Items.Add(this.chkAutoSyncStrip);
+
+            this.chkExitAfterDoneStrip.ControlItem.Text = "Exit after done";
+            this.chkExitAfterDoneStrip.ControlItem.DataBindings.Clear();
+            this.chkExitAfterDoneStrip.ControlItem.DataBindings.Add("Checked", this._executionParam, "ExitAfterDone");
+            this.chkExitAfterDoneStrip.Alignment = ToolStripItemAlignment.Right;
+            this.statusStrip.Items.Add(this.chkExitAfterDoneStrip);
+            foreach (ToolStripItem item in this.statusStrip.Items)
+            {
                 item.Margin = new Padding(3, 1, 3, 1);
+            }
 
-            UpdateViewForDuration();
-            ResizeStatusStrip();
+            this.UpdateViewForDuration();
+            this.ResizeStatusStrip();
         }
 
+        /// <summary>
+        /// The update view for duration.
+        /// </summary>
         private void UpdateViewForDuration()
         {
-            bool skipDurationConstraint = numDepartDateRangePlus.Value == 0 && numDepartDateRangeMinus.Value == 0
-                                          && numReturnDateRangePlus.Value == 0 && numReturnDateRangeMinus.Value == 0;
-            numMinDuration.Enabled = numMaxDuration.Enabled = !skipDurationConstraint;
+            bool skipDurationConstraint = this.numDepartDateRangePlus.Value == 0 && this.numDepartDateRangeMinus.Value == 0
+                                          && this.numReturnDateRangePlus.Value == 0 && this.numReturnDateRangeMinus.Value == 0;
+            this.numMinDuration.Enabled = this.numMaxDuration.Enabled = !skipDurationConstraint;
         }
 
+        /// <summary>
+        /// The set scanner.
+        /// </summary>
+        /// <param name="enabled">
+        /// The enabled.
+        /// </param>
         internal void SetScanner(bool enabled)
         {
-            btnShowFare.Enabled = btnLiveMonitor.Enabled = btnGetFareAndSave.Enabled = enabled;
+            this.btnShowFare.Enabled = this.btnLiveMonitor.Enabled = this.btnGetFareAndSave.Enabled = enabled;
         }
 
+        /// <summary>
+        /// The set data processor.
+        /// </summary>
+        /// <param name="enabled">
+        /// The enabled.
+        /// </param>
         internal void SetDataProcessor(bool enabled)
         {
-            btnSummary.Enabled = btnSave.Enabled = btnUploadPackages.Enabled = enabled;
+            this.btnSummary.Enabled = this.btnSave.Enabled = this.btnUploadPackages.Enabled = enabled;
         }
 
+        /// <summary>
+        /// The clear browser tabs.
+        /// </summary>
         internal void ClearBrowserTabs()
         {
-            fareBrowserTabs.SuspendLayout();
-            foreach (TabPage t in fareBrowserTabs.TabPages)
+            this.fareBrowserTabs.SuspendLayout();
+            foreach (TabPage t in this.fareBrowserTabs.TabPages)
             {
-                fareBrowserTabs.TabPages.Remove(t);
+                this.fareBrowserTabs.TabPages.Remove(t);
                 t.Dispose();
             }
-            fareBrowserTabs.ResumeLayout();
+
+            this.fareBrowserTabs.ResumeLayout();
         }
 
+        /// <summary>
+        /// The extract tab data.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="IList"/>.
+        /// </returns>
         private IList<TravelRoute> ExtractTabData()
         {
             AppContext.Logger.Debug("Generating journey from all tabs...");
             var result = new List<TravelRoute>();
 
-            foreach (TabPage tab in fareBrowserTabs.TabPages)
+            foreach (TabPage tab in this.fareBrowserTabs.TabPages)
             {
                 try
                 {
@@ -281,145 +445,263 @@ namespace SkyDean.FareLiz.WinForm.Presentation.Views
             return result;
         }
 
+        /// <summary>
+        /// The set status.
+        /// </summary>
+        /// <param name="text">
+        /// The text.
+        /// </param>
+        /// <param name="image">
+        /// The image.
+        /// </param>
         private void SetStatus(string text, Image image)
         {
-            if (InvokeRequired)
-                this.SafeInvoke(new MethodInvoker(() => SetStatus(text, image)));
+            if (this.InvokeRequired)
+            {
+                this.SafeInvoke(new MethodInvoker(() => this.SetStatus(text, image)));
+            }
             else
             {
-                lblStatus.Text = text;
-                lblStatus.Image = image;
-                ResizeStatusStrip();
+                this.lblStatus.Text = text;
+                this.lblStatus.Image = image;
+                this.ResizeStatusStrip();
             }
         }
 
+        /// <summary>
+        /// The set status.
+        /// </summary>
+        /// <param name="request">
+        /// The request.
+        /// </param>
         internal void SetStatus(FareMonitorRequest request)
         {
-            string action = (request.BrowserControl.RequestState == DataRequestState.Pending ? "Getting" : "Waiting");
+            string action = request.BrowserControl.RequestState == DataRequestState.Pending ? "Getting" : "Waiting";
             bool oneWayTrip = request.ReturnDate.IsUndefined();
-            string trip = String.Format("{0} trip {1}{2}", oneWayTrip ? "one-way" : "round", request.DepartureDate.ToShortDayAndDateString(), oneWayTrip ? "" : " - " + request.ReturnDate.ToShortDayAndDateString());
-            var img = (request.BrowserControl.RequestState == DataRequestState.Pending ? Properties.Resources.Loading : null);
-            string message = String.Format("{0} fare data for {1} ({2}/{3})...",
-                                           action,
-                                           trip,
-                                           loadProgress.ControlItem.Value,
-                                           loadProgress.ControlItem.Maximum);
+            string trip = string.Format(
+                "{0} trip {1}{2}", 
+                oneWayTrip ? "one-way" : "round", 
+                request.DepartureDate.ToShortDayAndDateString(), 
+                oneWayTrip ? string.Empty : " - " + request.ReturnDate.ToShortDayAndDateString());
+            var img = request.BrowserControl.RequestState == DataRequestState.Pending ? Resources.Loading : null;
+            string message = string.Format(
+                "{0} fare data for {1} ({2}/{3})...", 
+                action, 
+                trip, 
+                this.loadProgress.ControlItem.Value, 
+                this.loadProgress.ControlItem.Maximum);
             AppContext.Logger.Debug(message);
-            SetStatus(message, img);
+            this.SetStatus(message, img);
         }
 
+        /// <summary>
+        /// The resize status strip.
+        /// </summary>
         private void ResizeStatusStrip()
         {
-            int minusWidth = (statusStrip.SizingGrip ? statusStrip.SizeGripBounds.Width : 0) + 5 + 2 * SystemInformation.BorderSize.Width + loadProgress.Margin.Left + loadProgress.Margin.Right;
-            foreach (ToolStripItem item in statusStrip.Items)
-                if (item != loadProgress && item != springLabelStrip && item.Visible)
-                    minusWidth += item.Width + item.Margin.Left + item.Margin.Right;
-
-            int newWidth = statusStrip.Width - minusWidth;
-            if (newWidth > 0)
-                loadProgress.Size = new Size(newWidth, statusStrip.Height / 2);
-        }
-
-        private void CheckProgress()
-        {
-            if (loadProgress.ControlItem.Value == loadProgress.ControlItem.Maximum)
+            int minusWidth = (this.statusStrip.SizingGrip ? this.statusStrip.SizeGripBounds.Width : 0) + 5 + 2 * SystemInformation.BorderSize.Width
+                             + this.loadProgress.Margin.Left + this.loadProgress.Margin.Right;
+            foreach (ToolStripItem item in this.statusStrip.Items)
             {
-                if (_executionParam.ExitAfterDone)
-                    Environment.Exit(0);
+                if (item != this.loadProgress && item != this.springLabelStrip && item.Visible)
+                {
+                    minusWidth += item.Width + item.Margin.Left + item.Margin.Right;
+                }
+            }
 
-                loadProgress.ControlItem.Value = loadProgress.ControlItem.Maximum = 0;
-                loadProgress.Visible = false;
-                loadProgress.ControlItem.ShowInTaskbar = false;
-                SetStatus("Idle", null);
+            int newWidth = this.statusStrip.Width - minusWidth;
+            if (newWidth > 0)
+            {
+                this.loadProgress.Size = new Size(newWidth, this.statusStrip.Height / 2);
             }
         }
 
-        private void IncreaseProgress()
+        /// <summary>
+        /// The check progress.
+        /// </summary>
+        private void CheckProgress()
         {
-            if (loadProgress.ControlItem.Value < loadProgress.ControlItem.Maximum)
-                loadProgress.ControlItem.Value++;
+            if (this.loadProgress.ControlItem.Value == this.loadProgress.ControlItem.Maximum)
+            {
+                if (this._executionParam.ExitAfterDone)
+                {
+                    Environment.Exit(0);
+                }
+
+                this.loadProgress.ControlItem.Value = this.loadProgress.ControlItem.Maximum = 0;
+                this.loadProgress.Visible = false;
+                this.loadProgress.ControlItem.ShowInTaskbar = false;
+                this.SetStatus("Idle", null);
+            }
         }
 
+        /// <summary>
+        /// The increase progress.
+        /// </summary>
+        private void IncreaseProgress()
+        {
+            if (this.loadProgress.ControlItem.Value < this.loadProgress.ControlItem.Maximum)
+            {
+                this.loadProgress.ControlItem.Value++;
+            }
+        }
+
+        /// <summary>
+        /// The check fare form_ load.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void CheckFareForm_Load(object sender, EventArgs e)
         {
             // Click the appropriate button after everything is fully loaded
-            if (_executionParam.OperationMode != OperationMode.Unspecified)
+            if (this._executionParam.OperationMode != OperationMode.Unspecified)
             {
-                var opMode = _executionParam.OperationMode;
+                var opMode = this._executionParam.OperationMode;
                 if (opMode == OperationMode.ShowFare)
-                    btnShowFare.PerformClick();
+                {
+                    this.btnShowFare.PerformClick();
+                }
                 else if (opMode == OperationMode.GetFareAndSave)
-                    btnGetFareAndSave.PerformClick();
+                {
+                    this.btnGetFareAndSave.PerformClick();
+                }
                 else if (opMode == OperationMode.LiveMonitor)
-                    btnLiveMonitor.PerformClick();
+                {
+                    this.btnLiveMonitor.PerformClick();
+                }
 
-                WindowState = _executionParam.IsMinimized ? FormWindowState.Minimized : FormWindowState.Normal;
-                ShowInTaskbar = (WindowState != FormWindowState.Minimized);
+                this.WindowState = this._executionParam.IsMinimized ? FormWindowState.Minimized : FormWindowState.Normal;
+                this.ShowInTaskbar = this.WindowState != FormWindowState.Minimized;
             }
         }
 
-        void btnSave_Click(object sender, EventArgs e)
+        /// <summary>
+        /// The btn save_ click.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
+        private void btnSave_Click(object sender, EventArgs e)
         {
-            btnSave.Enabled = false;
+            this.btnSave.Enabled = false;
             try
             {
                 var db = AppContext.MonitorEnvironment.FareDatabase;
                 AppContext.Logger.Info("Export current fare data on all tabs");
-                var tabRoutes = ExtractTabData();
+                var tabRoutes = this.ExtractTabData();
                 db.AddData(tabRoutes, AppContext.ProgressCallback);
             }
             finally
             {
-                btnSave.Enabled = true;
+                this.btnSave.Enabled = true;
             }
         }
 
+        /// <summary>
+        /// The btn upload packages_ click.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void btnUploadPackages_Click(object sender, EventArgs e)
         {
             var syncDb = AppContext.MonitorEnvironment.FareDatabase as ISyncableDatabase;
             if (syncDb == null)
-                MessageBox.Show(this, "You have not selected a database type which supports data synchronization", "Unsupported Operation", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+            {
+                MessageBox.Show(
+                    this, 
+                    "You have not selected a database type which supports data synchronization", 
+                    "Unsupported Operation", 
+                    MessageBoxButtons.OK, 
+                    MessageBoxIcon.Asterisk);
+            }
             else
             {
-                var journeys = ExtractTabData();
+                var journeys = this.ExtractTabData();
                 if (journeys.Count == 0)
-                    MessageBox.Show(this, "There is no journey available for synchronizing! Get fare data first!", "Unsupported Operation", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                {
+                    MessageBox.Show(
+                        this, 
+                        "There is no journey available for synchronizing! Get fare data first!", 
+                        "Unsupported Operation", 
+                        MessageBoxButtons.OK, 
+                        MessageBoxIcon.Asterisk);
+                }
                 else
                 {
                     string pkgId = null;
-                    ProgressDialog.ExecuteTask(null, "Data Package Sending", "Please wait while the new data packages are being sent...", GetType().Name + "UploadPackages", ProgressBarStyle.Marquee, AppContext.Logger, callback =>
-                        {
-                            var progress = callback as ProgressDialog;
-                            progress.Begin();
-                            pkgId = syncDb.SendData(journeys, AppContext.ProgressCallback);
+                    ProgressDialog.ExecuteTask(
+                        null, 
+                        "Data Package Sending", 
+                        "Please wait while the new data packages are being sent...", 
+                        this.GetType().Name + "UploadPackages", 
+                        ProgressBarStyle.Marquee, 
+                        AppContext.Logger, 
+                        callback =>
+                            {
+                                var progress = callback as ProgressDialog;
+                                progress.Begin();
+                                pkgId = syncDb.SendData(journeys, AppContext.ProgressCallback);
 
-                            if (pkgId != null)
-                                AppContext.ProgressCallback.Inform(this, "A new package with ID " + pkgId + " has been successfully sent using the configured synchronizer", "Package Sending", NotificationType.Exclamation);
-                        });
+                                if (pkgId != null)
+                                {
+                                    AppContext.ProgressCallback.Inform(
+                                        this, 
+                                        "A new package with ID " + pkgId + " has been successfully sent using the configured synchronizer", 
+                                        "Package Sending", 
+                                        NotificationType.Exclamation);
+                                }
+                            });
                 }
             }
         }
 
+        /// <summary>
+        /// The start monitor button_ click.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
         private void StartMonitorButton_Click(object sender, EventArgs e)
         {
             var btn = sender as SwitchButton;
             if (btn != null)
             {
-                if (btn.IsSecondState) // The monitor is actually running
+                if (btn.IsSecondState)
                 {
+                    // The monitor is actually running
                     var existMon = ((Control)sender).Tag as FareRequestMonitor;
                     if (existMon != null)
                     {
-                        _controller.Stop(existMon);
+                        this._controller.Stop(existMon);
                     }
 
-                    if (sender == btnLiveMonitor)
+                    if (sender == this.btnLiveMonitor)
                     {
-                        if (trayIcon.Icon != null)
-                            trayIcon.Visible = false;
+                        if (this.trayIcon.Icon != null)
+                        {
+                            this.trayIcon.Visible = false;
+                        }
 
-                        if (!Visible)
-                            Show();
+                        if (!this.Visible)
+                        {
+                            this.Show();
+                        }
                     }
                 }
                 else
@@ -427,23 +709,38 @@ namespace SkyDean.FareLiz.WinForm.Presentation.Views
                     btn.Enabled = false;
                     try
                     {
-
                         OperationMode mode;
-                        if (sender == btnShowFare)
+                        if (sender == this.btnShowFare)
+                        {
                             mode = OperationMode.ShowFare;
-                        else if (sender == btnGetFareAndSave)
+                        }
+                        else if (sender == this.btnGetFareAndSave)
+                        {
                             mode = OperationMode.GetFareAndSave;
-                        else if (sender == btnLiveMonitor)
+                        }
+                        else if (sender == this.btnLiveMonitor)
+                        {
                             mode = OperationMode.LiveMonitor;
+                        }
                         else
+                        {
                             throw new NotImplementedException("Unsupported fare monitor mode!");
+                        }
 
-                        var newMon = _controller.Monitor(mode);
+                        var newMon = this._controller.Monitor(mode);
                         if (newMon != null)
                         {
                             if (mode == OperationMode.LiveMonitor)
-                                notifier.Show("Live Fare Monitor", "Live Fare Monitor will run in background" + Environment.NewLine + "You will receive a notification whenever the flight fare has been changed",
-                                              7000, NotificationType.Success, false);
+                            {
+                                this.notifier.Show(
+                                    "Live Fare Monitor", 
+                                    "Live Fare Monitor will run in background" + Environment.NewLine
+                                    + "You will receive a notification whenever the flight fare has been changed", 
+                                    7000, 
+                                    NotificationType.Success, 
+                                    false);
+                            }
+
                             btn.IsSecondState = true;
                         }
 
@@ -457,36 +754,58 @@ namespace SkyDean.FareLiz.WinForm.Presentation.Views
             }
         }
 
-        void btnSummary_Click(object sender, EventArgs e)
+        /// <summary>
+        /// The btn summary_ click.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
+        private void btnSummary_Click(object sender, EventArgs e)
         {
             string err = null;
             IList<TravelRoute> tabData = null;
-            var tabPagesCount = fareBrowserTabs.TabPages.Count;
+            var tabPagesCount = this.fareBrowserTabs.TabPages.Count;
 
             if (tabPagesCount < 1)
+            {
                 err = "There is no loaded flight data. Select to show the fare first before viewing the summary!";
+            }
             else
             {
-                tabData = ExtractTabData();
+                tabData = this.ExtractTabData();
+
                 // Remove empty data set
                 for (int i = 0; i < tabData.Count; i++)
                 {
                     var route = tabData[i];
                     if (route.Journeys.Count < 1)
+                    {
                         tabData.RemoveAt(i--);
+                    }
                 }
 
                 // Set error message if there is not sufficient data for summary view
                 if (tabData != null)
                 {
                     if (tabData.Count < 1)
+                    {
                         err = "There is no available data. Please wait until the fare browser has finished loading data!";
+                    }
                     else if (tabData.Count == 1)
                     {
                         if (tabPagesCount == 1)
-                            err = "There is only one loaded journey. The summary view is only helpful when you have loaded multiple journeys. Try changing the travel date offsets and try again!";
+                        {
+                            err =
+                                "There is only one loaded journey. The summary view is only helpful when you have loaded multiple journeys. Try changing the travel date offsets and try again!";
+                        }
                         else if (tabData[0].Journeys.Count == 1)
-                            err = "Only one journey has completed loading. The summary view is only helpful when you have multiple loaded journeys. Please wait until the application has finished loading another journey and try again!";
+                        {
+                            err =
+                                "Only one journey has completed loading. The summary view is only helpful when you have multiple loaded journeys. Please wait until the application has finished loading another journey and try again!";
+                        }
                     }
                 }
             }
@@ -497,20 +816,29 @@ namespace SkyDean.FareLiz.WinForm.Presentation.Views
                 return;
             }
 
-            var newParam = _executionParam.ReflectionDeepClone(AppContext.Logger);
+            var newParam = this._executionParam.ReflectionDeepClone(AppContext.Logger);
             int minStay = 0, maxStay = 0;
             double maxPrice = 0;
             foreach (var r in tabData)
+            {
                 foreach (var j in r.Journeys)
                 {
                     if (j.StayDuration < minStay)
+                    {
                         minStay = j.StayDuration;
+                    }
                     else if (j.StayDuration > maxStay)
+                    {
                         maxStay = j.StayDuration;
+                    }
+
                     var jPrice = j.Data.Max(d => d.Flights.Max(f => f.Price));
                     if (jPrice > maxPrice)
+                    {
                         maxPrice = jPrice;
+                    }
                 }
+            }
 
             var priceLim = (int)Math.Ceiling(maxPrice);
             newParam.MinStayDuration = minStay;
@@ -520,55 +848,120 @@ namespace SkyDean.FareLiz.WinForm.Presentation.Views
             summaryForm.Show(this);
         }
 
+        /// <summary>
+        /// The date picker_ value changed.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void datePicker_ValueChanged(object sender, CheckDateEventArgs e)
         {
-            if (sender == departureDatePicker)
-                returnDatePicker.MinDate = departureDatePicker.Value;
+            if (sender == this.departureDatePicker)
+            {
+                this.returnDatePicker.MinDate = this.departureDatePicker.Value;
+            }
 
-            if (departureDatePicker.Value > returnDatePicker.Value)
-                returnDatePicker.Value = departureDatePicker.Value.AddDays(7);
+            if (this.departureDatePicker.Value > this.returnDatePicker.Value)
+            {
+                this.returnDatePicker.Value = this.departureDatePicker.Value.AddDays(7);
+            }
         }
 
+        /// <summary>
+        /// The check fare form_ resize.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void CheckFareForm_Resize(object sender, EventArgs e)
         {
-            ResizeStatusStrip();
+            this.ResizeStatusStrip();
         }
 
+        /// <summary>
+        /// The lbl status_ text changed.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void lblStatus_TextChanged(object sender, EventArgs e)
         {
-            ResizeStatusStrip();
+            this.ResizeStatusStrip();
         }
 
+        /// <summary>
+        /// The notify icon_ mouse double click.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void notifyIcon_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            Show();
-            ShowInTaskbar = true;
-            WindowState = FormWindowState.Normal;
+            this.Show();
+            this.ShowInTaskbar = true;
+            this.WindowState = FormWindowState.Normal;
         }
 
+        /// <summary>
+        /// The btn live fare data_ click.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void btnLiveFareData_Click(object sender, EventArgs e)
         {
-            _controller.ShowLiveFare();
+            this._controller.ShowLiveFare();
         }
 
+        /// <summary>
+        /// The check fare form_ form closing.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void CheckFareForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (btnLiveMonitor.IsSecondState) // If LiveMonitor is Running
+            if (this.btnLiveMonitor.IsSecondState)
             {
+                // If LiveMonitor is Running
                 e.Cancel = true;
-                if (_firstCloseForLiveMonitor)
+                if (this._firstCloseForLiveMonitor)
                 {
-                    trayIcon.ShowBalloonTip(500, "Run in tray", "Fare Monitor will continue monitoring in System tray", ToolTipIcon.Info);
-                    _firstCloseForLiveMonitor = false;
+                    this.trayIcon.ShowBalloonTip(500, "Run in tray", "Fare Monitor will continue monitoring in System tray", ToolTipIcon.Info);
+                    this._firstCloseForLiveMonitor = false;
                 }
 
-                Hide();
+                this.Hide();
             }
             else
             {
-                if (loadProgress.Visible)   // Something is on-going
+                if (this.loadProgress.Visible)
                 {
-                    var closeDialog = MessageBox.Show(this, "Fare scanning is in progress. Are you sure you want to close this window and abort the active operations?", "Operations in progress", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    // Something is on-going
+                    var closeDialog = MessageBox.Show(
+                        this, 
+                        "Fare scanning is in progress. Are you sure you want to close this window and abort the active operations?", 
+                        "Operations in progress", 
+                        MessageBoxButtons.YesNo, 
+                        MessageBoxIcon.Question);
                     if (closeDialog == DialogResult.No)
                     {
                         e.Cancel = true;
@@ -576,125 +969,243 @@ namespace SkyDean.FareLiz.WinForm.Presentation.Views
                     }
                 }
 
-                _controller.ClearMonitors();
-                Dispose();
+                this._controller.ClearMonitors();
+                this.Dispose();
             }
         }
 
-        void CloseAndExport_RequestCompleted(FareRequestMonitor sender, FareBrowserRequestArg args)
+        /// <summary>
+        /// The close and export_ request completed.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="args">
+        /// The args.
+        /// </param>
+        private void CloseAndExport_RequestCompleted(FareRequestMonitor sender, FareBrowserRequestArg args)
         {
-            this.SafeInvoke(new Action(() =>
-            {
-                FareMonitor_RequestCompleted(sender, args);
-                var browserControl = args.Request.BrowserControl as WebFareBrowserControl;
-                var tabPageObj = browserControl.Parent as TabPage;
-                if (tabPageObj != null)
-                {
-                    fareBrowserTabs.TabPages.Remove(tabPageObj);
-                    tabPageObj.Dispose();
-                }
+            this.SafeInvoke(
+                new Action(
+                    () =>
+                        {
+                            this.FareMonitor_RequestCompleted(sender, args);
+                            var browserControl = args.Request.BrowserControl as WebFareBrowserControl;
+                            var tabPageObj = browserControl.Parent as TabPage;
+                            if (tabPageObj != null)
+                            {
+                                this.fareBrowserTabs.TabPages.Remove(tabPageObj);
+                                tabPageObj.Dispose();
+                            }
 
-                if (sender.State == MonitorState.Stopped && chkExitAfterDoneStrip.ControlItem.Checked)
-                    Environment.Exit(0);
-            }));
+                            if (sender.State == MonitorState.Stopped && this.chkExitAfterDoneStrip.ControlItem.Checked)
+                            {
+                                Environment.Exit(0);
+                            }
+                        }));
         }
 
-        void ShowFare_RequestCompleted(FareRequestMonitor sender, FareBrowserRequestArg args)
+        /// <summary>
+        /// The show fare_ request completed.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="args">
+        /// The args.
+        /// </param>
+        private void ShowFare_RequestCompleted(FareRequestMonitor sender, FareBrowserRequestArg args)
         {
-            this.InvokeActionIfNeeded(new Action(() =>
-            {
-                var fareBrowserObj = args.Request.BrowserControl as WebFareBrowserControl;
-                if (fareBrowserObj.IsDestructed()
-                    || fareBrowserObj.LastRequestInitiatedDate != args.RequestInitiatedDate ||
-                    fareBrowserObj.RequestState == DataRequestState.Pending)
-                    return;
+            this.InvokeActionIfNeeded(
+                new Action(
+                    () =>
+                        {
+                            var fareBrowserObj = args.Request.BrowserControl as WebFareBrowserControl;
+                            if (fareBrowserObj.IsDestructed() || fareBrowserObj.LastRequestInitiatedDate != args.RequestInitiatedDate
+                                || fareBrowserObj.RequestState == DataRequestState.Pending)
+                            {
+                                return;
+                            }
 
-                var browserTabPage = fareBrowserObj.Parent as TabPage;
-                if (browserTabPage == null)
-                    return;
+                            var browserTabPage = fareBrowserObj.Parent as TabPage;
+                            if (browserTabPage == null)
+                            {
+                                return;
+                            }
 
-                if (fareBrowserObj.RequestState == DataRequestState.Pending ||
-                    fareBrowserObj.RequestState == DataRequestState.Requested)
-                    browserTabPage.BackColor = BrowserStartingColor;
-                else if (fareBrowserObj.RequestState == DataRequestState.Ok)
-                    browserTabPage.BackColor = BrowserSuccessColor;
-                else
-                    browserTabPage.BackColor = BrowserFailedColor;
+                            if (fareBrowserObj.RequestState == DataRequestState.Pending || fareBrowserObj.RequestState == DataRequestState.Requested)
+                            {
+                                browserTabPage.BackColor = this.BrowserStartingColor;
+                            }
+                            else if (fareBrowserObj.RequestState == DataRequestState.Ok)
+                            {
+                                browserTabPage.BackColor = this.BrowserSuccessColor;
+                            }
+                            else
+                            {
+                                browserTabPage.BackColor = this.BrowserFailedColor;
+                            }
 
-                if (chkAutoFocusTabStrip.ControlItem.Checked)
-                    fareBrowserTabs.SelectedTab = browserTabPage;
+                            if (this.chkAutoFocusTabStrip.ControlItem.Checked)
+                            {
+                                this.fareBrowserTabs.SelectedTab = browserTabPage;
+                            }
 
-                FareMonitor_RequestCompleted(sender, args);
-            }));
+                            this.FareMonitor_RequestCompleted(sender, args);
+                        }));
         }
 
-        void FareMonitor_RequestCompleted(FareRequestMonitor sender, FareBrowserRequestArg args)
+        /// <summary>
+        /// The fare monitor_ request completed.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="args">
+        /// The args.
+        /// </param>
+        private void FareMonitor_RequestCompleted(FareRequestMonitor sender, FareBrowserRequestArg args)
         {
             // This method should be triggered both before stopping the request or after the request is completed
-            var browser = args.Request.BrowserControl;  // The browser might be nulled
-            this.InvokeActionIfNeeded(new Action(() =>
-            {
-                SwitchButton senderBtn = null;
-                var monType = sender.GetType();
-                var resultRoute = (browser == null ? null : browser.LastRetrievedRoute);
+            var browser = args.Request.BrowserControl; // The browser might be nulled
+            this.InvokeActionIfNeeded(
+                new Action(
+                    () =>
+                        {
+                            SwitchButton senderBtn = null;
+                            var monType = sender.GetType();
+                            var resultRoute = browser == null ? null : browser.LastRetrievedRoute;
 
-                if (monType == typeof(FareRequestMonitor))
-                {
-                    // Browser can be nulled if the request was aborted before it is event started
-                    if (browser != null && resultRoute != null && !btnSummary.Enabled)
-                        SetDataProcessor(true);
-                    senderBtn = btnShowFare;
-                }
-                else if (monType == typeof(FareExportMonitor))
-                    senderBtn = btnGetFareAndSave;
+                            if (monType == typeof(FareRequestMonitor))
+                            {
+                                // Browser can be nulled if the request was aborted before it is event started
+                                if (browser != null && resultRoute != null && !this.btnSummary.Enabled)
+                                {
+                                    this.SetDataProcessor(true);
+                                }
 
-                IncreaseProgress();
-                CheckProgress();
+                                senderBtn = this.btnShowFare;
+                            }
+                            else if (monType == typeof(FareExportMonitor))
+                            {
+                                senderBtn = this.btnGetFareAndSave;
+                            }
 
-                if (!loadProgress.Visible && senderBtn != null)
-                {
-                    var senderMonitor = senderBtn.Tag as FareRequestMonitor;
-                    if (senderMonitor == sender && senderBtn.IsSecondState)
-                        senderBtn.IsSecondState = false;    // Reset the button after everything is done!
-                }
-            }));
+                            this.IncreaseProgress();
+                            this.CheckProgress();
+
+                            if (!this.loadProgress.Visible && senderBtn != null)
+                            {
+                                var senderMonitor = senderBtn.Tag as FareRequestMonitor;
+                                if (senderMonitor == sender && senderBtn.IsSecondState)
+                                {
+                                    senderBtn.IsSecondState = false; // Reset the button after everything is done!
+                                }
+                            }
+                        }));
         }
 
-        void LiveFareMonitorStopping(FareRequestMonitor sender)
+        /// <summary>
+        /// The live fare monitor stopping.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        private void LiveFareMonitorStopping(FareRequestMonitor sender)
         {
-            btnLiveMonitor.IsSecondState = false;
+            this.btnLiveMonitor.IsSecondState = false;
         }
 
-        void LiveFare_RequestStarting(FareRequestMonitor sender, FareBrowserRequestArg args)
+        /// <summary>
+        /// The live fare_ request starting.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="args">
+        /// The args.
+        /// </param>
+        private void LiveFare_RequestStarting(FareRequestMonitor sender, FareBrowserRequestArg args)
         {
             args.Request.Initialize();
             var monitor = sender as LiveFareMonitor;
-            monitor.PriceLimit = (double)numPriceLimit.Value;
+            monitor.PriceLimit = (double)this.numPriceLimit.Value;
         }
 
+        /// <summary>
+        /// The btn exit_ click.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void btnExit_Click(object sender, EventArgs e)
         {
             Environment.Exit(0);
         }
 
+        /// <summary>
+        /// The process cmd key.
+        /// </summary>
+        /// <param name="msg">
+        /// The msg.
+        /// </param>
+        /// <param name="keyData">
+        /// The key data.
+        /// </param>
+        /// <returns>
+        /// The <see cref="bool"/>.
+        /// </returns>
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             // Close window if user press Esc and Live Monitor is running
-            if (btnLiveMonitor.IsSecondState && keyData == Keys.Escape)
-                Close();
+            if (this.btnLiveMonitor.IsSecondState && keyData == Keys.Escape)
+            {
+                this.Close();
+            }
+
             return base.ProcessCmdKey(ref msg, keyData);
         }
 
+        /// <summary>
+        /// The btn no depart range_ click.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void btnNoDepartRange_Click(object sender, EventArgs e)
         {
-            numDepartDateRangeMinus.Value = numDepartDateRangePlus.Value = 0;
+            this.numDepartDateRangeMinus.Value = this.numDepartDateRangePlus.Value = 0;
         }
 
+        /// <summary>
+        /// The btn no return range_ click.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void btnNoReturnRange_Click(object sender, EventArgs e)
         {
-            numReturnDateRangeMinus.Value = numReturnDateRangePlus.Value = 0;
+            this.numReturnDateRangeMinus.Value = this.numReturnDateRangePlus.Value = 0;
         }
 
+        /// <summary>
+        /// The fare browser tabs_ tab page refreshing.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void fareBrowserTabs_TabPageRefreshing(object sender, TabControlEventArgs e)
         {
             var browserTabPage = e.TabPage;
@@ -702,11 +1213,20 @@ namespace SkyDean.FareLiz.WinForm.Presentation.Views
             if (request != null)
             {
                 request.Start();
-                browserTabPage.BackColor = BrowserStartingColor;
+                browserTabPage.BackColor = this.BrowserStartingColor;
                 browserTabPage.ImageIndex = 0;
             }
         }
 
+        /// <summary>
+        /// The fare browser tabs_ tab page closing.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void fareBrowserTabs_TabPageClosing(object sender, TabControlCancelEventArgs e)
         {
             var tagPage = e.TabPage;
@@ -715,73 +1235,137 @@ namespace SkyDean.FareLiz.WinForm.Presentation.Views
             {
                 request.Stop();
                 request.OwnerMonitor.FinalizeRequest(request);
-                if (!(request.BrowserControl.RequestState > DataRequestState.Requested) && loadProgress.ControlItem.Maximum > 0) // If the request was not completed: Increase the progress
+                if (!(request.BrowserControl.RequestState > DataRequestState.Requested) && this.loadProgress.ControlItem.Maximum > 0)
                 {
-                    IncreaseProgress();
-                    CheckProgress();
+                    // If the request was not completed: Increase the progress
+                    this.IncreaseProgress();
+                    this.CheckProgress();
                 }
 
-                if (fareBrowserTabs.TabPages.Count == 1)    // This is the last tab: Disable unneeded buttons
-                    SetDataProcessor(false);
+                if (this.fareBrowserTabs.TabPages.Count == 1)
+                {
+                    // This is the last tab: Disable unneeded buttons
+                    this.SetDataProcessor(false);
+                }
             }
         }
 
+        /// <summary>
+        /// The chk return date_ checked changed.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void chkReturnDate_CheckedChanged(object sender, EventArgs e)
         {
-            lblDuration.Enabled = numMinDuration.Enabled = numMaxDuration.Enabled =
-                returnDatePicker.Enabled = numReturnDateRangeMinus.Enabled = numReturnDateRangePlus.Enabled = lblReturnPM.Enabled = btnNoReturnRange.Enabled
-                = chkReturnDate.Checked;
+            this.lblDuration.Enabled =
+                this.numMinDuration.Enabled =
+                this.numMaxDuration.Enabled =
+                this.returnDatePicker.Enabled =
+                this.numReturnDateRangeMinus.Enabled =
+                this.numReturnDateRangePlus.Enabled = this.lblReturnPM.Enabled = this.btnNoReturnRange.Enabled = this.chkReturnDate.Checked;
         }
 
+        /// <summary>
+        /// The get fare buttons_ state changing.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void GetFareButtons_StateChanging(object sender, CancelEventArgs e)
         {
-            if (_isChangingButtonState)
+            if (this._isChangingButtonState)
+            {
                 return;
+            }
 
-            _isChangingButtonState = true;
+            this._isChangingButtonState = true;
             var btn = sender as SwitchButton;
             if (btn != null)
             {
-                if (btn == btnShowFare)
-                    btnGetFareAndSave.Enabled = btn.IsSecondState;
-                else if (btn == btnGetFareAndSave)
-                    btnShowFare.Enabled = btn.IsSecondState;
+                if (btn == this.btnShowFare)
+                {
+                    this.btnGetFareAndSave.Enabled = btn.IsSecondState;
+                }
+                else if (btn == this.btnGetFareAndSave)
+                {
+                    this.btnShowFare.Enabled = btn.IsSecondState;
+                }
             }
-            _isChangingButtonState = false;
+
+            this._isChangingButtonState = false;
         }
 
+        /// <summary>
+        /// The date range_ value changed.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void DateRange_ValueChanged(object sender, EventArgs e)
         {
-            UpdateViewForDuration();
+            this.UpdateViewForDuration();
         }
 
-        void FareMonitor_RequestStarting(FareRequestMonitor sender, FareBrowserRequestArg args)
+        /// <summary>
+        /// The fare monitor_ request starting.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="args">
+        /// The args.
+        /// </param>
+        private void FareMonitor_RequestStarting(FareRequestMonitor sender, FareBrowserRequestArg args)
         {
-            this.InvokeActionIfNeeded(new Action(() =>
-            {
-                FareMonitorRequest request = args.Request;
-                request.Initialize(); // Initialize request here: So that the control is created on the UI thread
-                var browserTabPage = new TabPage(request.DepartureDate.ToString(NamingRule.DATE_FORMAT)
-                                                 +
-                                                 (request.IsRoundTrip
-                                                     ? " - " + request.ReturnDate.ToString(NamingRule.DATE_FORMAT)
-                                                     : String.Empty));
+            this.InvokeActionIfNeeded(
+                new Action(
+                    () =>
+                        {
+                            FareMonitorRequest request = args.Request;
+                            request.Initialize(); // Initialize request here: So that the control is created on the UI thread
+                            var browserTabPage =
+                                new TabPage(
+                                    request.DepartureDate.ToString(NamingRule.DATE_FORMAT)
+                                    + (request.IsRoundTrip ? " - " + request.ReturnDate.ToString(NamingRule.DATE_FORMAT) : string.Empty));
 
-                var browser = request.BrowserControl as Control;
-                if (browser != null)
-                {
-                    browser.Dock = DockStyle.Fill;
-                    browserTabPage.Controls.Add(browser);
-                    browserTabPage.BackColor = BrowserStartingColor;
-                    browserTabPage.ImageIndex = 0;
-                    browserTabPage.Tag = request;
-                    browserTabPage.ToolTipText = request.Detail;
-                    fareBrowserTabs.TabPages.Add(browserTabPage);
-                }
-                SetStatus(request);
-            }));
+                            var browser = request.BrowserControl as Control;
+                            if (browser != null)
+                            {
+                                browser.Dock = DockStyle.Fill;
+                                browserTabPage.Controls.Add(browser);
+                                browserTabPage.BackColor = this.BrowserStartingColor;
+                                browserTabPage.ImageIndex = 0;
+                                browserTabPage.Tag = request;
+                                browserTabPage.ToolTipText = request.Detail;
+                                this.fareBrowserTabs.TabPages.Add(browserTabPage);
+                            }
+
+                            this.SetStatus(request);
+                        }));
         }
 
+        /// <summary>
+        /// The show.
+        /// </summary>
+        /// <param name="message">
+        /// The message.
+        /// </param>
+        /// <param name="title">
+        /// The title.
+        /// </param>
+        /// <param name="icon">
+        /// The icon.
+        /// </param>
         internal void Show(string message, string title, MessageBoxIcon icon)
         {
             this.InvokeActionIfNeeded(new Action(() => MessageBox.Show(this, message, title, MessageBoxButtons.OK, icon)));

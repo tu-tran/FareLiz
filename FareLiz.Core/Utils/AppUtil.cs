@@ -1,25 +1,49 @@
-﻿using SkyDean.FareLiz.Core.Data;
-using System;
-using System.IO;
-using System.Reflection;
-using System.Threading;
-
-namespace SkyDean.FareLiz.Core.Utils
+﻿namespace SkyDean.FareLiz.Core.Utils
 {
+    using System;
+    using System.IO;
+    using System.Reflection;
+    using System.Threading;
+
+    using SkyDean.FareLiz.Core.Data;
+
+    /// <summary>The app util.</summary>
     public static class AppUtil
     {
+        /// <summary>The company name.</summary>
         public static readonly string CompanyName;
+
+        /// <summary>The product name.</summary>
         public static readonly string ProductName;
+
+        /// <summary>The product copyright.</summary>
         public static readonly string ProductCopyright;
+
+        /// <summary>The entry directory.</summary>
         public static readonly string EntryDirectory;
+
+        /// <summary>The entry module name.</summary>
         public static readonly string EntryModuleName;
+
+        /// <summary>The product version.</summary>
         public static readonly string ProductVersion;
+
+        /// <summary>The local product data path.</summary>
         public static readonly string LocalProductDataPath;
+
+        /// <summary>The publisher url.</summary>
         public static readonly string PublisherUrl;
+
+        /// <summary>The publisher email.</summary>
         public static readonly string PublisherEmail;
+
+        /// <summary>The product write date.</summary>
         public static readonly DateTime ProductWriteDate;
+
+        /// <summary>The is debug build.</summary>
         public static readonly bool IsDebugBuild;
 
+        /// <summary>Initializes static members of the <see cref="AppUtil" /> class.</summary>
         static AppUtil()
         {
             var executeAsm = Assembly.GetExecutingAssembly();
@@ -70,21 +94,42 @@ namespace SkyDean.FareLiz.Core.Utils
             IsDebugBuild = false;
 #endif
 
-            LocalProductDataPath = String.Format(@"{0}\{1}\{2}",
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), CompanyName, ProductName);
+            LocalProductDataPath = string.Format(
+                @"{0}\{1}\{2}", 
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), 
+                CompanyName, 
+                ProductName);
         }
 
+        /// <summary>
+        /// The get local data path.
+        /// </summary>
+        /// <param name="subPath">
+        /// The sub path.
+        /// </param>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
         public static string GetLocalDataPath(string subPath)
         {
             return Path.Combine(LocalProductDataPath, subPath);
         }
 
+        /// <summary>
+        /// The name current thread.
+        /// </summary>
+        /// <param name="name">
+        /// The name.
+        /// </param>
         public static void NameCurrentThread(string name)
         {
-            if (String.IsNullOrEmpty(Thread.CurrentThread.Name))
+            if (string.IsNullOrEmpty(Thread.CurrentThread.Name))
             {
                 if (name.Length > 100)
+                {
                     name = name.Substring(0, 100);
+                }
+
                 Thread.CurrentThread.Name = name;
             }
         }

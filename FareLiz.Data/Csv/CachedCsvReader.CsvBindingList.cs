@@ -1,90 +1,115 @@
 //	SkyDean.FareLiz.WinForm.Utils.CachedCsvReader.CsvBindingList
 //	Copyright (c) 2006 Sébastien Lorion
-//
 //	MIT license (http://en.wikipedia.org/wiki/MIT_License)
-//
 //	Permission is hereby granted, free of charge, to any person obtaining a copy
 //	of this software and associated documentation files (the "Software"), to deal
 //	in the Software without restriction, including without limitation the rights 
 //	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
 //	of the Software, and to permit persons to whom the Software is furnished to do so, 
 //	subject to the following conditions:
-//
 //	The above copyright notice and this permission notice shall be included in all 
 //	copies or substantial portions of the Software.
-//
 //	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
 //	INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
 //	PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
 //	FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 //	ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-
 namespace SkyDean.FareLiz.Data.Csv
 {
-    public partial class CachedCsvReader
-        : CsvReader
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.Data;
+
+    /// <summary>
+    /// The cached csv reader.
+    /// </summary>
+    public partial class CachedCsvReader : CsvReader
     {
-        /// <summary>
-        /// Represents a binding list wrapper for a CSV reader.
-        /// </summary>
-        private class CsvBindingList
-            : IBindingList, ITypedList, IList<string[]>, IList
+        /// <summary>Represents a binding list wrapper for a CSV reader.</summary>
+        private class CsvBindingList : IBindingList, ITypedList, IList<string[]>, IList
         {
-            #region Fields
-
-            /// <summary>
-            /// Contains the linked CSV reader.
-            /// </summary>
-            private CachedCsvReader _csv;
-
-            /// <summary>
-            /// Contains the cached record count.
-            /// </summary>
-            private int _count;
-
-            /// <summary>
-            /// Contains the cached property descriptors.
-            /// </summary>
-            private PropertyDescriptorCollection _properties;
-
-            /// <summary>
-            /// Contains the current sort property.
-            /// </summary>
-            private CsvPropertyDescriptor _sort;
-
-            /// <summary>
-            /// Contains the current sort direction.
-            /// </summary>
-            private ListSortDirection _direction;
-
-            #endregion
-
             #region Constructors
 
             /// <summary>
             /// Initializes a new instance of the CsvBindingList class.
             /// </summary>
-            /// <param name="csv"></param>
+            /// <param name="csv">
+            /// </param>
             public CsvBindingList(CachedCsvReader csv)
             {
-                _csv = csv;
-                _count = -1;
-                _direction = ListSortDirection.Ascending;
+                this._csv = csv;
+                this._count = -1;
+                this._direction = ListSortDirection.Ascending;
             }
+
+            #endregion
+
+            #region IEnumerable Members
+
+            /// <summary>
+            /// The get enumerator.
+            /// </summary>
+            /// <returns>
+            /// The <see cref="IEnumerator"/>.
+            /// </returns>
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return this.GetEnumerator();
+            }
+
+            #endregion
+
+            #region IEnumerable<string[]> Members
+
+            /// <summary>
+            /// The get enumerator.
+            /// </summary>
+            /// <returns>
+            /// The <see cref="IEnumerator"/>.
+            /// </returns>
+            public IEnumerator<string[]> GetEnumerator()
+            {
+                return this._csv.GetEnumerator();
+            }
+
+            #endregion
+
+            #region Fields
+
+            /// <summary>Contains the linked CSV reader.</summary>
+            private CachedCsvReader _csv;
+
+            /// <summary>Contains the cached record count.</summary>
+            private int _count;
+
+            /// <summary>Contains the cached property descriptors.</summary>
+            private PropertyDescriptorCollection _properties;
+
+            /// <summary>Contains the current sort property.</summary>
+            private CsvPropertyDescriptor _sort;
+
+            /// <summary>Contains the current sort direction.</summary>
+            private ListSortDirection _direction;
 
             #endregion
 
             #region IBindingList members
 
+            /// <summary>
+            /// The add index.
+            /// </summary>
+            /// <param name="property">
+            /// The property.
+            /// </param>
             public void AddIndex(PropertyDescriptor property)
             {
             }
 
+            /// <summary>
+            /// Gets a value indicating whether allow new.
+            /// </summary>
             public bool AllowNew
             {
                 get
@@ -93,24 +118,48 @@ namespace SkyDean.FareLiz.Data.Csv
                 }
             }
 
-            public void ApplySort(PropertyDescriptor property, System.ComponentModel.ListSortDirection direction)
+            /// <summary>
+            /// The apply sort.
+            /// </summary>
+            /// <param name="property">
+            /// The property.
+            /// </param>
+            /// <param name="direction">
+            /// The direction.
+            /// </param>
+            public void ApplySort(PropertyDescriptor property, ListSortDirection direction)
             {
-                _sort = (CsvPropertyDescriptor)property;
-                _direction = direction;
+                this._sort = (CsvPropertyDescriptor)property;
+                this._direction = direction;
 
-                _csv.ReadToEnd();
+                this._csv.ReadToEnd();
 
-                _csv._records.Sort(new CsvRecordComparer(_sort.Index, _direction));
+                this._csv._records.Sort(new CsvRecordComparer(this._sort.Index, this._direction));
             }
 
+            /// <summary>
+            /// Gets the sort property.
+            /// </summary>
             public PropertyDescriptor SortProperty
             {
                 get
                 {
-                    return _sort;
+                    return this._sort;
                 }
             }
 
+            /// <summary>
+            /// The find.
+            /// </summary>
+            /// <param name="property">
+            /// The property.
+            /// </param>
+            /// <param name="key">
+            /// The key.
+            /// </param>
+            /// <returns>
+            /// The <see cref="int"/>.
+            /// </returns>
             public int Find(PropertyDescriptor property, object key)
             {
                 int fieldIndex = ((CsvPropertyDescriptor)property).Index;
@@ -119,15 +168,22 @@ namespace SkyDean.FareLiz.Data.Csv
                 int recordIndex = 0;
                 int count = this.Count;
 
-                while (recordIndex < count && _csv[recordIndex, fieldIndex] != value)
+                while (recordIndex < count && this._csv[recordIndex, fieldIndex] != value)
+                {
                     recordIndex++;
+                }
 
                 if (recordIndex == count)
+                {
                     return -1;
-                else
-                    return recordIndex;
+                }
+
+                return recordIndex;
             }
 
+            /// <summary>
+            /// Gets a value indicating whether supports sorting.
+            /// </summary>
             public bool SupportsSorting
             {
                 get
@@ -136,14 +192,20 @@ namespace SkyDean.FareLiz.Data.Csv
                 }
             }
 
+            /// <summary>
+            /// Gets a value indicating whether is sorted.
+            /// </summary>
             public bool IsSorted
             {
                 get
                 {
-                    return _sort != null;
+                    return this._sort != null;
                 }
             }
 
+            /// <summary>
+            /// Gets a value indicating whether allow remove.
+            /// </summary>
             public bool AllowRemove
             {
                 get
@@ -152,6 +214,9 @@ namespace SkyDean.FareLiz.Data.Csv
                 }
             }
 
+            /// <summary>
+            /// Gets a value indicating whether supports searching.
+            /// </summary>
             public bool SupportsSearching
             {
                 get
@@ -160,20 +225,34 @@ namespace SkyDean.FareLiz.Data.Csv
                 }
             }
 
-            public System.ComponentModel.ListSortDirection SortDirection
+            /// <summary>
+            /// Gets the sort direction.
+            /// </summary>
+            public ListSortDirection SortDirection
             {
                 get
                 {
-                    return _direction;
+                    return this._direction;
                 }
             }
 
-            public event System.ComponentModel.ListChangedEventHandler ListChanged
+            /// <summary>
+            /// The list changed.
+            /// </summary>
+            public event ListChangedEventHandler ListChanged
             {
-                add { }
-                remove { }
+                add
+                {
+                }
+
+                remove
+                {
+                }
             }
 
+            /// <summary>
+            /// Gets a value indicating whether supports change notification.
+            /// </summary>
             public bool SupportsChangeNotification
             {
                 get
@@ -182,17 +261,31 @@ namespace SkyDean.FareLiz.Data.Csv
                 }
             }
 
+            /// <summary>
+            /// The remove sort.
+            /// </summary>
             public void RemoveSort()
             {
-                _sort = null;
-                _direction = ListSortDirection.Ascending;
+                this._sort = null;
+                this._direction = ListSortDirection.Ascending;
             }
 
+            /// <summary>
+            /// The add new.
+            /// </summary>
+            /// <returns>
+            /// The <see cref="object"/>.
+            /// </returns>
+            /// <exception cref="NotSupportedException">
+            /// </exception>
             public object AddNew()
             {
                 throw new NotSupportedException();
             }
 
+            /// <summary>
+            /// Gets a value indicating whether allow edit.
+            /// </summary>
             public bool AllowEdit
             {
                 get
@@ -201,6 +294,12 @@ namespace SkyDean.FareLiz.Data.Csv
                 }
             }
 
+            /// <summary>
+            /// The remove index.
+            /// </summary>
+            /// <param name="property">
+            /// The property.
+            /// </param>
             public void RemoveIndex(PropertyDescriptor property)
             {
             }
@@ -209,21 +308,41 @@ namespace SkyDean.FareLiz.Data.Csv
 
             #region ITypedList Members
 
+            /// <summary>
+            /// The get item properties.
+            /// </summary>
+            /// <param name="listAccessors">
+            /// The list accessors.
+            /// </param>
+            /// <returns>
+            /// The <see cref="PropertyDescriptorCollection"/>.
+            /// </returns>
             public PropertyDescriptorCollection GetItemProperties(PropertyDescriptor[] listAccessors)
             {
-                if (_properties == null)
+                if (this._properties == null)
                 {
-                    PropertyDescriptor[] properties = new PropertyDescriptor[_csv.FieldCount];
+                    PropertyDescriptor[] properties = new PropertyDescriptor[this._csv.FieldCount];
 
                     for (int i = 0; i < properties.Length; i++)
-                        properties[i] = new CsvPropertyDescriptor(((System.Data.IDataReader)_csv).GetName(i), i);
+                    {
+                        properties[i] = new CsvPropertyDescriptor(((IDataReader)this._csv).GetName(i), i);
+                    }
 
-                    _properties = new PropertyDescriptorCollection(properties);
+                    this._properties = new PropertyDescriptorCollection(properties);
                 }
 
-                return _properties;
+                return this._properties;
             }
 
+            /// <summary>
+            /// The get list name.
+            /// </summary>
+            /// <param name="listAccessors">
+            /// The list accessors.
+            /// </param>
+            /// <returns>
+            /// The <see cref="string"/>.
+            /// </returns>
             public string GetListName(PropertyDescriptor[] listAccessors)
             {
                 return string.Empty;
@@ -233,28 +352,70 @@ namespace SkyDean.FareLiz.Data.Csv
 
             #region IList<string[]> Members
 
+            /// <summary>
+            /// The index of.
+            /// </summary>
+            /// <param name="item">
+            /// The item.
+            /// </param>
+            /// <returns>
+            /// The <see cref="int"/>.
+            /// </returns>
+            /// <exception cref="NotSupportedException">
+            /// </exception>
             public int IndexOf(string[] item)
             {
                 throw new NotSupportedException();
             }
 
+            /// <summary>
+            /// The insert.
+            /// </summary>
+            /// <param name="index">
+            /// The index.
+            /// </param>
+            /// <param name="item">
+            /// The item.
+            /// </param>
+            /// <exception cref="NotSupportedException">
+            /// </exception>
             public void Insert(int index, string[] item)
             {
                 throw new NotSupportedException();
             }
 
+            /// <summary>
+            /// The remove at.
+            /// </summary>
+            /// <param name="index">
+            /// The index.
+            /// </param>
+            /// <exception cref="NotSupportedException">
+            /// </exception>
             public void RemoveAt(int index)
             {
                 throw new NotSupportedException();
             }
 
+            /// <summary>
+            /// The this.
+            /// </summary>
+            /// <param name="index">
+            /// The index.
+            /// </param>
+            /// <exception cref="NotSupportedException">
+            /// </exception>
+            /// <returns>
+            /// The <see cref="string[]"/>.
+            /// </returns>
             public string[] this[int index]
             {
                 get
                 {
-                    _csv.MoveTo(index);
-                    return _csv._records[index];
+                    this._csv.MoveTo(index);
+                    return this._csv._records[index];
                 }
+
                 set
                 {
                     throw new NotSupportedException();
@@ -265,48 +426,103 @@ namespace SkyDean.FareLiz.Data.Csv
 
             #region ICollection<string[]> Members
 
+            /// <summary>
+            /// The add.
+            /// </summary>
+            /// <param name="item">
+            /// The item.
+            /// </param>
+            /// <exception cref="NotSupportedException">
+            /// </exception>
             public void Add(string[] item)
             {
                 throw new NotSupportedException();
             }
 
+            /// <summary>
+            /// The clear.
+            /// </summary>
+            /// <exception cref="NotSupportedException">
+            /// </exception>
             public void Clear()
             {
                 throw new NotSupportedException();
             }
 
+            /// <summary>
+            /// The contains.
+            /// </summary>
+            /// <param name="item">
+            /// The item.
+            /// </param>
+            /// <returns>
+            /// The <see cref="bool"/>.
+            /// </returns>
+            /// <exception cref="NotSupportedException">
+            /// </exception>
             public bool Contains(string[] item)
             {
                 throw new NotSupportedException();
             }
 
+            /// <summary>
+            /// The copy to.
+            /// </summary>
+            /// <param name="array">
+            /// The array.
+            /// </param>
+            /// <param name="arrayIndex">
+            /// The array index.
+            /// </param>
             public void CopyTo(string[][] array, int arrayIndex)
             {
-                _csv.MoveToStart();
+                this._csv.MoveToStart();
 
-                while (_csv.ReadNextRecord())
-                    _csv.CopyCurrentRecordTo(array[arrayIndex++]);
+                while (this._csv.ReadNextRecord())
+                {
+                    this._csv.CopyCurrentRecordTo(array[arrayIndex++]);
+                }
             }
 
+            /// <summary>
+            /// Gets the count.
+            /// </summary>
             public int Count
             {
                 get
                 {
-                    if (_count < 0)
+                    if (this._count < 0)
                     {
-                        _csv.ReadToEnd();
-                        _count = (int)_csv.CurrentRecordIndex + 1;
+                        this._csv.ReadToEnd();
+                        this._count = (int)this._csv.CurrentRecordIndex + 1;
                     }
 
-                    return _count;
+                    return this._count;
                 }
             }
 
+            /// <summary>
+            /// Gets a value indicating whether is read only.
+            /// </summary>
             public bool IsReadOnly
             {
-                get { return true; }
+                get
+                {
+                    return true;
+                }
             }
 
+            /// <summary>
+            /// The remove.
+            /// </summary>
+            /// <param name="item">
+            /// The item.
+            /// </param>
+            /// <returns>
+            /// The <see cref="bool"/>.
+            /// </returns>
+            /// <exception cref="NotSupportedException">
+            /// </exception>
             public bool Remove(string[] item)
             {
                 throw new NotSupportedException();
@@ -314,53 +530,114 @@ namespace SkyDean.FareLiz.Data.Csv
 
             #endregion
 
-            #region IEnumerable<string[]> Members
-
-            public IEnumerator<string[]> GetEnumerator()
-            {
-                return _csv.GetEnumerator();
-            }
-
-            #endregion
-
             #region IList Members
 
+            /// <summary>
+            /// The add.
+            /// </summary>
+            /// <param name="value">
+            /// The value.
+            /// </param>
+            /// <returns>
+            /// The <see cref="int"/>.
+            /// </returns>
+            /// <exception cref="NotSupportedException">
+            /// </exception>
             public int Add(object value)
             {
                 throw new NotSupportedException();
             }
 
+            /// <summary>
+            /// The contains.
+            /// </summary>
+            /// <param name="value">
+            /// The value.
+            /// </param>
+            /// <returns>
+            /// The <see cref="bool"/>.
+            /// </returns>
+            /// <exception cref="NotSupportedException">
+            /// </exception>
             public bool Contains(object value)
             {
                 throw new NotSupportedException();
             }
 
+            /// <summary>
+            /// The index of.
+            /// </summary>
+            /// <param name="value">
+            /// The value.
+            /// </param>
+            /// <returns>
+            /// The <see cref="int"/>.
+            /// </returns>
+            /// <exception cref="NotSupportedException">
+            /// </exception>
             public int IndexOf(object value)
             {
                 throw new NotSupportedException();
             }
 
+            /// <summary>
+            /// The insert.
+            /// </summary>
+            /// <param name="index">
+            /// The index.
+            /// </param>
+            /// <param name="value">
+            /// The value.
+            /// </param>
+            /// <exception cref="NotSupportedException">
+            /// </exception>
             public void Insert(int index, object value)
             {
                 throw new NotSupportedException();
             }
 
+            /// <summary>
+            /// Gets a value indicating whether is fixed size.
+            /// </summary>
             public bool IsFixedSize
             {
-                get { return true; }
+                get
+                {
+                    return true;
+                }
             }
 
+            /// <summary>
+            /// The remove.
+            /// </summary>
+            /// <param name="value">
+            /// The value.
+            /// </param>
+            /// <exception cref="NotSupportedException">
+            /// </exception>
             public void Remove(object value)
             {
                 throw new NotSupportedException();
             }
 
+            /// <summary>
+            /// The i list.this.
+            /// </summary>
+            /// <param name="index">
+            /// The index.
+            /// </param>
+            /// <exception cref="NotSupportedException">
+            /// </exception>
+            /// <returns>
+            /// The <see cref="object"/>.
+            /// </returns>
             object IList.this[int index]
             {
                 get
                 {
                     return this[index];
                 }
+
                 set
                 {
                     throw new NotSupportedException();
@@ -371,31 +648,45 @@ namespace SkyDean.FareLiz.Data.Csv
 
             #region ICollection Members
 
+            /// <summary>
+            /// The copy to.
+            /// </summary>
+            /// <param name="array">
+            /// The array.
+            /// </param>
+            /// <param name="index">
+            /// The index.
+            /// </param>
             public void CopyTo(Array array, int index)
             {
-                _csv.MoveToStart();
+                this._csv.MoveToStart();
 
-                while (_csv.ReadNextRecord())
-                    _csv.CopyCurrentRecordTo((string[])array.GetValue(index++));
+                while (this._csv.ReadNextRecord())
+                {
+                    this._csv.CopyCurrentRecordTo((string[])array.GetValue(index++));
+                }
             }
 
+            /// <summary>
+            /// Gets a value indicating whether is synchronized.
+            /// </summary>
             public bool IsSynchronized
             {
-                get { return false; }
+                get
+                {
+                    return false;
+                }
             }
 
+            /// <summary>
+            /// Gets the sync root.
+            /// </summary>
             public object SyncRoot
             {
-                get { return null; }
-            }
-
-            #endregion
-
-            #region IEnumerable Members
-
-            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-            {
-                return this.GetEnumerator();
+                get
+                {
+                    return null;
+                }
             }
 
             #endregion

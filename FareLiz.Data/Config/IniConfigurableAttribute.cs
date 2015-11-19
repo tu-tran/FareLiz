@@ -1,20 +1,47 @@
-﻿using System;
-
-namespace SkyDean.FareLiz.Data.Config
+﻿namespace SkyDean.FareLiz.Data.Config
 {
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+    using System;
+
+    /// <summary>
+    /// The ini configurable attribute.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Property)]
     public class IniConfigurableAttribute : Attribute
     {
-        public string ConfigurationKey { get; private set; }
-        public bool IsConfigurable { get; private set; }
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IniConfigurableAttribute"/> class.
+        /// </summary>
+        /// <param name="configurable">
+        /// The configurable.
+        /// </param>
+        /// <param name="key">
+        /// The key.
+        /// </param>
         public IniConfigurableAttribute(bool configurable, string key)
-            : base()
         {
-            ConfigurationKey = key;
-            IsConfigurable = configurable;
+            this.ConfigurationKey = key;
+            this.IsConfigurable = configurable;
         }
 
-        public IniConfigurableAttribute(bool configurable) : this(configurable, null) { }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IniConfigurableAttribute"/> class.
+        /// </summary>
+        /// <param name="configurable">
+        /// The configurable.
+        /// </param>
+        public IniConfigurableAttribute(bool configurable)
+            : this(configurable, null)
+        {
+        }
+
+        /// <summary>
+        /// Gets the configuration key.
+        /// </summary>
+        public string ConfigurationKey { get; private set; }
+
+        /// <summary>
+        /// Gets a value indicating whether is configurable.
+        /// </summary>
+        public bool IsConfigurable { get; private set; }
     }
 }

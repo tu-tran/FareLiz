@@ -1,12 +1,19 @@
-﻿using System;
-
-namespace SkyDean.FareLiz.Core
+﻿namespace SkyDean.FareLiz.Core
 {
-    /// <summary>
-    /// Interface for handling specific types of exception
-    /// </summary>
+    using System;
+
+    /// <summary>Interface for handling specific types of exception</summary>
     public interface IExceptionHandler
     {
+        /// <summary>
+        /// The process exception.
+        /// </summary>
+        /// <param name="ex">
+        /// The ex.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Exception"/>.
+        /// </returns>
         Exception ProcessException(Exception ex);
     }
 }

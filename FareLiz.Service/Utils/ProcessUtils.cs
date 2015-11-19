@@ -1,40 +1,66 @@
-﻿using SkyDean.FareLiz.Service.Utils.WinNative;
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Text;
-
-namespace SkyDean.FareLiz.Service.Utils
+﻿namespace SkyDean.FareLiz.Service.Utils
 {
+    using System;
+    using System.Diagnostics;
+    using System.IO;
+    using System.Text;
+
+    using SkyDean.FareLiz.Service.Utils.WinNative;
+
+    /// <summary>
+    /// The process utils.
+    /// </summary>
     public static class ProcessUtils
     {
         #region Process functions
-        /// <summary>
-        /// Get the name of current running process
-        /// </summary>
+
+        /// <summary>Get the name of current running process</summary>
         public static string CurrentProcessName
         {
-            get { return Process.GetCurrentProcess().ProcessName; }
+            get
+            {
+                return Process.GetCurrentProcess().ProcessName;
+            }
         }
 
+        /// <summary>
+        /// Gets the current process directory.
+        /// </summary>
         public static string CurrentProcessDirectory
         {
-            get { return Path.GetDirectoryName(CurrentProcessLocation); }
+            get
+            {
+                return Path.GetDirectoryName(CurrentProcessLocation);
+            }
         }
 
+        /// <summary>
+        /// Gets the current process location.
+        /// </summary>
         public static string CurrentProcessLocation
         {
-            get { return Process.GetCurrentProcess().MainModule.FileName; }
+            get
+            {
+                return Process.GetCurrentProcess().MainModule.FileName;
+            }
         }
-
 
         /// <summary>
         /// Kill all instance of specific process
         /// </summary>
-        /// <param name="processExecutable">Process name (or the full path to the executable file). If the full path is specified, only processes which are started at that location are terminated</param>
+        /// <param name="processExecutable">
+        /// Process name (or the full path to the executable file). If the full path is specified, only processes which are started at that location are
+        /// terminated
+        /// </param>
+        /// <param name="attempts">
+        /// The attempts.
+        /// </param>
+        /// <param name="intervalInSeconds">
+        /// The interval In Seconds.
+        /// </param>
         public static void KillProcess(string processExecutable, int attempts, int intervalInSeconds)
         {
-            string processName = Path.GetFileName(processExecutable.TrimEnd(".exe".ToCharArray())),
+            string processName = Path.GetFileName(processExecutable.TrimEnd(".exe".ToCharArray())), 
                    processLocation = Path.GetDirectoryName(processExecutable);
 
             Process[] processToKill = Process.GetProcessesByName(processName);
@@ -44,21 +70,27 @@ namespace SkyDean.FareLiz.Service.Utils
             {
                 try
                 {
-                    if (!String.IsNullOrEmpty(processLocation))   // Check if the current process is started in the specified location
+                    if (!string.IsNullOrEmpty(processLocation))
                     {
+                        // Check if the current process is started in the specified location
                         string procLocation = GetExecutablePath(process.MainWindowHandle);
-                        if (String.IsNullOrEmpty(procLocation))
+                        if (string.IsNullOrEmpty(procLocation))
+                        {
                             continue;
+                        }
 
                         var procDir = Path.GetDirectoryName(procLocation);
-                        if (!String.Equals(procDir, processLocation, StringComparison.OrdinalIgnoreCase)) // If it was not started in the expected location
+                        if (!string.Equals(procDir, processLocation, StringComparison.OrdinalIgnoreCase))
+                        {
+                            // If it was not started in the expected location
                             continue;
+                        }
                     }
 
                     if (process.MainWindowHandle != IntPtr.Zero)
                     {
                         process.WaitForInputIdle(intervalInSeconds);
-                        process.CloseMainWindow();  // Close the main window first
+                        process.CloseMainWindow(); // Close the main window first
                     }
 
                     int killAttempts = 0;
@@ -72,20 +104,35 @@ namespace SkyDean.FareLiz.Service.Utils
                 catch (Exception ex)
                 {
                     Console.WriteLine("Failed to kill process: " + processExecutable + Environment.NewLine + ex.Message + ex.StackTrace);
-                }   //Ignore
+                }
+ // Ignore
             }
 
             if (forceKill)
-                RefreshTaskbarNotificationArea();   // Cleanup any tray icon
-
+            {
+                RefreshTaskbarNotificationArea(); // Cleanup any tray icon
+            }
         }
 
+        /// <summary>
+        /// The get executable path.
+        /// </summary>
+        /// <param name="hwnd">
+        /// The hwnd.
+        /// </param>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
         public static string GetExecutablePath(IntPtr hwnd)
         {
             uint pathBufferSize = 512; // plenty big enough
             StringBuilder pathBufferSb = new StringBuilder((int)pathBufferSize);
 
-            if (hwnd == IntPtr.Zero) { return string.Empty; } // not a valid window handle
+            if (hwnd == IntPtr.Zero)
+            {
+                return string.Empty;
+            }
+ // not a valid window handle
 
             // Get the process id
             uint processid;
@@ -117,8 +164,8 @@ namespace SkyDean.FareLiz.Service.Utils
                 {
                     // Try this method for Vista or higher operating systems
                     uint size = pathBufferSize;
-                    if ((Environment.OSVersion.Version.Major >= 6) &&
-                     (NativeMethods.QueryFullProcessImageName(hprocess, 0, pathBufferSb, ref size) && (size > 0)))
+                    if ((Environment.OSVersion.Version.Major >= 6)
+                        && (NativeMethods.QueryFullProcessImageName(hprocess, 0, pathBufferSb, ref size) && (size > 0)))
                     {
                         return pathBufferSb.ToString();
                     }
@@ -148,9 +195,7 @@ namespace SkyDean.FareLiz.Service.Utils
             return string.Empty;
         }
 
-        /// <summary>
-        /// Refresh the tray
-        /// </summary>
+        /// <summary>Refresh the tray</summary>
         public static void RefreshTaskbarNotificationArea()
         {
             IntPtr systemTrayContainerHandle = NativeMethods.FindWindow("Shell_TrayWnd", null);
@@ -161,20 +206,35 @@ namespace SkyDean.FareLiz.Service.Utils
             {
                 notificationAreaHandle = NativeMethods.FindWindowEx(sysPagerHandle, IntPtr.Zero, "ToolbarWindow32", "User Promoted Notification Area");
                 IntPtr notifyIconOverflowWindowHandle = NativeMethods.FindWindow("NotifyIconOverflowWindow", null);
-                IntPtr overflowNotificationAreaHandle = NativeMethods.FindWindowEx(notifyIconOverflowWindowHandle, IntPtr.Zero, "ToolbarWindow32", "Overflow Notification Area");
+                IntPtr overflowNotificationAreaHandle = NativeMethods.FindWindowEx(
+                    notifyIconOverflowWindowHandle, 
+                    IntPtr.Zero, 
+                    "ToolbarWindow32", 
+                    "Overflow Notification Area");
                 RefreshTaskbarNotificationArea(overflowNotificationAreaHandle);
             }
+
             RefreshTaskbarNotificationArea(notificationAreaHandle);
         }
 
+        /// <summary>
+        /// The refresh taskbar notification area.
+        /// </summary>
+        /// <param name="windowHandle">
+        /// The window handle.
+        /// </param>
         public static void RefreshTaskbarNotificationArea(IntPtr windowHandle)
         {
             const uint wmMousemove = 0x0200;
             RECT rect;
             NativeMethods.GetClientRect(windowHandle, out rect);
             for (var x = 0; x < rect.right; x += 5)
+            {
                 for (var y = 0; y < rect.bottom; y += 5)
+                {
                     NativeMethods.SendMessage(windowHandle, wmMousemove, 0, (y << 16) + x);
+                }
+            }
         }
 
         /*  // GET PARENT PROCESS -- NOT NEEDED YET
@@ -243,17 +303,43 @@ namespace SkyDean.FareLiz.Service.Utils
         #endregion
     }
 
+    /// <summary>
+    /// The process info.
+    /// </summary>
     public class ProcessInfo
     {
+        /// <summary>
+        /// The handle.
+        /// </summary>
         public readonly IntPtr Handle;
-        public readonly IntPtr MainWindowHandle;
+
+        /// <summary>
+        /// The location.
+        /// </summary>
         public readonly string Location;
 
+        /// <summary>
+        /// The main window handle.
+        /// </summary>
+        public readonly IntPtr MainWindowHandle;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProcessInfo"/> class.
+        /// </summary>
+        /// <param name="handle">
+        /// The handle.
+        /// </param>
+        /// <param name="mainWndHandle">
+        /// The main wnd handle.
+        /// </param>
+        /// <param name="location">
+        /// The location.
+        /// </param>
         public ProcessInfo(IntPtr handle, IntPtr mainWndHandle, string location)
         {
-            Handle = handle;
-            MainWindowHandle = mainWndHandle;
-            Location = location;
+            this.Handle = handle;
+            this.MainWindowHandle = mainWndHandle;
+            this.Location = location;
         }
     }
 }

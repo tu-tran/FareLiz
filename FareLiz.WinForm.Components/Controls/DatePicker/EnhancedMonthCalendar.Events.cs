@@ -4,58 +4,52 @@
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Drawing;
+    using System.Drawing.Text;
     using System.Windows.Forms;
 
     using SkyDean.FareLiz.WinForm.Components.Controls.DatePicker.EventClasses;
     using SkyDean.FareLiz.WinForm.Components.Controls.DatePicker.Helper;
     using SkyDean.FareLiz.WinForm.Components.Controls.DatePicker.Renderer;
 
+    /// <summary>
+    /// The enhanced month calendar.
+    /// </summary>
     partial class EnhancedMonthCalendar
     {
-        /// <summary>
-        /// Occurs when the user selects a date or a date range.
-        /// </summary>
+        /// <summary>Occurs when the user selects a date or a date range.</summary>
         [Category("Action")]
         [Description("Is raised, when the user selected a date or date range.")]
         public event EventHandler<DateRangeEventArgs> DateSelected;
 
-        /// <summary>
-        /// Occurs when the user changed the month or year.
-        /// </summary>
+        /// <summary>Occurs when the user changed the month or year.</summary>
         [Category("Action")]
         [Description("Is raised, when the user changed the month or year.")]
         public event EventHandler<DateRangeEventArgs> DateChanged;
 
-        /// <summary>
-        /// Is Raised when the mouse is over an date.
-        /// </summary>
+        /// <summary>Is Raised when the mouse is over an date.</summary>
         [Category("Action")]
         [Description("Is raised when the mouse is over an date.")]
         public event EventHandler<ActiveDateChangedEventArgs> ActiveDateChanged;
 
-        /// <summary>
-        /// Is raised when the selection extension ended.
-        /// </summary>
+        /// <summary>Is raised when the selection extension ended.</summary>
         [Category("Action")]
         [Description("Is raised when the selection extension ended.")]
         public event EventHandler SelectionExtendEnd;
 
-        /// <summary>
-        /// Is raised when a date was clicked.
-        /// </summary>
+        /// <summary>Is raised when a date was clicked.</summary>
         [Category("Action")]
         [Description("Is raised when a date in selection mode 'Day' was clicked.")]
         public event EventHandler<DateEventArgs> DateClicked;
 
-        /// <summary>
-        /// Is raises when a date was selected.
-        /// </summary>
+        /// <summary>Is raises when a date was selected.</summary>
         internal event EventHandler<DateEventArgs> InternalDateSelected;
 
         /// <summary>
         /// Raises the <see cref="DateSelected"/> event.
         /// </summary>
-        /// <param name="e">The <see cref="DateRangeEventArgs"/> object that contains the event data.</param>
+        /// <param name="e">
+        /// The <see cref="DateRangeEventArgs"/> object that contains the event data.
+        /// </param>
         private void OnDateSelected(DateRangeEventArgs e)
         {
             if (this.DateSelected != null)
@@ -67,7 +61,9 @@
         /// <summary>
         /// Raises the <see cref="DateClicked"/> event.
         /// </summary>
-        /// <param name="e">A <see cref="DateEventArgs"/> that contains the event data.</param>
+        /// <param name="e">
+        /// A <see cref="DateEventArgs"/> that contains the event data.
+        /// </param>
         private void OnDateClicked(DateEventArgs e)
         {
             if (this.DateClicked != null)
@@ -79,15 +75,19 @@
         /// <summary>
         /// Raises the <see cref="System.Windows.Forms.Control.Paint"/> event.
         /// </summary>
-        /// <param name="e">A <see cref="PaintEventArgs"/> that contains the event data.</param>
+        /// <param name="e">
+        /// A <see cref="PaintEventArgs"/> that contains the event data.
+        /// </param>
         protected override void OnPaint(PaintEventArgs e)
         {
             // return if in update mode of if nothing to draw
             if (this.calendarDimensions.IsEmpty || this._inUpdate)
+            {
                 return;
+            }
 
             // set text rendering hint
-            e.Graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
+            e.Graphics.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
 
             this._renderer.DrawCalendarBackground(e.Graphics, this.Bounds);
 
@@ -96,7 +96,9 @@
             {
                 // if month is null or not in the clip rectangle - continue
                 if (month == null || !e.ClipRectangle.IntersectsWith(month.Bounds))
+                {
                     continue;
+                }
 
                 MonthCalendarHeaderState state = this.GetMonthHeaderState(month.Date);
 
@@ -157,7 +159,9 @@
         /// <summary>
         /// Raises the <see cref="System.Windows.Forms.Control.MouseDown"/> event.
         /// </summary>
-        /// <param name="e">A <see cref="MouseEventArgs"/> that contains the event data.</param>
+        /// <param name="e">
+        /// A <see cref="MouseEventArgs"/> that contains the event data.
+        /// </param>
         protected override void OnMouseDown(MouseEventArgs e)
         {
             base.OnMouseDown(e);
@@ -171,7 +175,7 @@
             {
                 MonthCalendarHitTest hit = this.HitTest(e.Location); // perform hit test                
                 this.currentMoveBounds = hit.Bounds; // set current bounds
-                this.currentHitType = hit.Type;  // set current hit type
+                this.currentHitType = hit.Type; // set current hit type
 
                 switch (hit.Type)
                 {
@@ -191,6 +195,7 @@
                                 case MonthCalendarSelectionMode.Day:
                                     {
                                         this.OnDateClicked(new DateEventArgs(hit.Date));
+
                                         // only single days are selectable
                                         if (this.selectionStart != hit.Date)
                                         {
@@ -205,7 +210,8 @@
                                     {
                                         // only single work week is selectable
                                         // get first day of week
-                                        DateTime firstDay = new MonthCalendarDate(this.CultureCalendar, hit.Date).GetFirstDayInWeek(this._formatProvider).Date;
+                                        DateTime firstDay =
+                                            new MonthCalendarDate(this.CultureCalendar, hit.Date).GetFirstDayInWeek(this._formatProvider).Date;
 
                                         // get work days
                                         List<DayOfWeek> workDays = DateMethods.GetWorkDays(this.nonWorkDays);
@@ -225,12 +231,18 @@
                                             if (workDays.Contains(toAdd.DayOfWeek))
                                             {
                                                 if (currentRange == null)
+                                                {
                                                     currentRange = new SelectionRange(DateTime.MinValue, DateTime.MinValue);
+                                                }
 
                                                 if (currentRange.Start == DateTime.MinValue)
+                                                {
                                                     currentRange.Start = toAdd;
+                                                }
                                                 else
+                                                {
                                                     currentRange.End = toAdd;
+                                                }
                                             }
                                             else if (currentRange != null)
                                             {
@@ -247,10 +259,14 @@
 
                                             // if selection range changed, raise event
                                             if (this.SelectionRange != oldRange)
+                                            {
                                                 this.RaiseDateSelected();
+                                            }
                                         }
                                         else
+                                        {
                                             this.Refresh();
+                                        }
 
                                         break;
                                     }
@@ -259,7 +275,8 @@
                                     {
                                         // only a full week is selectable
                                         // get selection start and end
-                                        MonthCalendarDate dt = new MonthCalendarDate(this.CultureCalendar, hit.Date).GetFirstDayInWeek(this._formatProvider);
+                                        MonthCalendarDate dt =
+                                            new MonthCalendarDate(this.CultureCalendar, hit.Date).GetFirstDayInWeek(this._formatProvider);
                                         this.selectionStart = dt.Date;
                                         this.selectionEnd = dt.GetEndDateOfWeek(this._formatProvider).Date;
 
@@ -288,6 +305,7 @@
                                             this.RaiseDateSelected();
                                             this.Refresh();
                                         }
+
                                         break;
                                     }
 
@@ -297,7 +315,9 @@
                                         {
                                             var range = this.selectionRanges.Find(r => hit.Date >= r.Start && hit.Date <= r.End);
                                             if (range != null)
+                                            {
                                                 this.selectionRanges.Remove(range);
+                                            }
                                         }
 
                                         // manual mode - selection ends when user is releasing the left mouse button
@@ -308,6 +328,7 @@
                                         break;
                                     }
                             }
+
                             break;
                         }
 
@@ -323,6 +344,7 @@
                                 this.SelectionStart = hit.Date;
                                 this._selectionStartRange = this.SelectionRange;
                             }
+
                             break;
                         }
 
@@ -376,8 +398,9 @@
                                 // raise event
                                 this.RaiseDateChanged();
 
-                                this.mouseMoveFlags.HeaderDate = this._leftArrowRect.Contains(e.Location) ?
-                                   this.Months[0].Date : this.Months[this.calendarDimensions.Width - 1].Date;
+                                this.mouseMoveFlags.HeaderDate = this._leftArrowRect.Contains(e.Location)
+                                                                     ? this.Months[0].Date
+                                                                     : this.Months[this.calendarDimensions.Width - 1].Date;
 
                                 this.Refresh();
                             }
@@ -406,7 +429,9 @@
                                     raiseDateChanged = true;
                                 }
                                 else
+                                {
                                     break;
+                                }
                             }
 
                             // set new selection start and end values
@@ -419,10 +444,14 @@
 
                             // raise events if necessary
                             if (range != this.SelectionRange)
+                            {
                                 this.RaiseDateSelected();
+                            }
 
                             if (raiseDateChanged)
+                            {
                                 this.RaiseDateChanged();
+                            }
 
                             this.Refresh();
                             break;
@@ -442,13 +471,17 @@
         /// <summary>
         /// Raises the <see cref="System.Windows.Forms.Control.MouseMove"/> event.
         /// </summary>
-        /// <param name="e">A <see cref="MouseEventArgs"/> that contains the event data.</param>
+        /// <param name="e">
+        /// A <see cref="MouseEventArgs"/> that contains the event data.
+        /// </param>
         protected override void OnMouseMove(MouseEventArgs e)
         {
             base.OnMouseMove(e);
 
             if (e.Location == this.mouseLocation)
+            {
                 return;
+            }
 
             this.mouseLocation = e.Location;
 
@@ -464,17 +497,15 @@
                 if (this.selectionStarted)
                 {
                     // if selection started with hit type Day and mouse is over new date
-                    if (hit.Type == MonthCalendarHitType.Day
-                       && this.currentHitType == MonthCalendarHitType.Day
-                       && this.currentMoveBounds != hit.Bounds)
+                    if (hit.Type == MonthCalendarHitType.Day && this.currentHitType == MonthCalendarHitType.Day
+                        && this.currentMoveBounds != hit.Bounds)
                     {
                         this.currentMoveBounds = hit.Bounds;
 
                         // set new selection end
                         this.SelectionEnd = hit.Date;
                     }
-                    else if (hit.Type == MonthCalendarHitType.Week
-                       && this.currentHitType == MonthCalendarHitType.Week)
+                    else if (hit.Type == MonthCalendarHitType.Week && this.currentHitType == MonthCalendarHitType.Week)
                     {
                         // set indicator that a week header element is selected
                         this.mouseMoveFlags.WeekHeader = true;
@@ -566,6 +597,7 @@
                                     this.mouseMoveFlags.RightArrow = !useRTL;
                                     this.mouseMoveFlags.HeaderDate = this.Months[this.calendarDimensions.Width - 1].Date;
                                 }
+
                                 this.Invalidate(hit.InvalidateBounds);
                                 break;
                             }
@@ -594,7 +626,8 @@
                     case MonthCalendarHitType.Day:
                         {
                             this.mouseMoveFlags.Day = hit.Date;
-                            var bold = this.GetBoldedDates().Contains(hit.Date) || this._boldDatesCollection.Exists(d => d.Value.Date == hit.Date.Date);
+                            var bold = this.GetBoldedDates().Contains(hit.Date)
+                                       || this._boldDatesCollection.Exists(d => d.Value.Date == hit.Date.Date);
                             this.OnActiveDateChanged(new ActiveDateChangedEventArgs(hit.Date, bold));
                             this.InvalidateMonth(hit.Date, true);
                             break;
@@ -645,6 +678,7 @@
 
                                 this.mouseMoveFlags.HeaderDate = this.Months[this.calendarDimensions.Width - 1].Date;
                             }
+
                             break;
                         }
 
@@ -718,7 +752,9 @@
         /// <summary>
         /// Raises the <see cref="System.Windows.Forms.Control.MouseUp"/> event.
         /// </summary>
-        /// <param name="e">A <see cref="MouseEventArgs"/> that contains the event data.</param>
+        /// <param name="e">
+        /// A <see cref="MouseEventArgs"/> that contains the event data.
+        /// </param>
         protected override void OnMouseUp(MouseEventArgs e)
         {
             base.OnMouseUp(e);
@@ -734,8 +770,7 @@
                 this.Refresh();
 
                 // raise selected event if necessary
-                if (this._backupRange.Start != this.SelectionRange.Start
-                   || this._backupRange.End != this.SelectionRange.End)
+                if (this._backupRange.Start != this.SelectionRange.Start || this._backupRange.End != this.SelectionRange.End)
                 {
                     // raise date 
                     this.RaiseDateSelected();
@@ -751,7 +786,9 @@
         /// <summary>
         /// Raises the <see cref="System.Windows.Forms.Control.MouseLeave"/> event.
         /// </summary>
-        /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
+        /// <param name="e">
+        /// An <see cref="EventArgs"/> that contains the event data.
+        /// </param>
         protected override void OnMouseLeave(EventArgs e)
         {
             base.OnMouseLeave(e);
@@ -775,7 +812,9 @@
         /// <summary>
         /// Raises the <see cref="System.Windows.Forms.Control.MouseWheel"/> event.
         /// </summary>
-        /// <param name="e">A <see cref="MouseEventArgs"/> that contains the event data.</param>
+        /// <param name="e">
+        /// A <see cref="MouseEventArgs"/> that contains the event data.
+        /// </param>
         protected override void OnMouseWheel(MouseEventArgs e)
         {
             base.OnMouseWheel(e);
@@ -789,7 +828,9 @@
         /// <summary>
         /// Raises the <see cref="System.Windows.Forms.Control.ParentChanged"/> event.
         /// </summary>
-        /// <param name="e">A <see cref="EventArgs"/> that contains the event data.</param>
+        /// <param name="e">
+        /// A <see cref="EventArgs"/> that contains the event data.
+        /// </param>
         protected override void OnParentChanged(EventArgs e)
         {
             base.OnParentChanged(e);
@@ -805,7 +846,9 @@
         /// <summary>
         /// Raises the <see cref="System.Windows.Forms.Control.RightToLeftChanged"/> event.
         /// </summary>
-        /// <param name="e">A <see cref="EventArgs"/> that contains the event data.</param>
+        /// <param name="e">
+        /// A <see cref="EventArgs"/> that contains the event data.
+        /// </param>
         protected override void OnRightToLeftChanged(EventArgs e)
         {
             base.OnRightToLeftChanged(e);
@@ -820,7 +863,9 @@
         /// <summary>
         /// Raises the <see cref="System.Windows.Forms.Control.EnabledChanged"/> event.
         /// </summary>
-        /// <param name="e">A <see cref="EventArgs"/> that contains the event data.</param>
+        /// <param name="e">
+        /// A <see cref="EventArgs"/> that contains the event data.
+        /// </param>
         protected override void OnEnabledChanged(EventArgs e)
         {
             base.OnEnabledChanged(e);
@@ -831,8 +876,10 @@
         /// <summary>
         /// Raises the <see cref="DateChanged"/> event.
         /// </summary>
-        /// <param name="e">The <see cref="DateRangeEventArgs"/> object that contains the event data.</param>
-        void OnDateChanged(DateRangeEventArgs e)
+        /// <param name="e">
+        /// The <see cref="DateRangeEventArgs"/> object that contains the event data.
+        /// </param>
+        private void OnDateChanged(DateRangeEventArgs e)
         {
             if (this.DateChanged != null)
             {
@@ -843,8 +890,10 @@
         /// <summary>
         /// Raises the <see cref="ActiveDateChanged"/> event.
         /// </summary>
-        /// <param name="e">A <see cref="ActiveDateChangedEventArgs"/> that contains the event data.</param>
-        void OnActiveDateChanged(ActiveDateChangedEventArgs e)
+        /// <param name="e">
+        /// A <see cref="ActiveDateChangedEventArgs"/> that contains the event data.
+        /// </param>
+        private void OnActiveDateChanged(ActiveDateChangedEventArgs e)
         {
             if (this.ActiveDateChanged != null)
             {
@@ -855,7 +904,9 @@
         /// <summary>
         /// Raises the <see cref="System.Windows.Forms.Control.FontChanged"/> event.
         /// </summary>
-        /// <param name="e">A <see cref="EventArgs"/> that contains the event data.</param>
+        /// <param name="e">
+        /// A <see cref="EventArgs"/> that contains the event data.
+        /// </param>
         protected override void OnFontChanged(EventArgs e)
         {
             base.OnFontChanged(e);
@@ -866,7 +917,9 @@
         /// <summary>
         /// Raises the <see cref="System.Windows.Forms.Control.KeyDown"/> event.
         /// </summary>
-        /// <param name="e">A <see cref="System.Windows.Forms.KeyEventArgs"/> that contains the event data.</param>
+        /// <param name="e">
+        /// A <see cref="System.Windows.Forms.KeyEventArgs"/> that contains the event data.
+        /// </param>
         protected override void OnKeyDown(KeyEventArgs e)
         {
             if (e.KeyCode == Keys.ControlKey)
@@ -880,7 +933,9 @@
         /// <summary>
         /// Raises the <see cref="System.Windows.Forms.Control.KeyUp"/> event.
         /// </summary>
-        /// <param name="e">A <see cref="System.Windows.Forms.KeyEventArgs"/> that contains the event data.</param>
+        /// <param name="e">
+        /// A <see cref="System.Windows.Forms.KeyEventArgs"/> that contains the event data.
+        /// </param>
         protected override void OnKeyUp(KeyEventArgs e)
         {
             if (e.KeyCode == Keys.ControlKey)

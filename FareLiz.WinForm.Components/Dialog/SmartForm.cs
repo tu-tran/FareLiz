@@ -3,11 +3,15 @@
     using System;
     using System.Windows.Forms;
 
-    /// <summary>
-    /// Helper class for properly center-aligned form
-    /// </summary>
+    /// <summary>Helper class for properly center-aligned form</summary>
     public class SmartForm : Form
     {
+        /// <summary>
+        /// The on load.
+        /// </summary>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         protected override void OnLoad(EventArgs e)
         {
             // If the start location of the form is set to be centered align and or the parent form is missing

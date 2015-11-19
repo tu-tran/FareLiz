@@ -7,74 +7,101 @@
     using SkyDean.FareLiz.WinForm.Components.Controls.DatePicker.Helper;
     using SkyDean.FareLiz.WinForm.Components.Controls.DatePicker.Interfaces;
 
-    /// <summary>
-    /// Class for date handling in different calendars.
-    /// </summary>
+    /// <summary>Class for date handling in different calendars.</summary>
     internal class MonthCalendarDate : ICloneable
     {
-        #region Fields
+        #region constructors
+
         /// <summary>
-        /// The calendar to use.
+        /// Initializes a new instance of the <see cref="MonthCalendarDate"/> class.
         /// </summary>
+        /// <param name="cal">
+        /// The calendar to use.
+        /// </param>
+        /// <param name="date">
+        /// The gregorian date.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="cal"/> is <c>null</c>.
+        /// </exception>
+        public MonthCalendarDate(Calendar cal, DateTime date)
+        {
+            if (cal == null)
+            {
+                throw new ArgumentNullException("cal", "parameter 'cal' cannot be null.");
+            }
+
+            if (date < cal.MinSupportedDateTime)
+            {
+                date = cal.MinSupportedDateTime;
+            }
+
+            if (date > cal.MaxSupportedDateTime)
+            {
+                date = cal.MaxSupportedDateTime;
+            }
+
+            this._date = date;
+            this._calendar = cal;
+            this.Year = cal.GetYear(date);
+            this.Month = cal.GetMonth(date);
+            this.Day = cal.GetDayOfMonth(date);
+            this.Era = cal.GetEra(date);
+        }
+
+        #endregion
+
+        #region Fields
+
+        /// <summary>The calendar to use.</summary>
         private Calendar _calendar = CultureInfo.CurrentUICulture.Calendar;
 
-        /// <summary>
-        /// The gregorian date this object represents.
-        /// </summary>
+        /// <summary>The gregorian date this object represents.</summary>
         private DateTime _date = DateTime.MinValue;
 
-        /// <summary>
-        /// The gregorian date for the first day in the month and year specified by the <see cref="_date"/>.
-        /// </summary>
+        /// <summary>The gregorian date for the first day in the month and year specified by the <see cref="_date" />.</summary>
         private MonthCalendarDate _firstOfMonth;
-        #endregion        
+
+        #endregion
 
         #region Properties
-        /// <summary>
-        /// Gets the gregorian date this object represents.
-        /// </summary>
+
+        /// <summary>Gets the gregorian date this object represents.</summary>
         public DateTime Date
         {
             get
             {
                 if (this._date == DateTime.MinValue)
+                {
                     this._date = this._calendar.ToDateTime(this.Year, this.Month, this.Day, 0, 0, 0, 0, this.Era);
+                }
 
                 return this._date;
             }
         }
 
-        /// <summary>
-        /// Gets the day in the <see cref="Calendar"/>.
-        /// </summary>
+        /// <summary>Gets the day in the <see cref="Calendar" />.</summary>
         public int Day { get; private set; }
 
-        /// <summary>
-        /// Gets the month in the <see cref="Calendar"/>.
-        /// </summary>
+        /// <summary>Gets the month in the <see cref="Calendar" />.</summary>
         public int Month { get; private set; }
 
-        /// <summary>
-        /// Gets the year in the <see cref="Calendar"/>.
-        /// </summary>
+        /// <summary>Gets the year in the <see cref="Calendar" />.</summary>
         public int Year { get; private set; }
 
-        /// <summary>
-        /// Gets the era of the date represented by this instance.
-        /// </summary>
+        /// <summary>Gets the era of the date represented by this instance.</summary>
         public int Era { get; private set; }
 
-        /// <summary>
-        /// Gets the <see cref="DayOfWeek"/> value this date represents in the <see cref="Calendar"/>.
-        /// </summary>
+        /// <summary>Gets the <see cref="DayOfWeek" /> value this date represents in the <see cref="Calendar" />.</summary>
         public DayOfWeek DayOfWeek
         {
-            get { return this._calendar.GetDayOfWeek(this.Date); }
+            get
+            {
+                return this._calendar.GetDayOfWeek(this.Date);
+            }
         }
 
-        /// <summary>
-        /// Gets the first date in the month as gregorian date.
-        /// </summary>
+        /// <summary>Gets the first date in the month as gregorian date.</summary>
         public MonthCalendarDate FirstOfMonth
         {
             get
@@ -87,7 +114,9 @@
                     }
                     else
                     {
-                        this._firstOfMonth = new MonthCalendarDate(this._calendar, this._calendar.ToDateTime(this.Year, this.Month, 1, 0, 0, 0, 0, this.Era));
+                        this._firstOfMonth = new MonthCalendarDate(
+                            this._calendar, 
+                            this._calendar.ToDateTime(this.Year, this.Month, 1, 0, 0, 0, 0, this.Era));
                     }
                 }
 
@@ -95,18 +124,16 @@
             }
         }
 
-        /// <summary>
-        /// Gets the number of days in the month specified by <see cref="Date"/> using the <see cref="Calendar"/>.
-        /// </summary>
+        /// <summary>Gets the number of days in the month specified by <see cref="Date" /> using the <see cref="Calendar" />.</summary>
         public int DaysInMonth
         {
-            get { return DateMethods.GetDaysInMonth(this); }
+            get
+            {
+                return DateMethods.GetDaysInMonth(this);
+            }
         }
 
-        /// <summary>
-        /// Gets or sets the <see cref="System.Globalization.Calendar"/> to use
-        /// in converting the gregorian date this object represents.
-        /// </summary>
+        /// <summary>Gets or sets the <see cref="System.Globalization.Calendar" /> to use in converting the gregorian date this object represents.</summary>
         public Calendar Calendar
         {
             get
@@ -117,37 +144,12 @@
             set
             {
                 if (value != null)
+                {
                     this._calendar = value;
+                }
             }
         }
 
-        #endregion
-
-        #region constructors
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MonthCalendarDate"/> class.
-        /// </summary>
-        /// <param name="cal">The calendar to use.</param>
-        /// <param name="date">The gregorian date.</param>
-        /// <exception cref="ArgumentNullException">If <paramref name="cal"/> is <c>null</c>.</exception>
-        public MonthCalendarDate(Calendar cal, DateTime date)
-        {
-            if (cal == null)
-                throw new ArgumentNullException("cal", "parameter 'cal' cannot be null.");
-
-            if (date < cal.MinSupportedDateTime)
-                date = cal.MinSupportedDateTime;
-
-            if (date > cal.MaxSupportedDateTime)
-                date = cal.MaxSupportedDateTime;
-
-            this._date = date;
-            this._calendar = cal;
-            this.Year = cal.GetYear(date);
-            this.Month = cal.GetMonth(date);
-            this.Day = cal.GetDayOfMonth(date);
-            this.Era = cal.GetEra(date);
-        }
         #endregion
 
         #region methods
@@ -155,8 +157,12 @@
         /// <summary>
         /// Gets the first day in the week.
         /// </summary>
-        /// <param name="provider">The format provider.</param>
-        /// <returns>The first day in the week specified by this instance.</returns>
+        /// <param name="provider">
+        /// The format provider.
+        /// </param>
+        /// <returns>
+        /// The first day in the week specified by this instance.
+        /// </returns>
         public MonthCalendarDate GetFirstDayInWeek(ICustomFormatProvider provider)
         {
             DayOfWeek firstDayOfWeek = provider.FirstDayOfWeek;
@@ -173,8 +179,12 @@
         /// <summary>
         /// Gets the last date of the week specified by this instance.
         /// </summary>
-        /// <param name="provider">The format provider.</param>
-        /// <returns>The last date in the week.</returns>
+        /// <param name="provider">
+        /// The format provider.
+        /// </param>
+        /// <returns>
+        /// The last date in the week.
+        /// </returns>
         public MonthCalendarDate GetEndDateOfWeek(ICustomFormatProvider provider)
         {
             DayOfWeek currentDayOfWeek = this.DayOfWeek;
@@ -206,8 +216,13 @@
         /// <summary>
         /// Adds the specified months to the date represented by this instance.
         /// </summary>
-        /// <param name="months">The months to add.</param>
-        /// <returns>Either the resulting date or the min/max date of the current calendar if the adding of months resulted in an invalid date for the current calendar.</returns>
+        /// <param name="months">
+        /// The months to add.
+        /// </param>
+        /// <returns>
+        /// Either the resulting date or the min/max date of the current calendar if the adding of months resulted in an invalid date for the current
+        /// calendar.
+        /// </returns>
         public MonthCalendarDate AddMonths(int months)
         {
             return new MonthCalendarDate(this._calendar, this.InternalAddMonths(months));
@@ -216,8 +231,12 @@
         /// <summary>
         /// Adds the specified days to the date represented by this instance.
         /// </summary>
-        /// <param name="days">The days to add.</param>
-        /// <returns>The resulting date or the min/max date of the current calendar if the resulting date is out of bounds for the current calendar.</returns>
+        /// <param name="days">
+        /// The days to add.
+        /// </param>
+        /// <returns>
+        /// The resulting date or the min/max date of the current calendar if the resulting date is out of bounds for the current calendar.
+        /// </returns>
         public MonthCalendarDate AddDays(int days)
         {
             DateTime dt = this.Date;
@@ -225,7 +244,8 @@
             days = Math.Abs(days);
             int daysAdded = 0;
 
-            while (((dt > this._calendar.MinSupportedDateTime && sign == -1) || (dt < this._calendar.MaxSupportedDateTime.Date && sign == 1)) && days != daysAdded)
+            while (((dt > this._calendar.MinSupportedDateTime && sign == -1) || (dt < this._calendar.MaxSupportedDateTime.Date && sign == 1))
+                   && days != daysAdded)
             {
                 dt = this._calendar.AddDays(dt, sign);
                 daysAdded++;
@@ -235,20 +255,16 @@
         }
 
         /// <summary>
-        /// Returns a string representation of the native <see cref="Calendar"/> dependent date using the current UI's <see cref="DateTimeFormatInfo.ShortDatePattern"/>.
+        /// Returns a string representation of the native <see cref="Calendar" /> dependent date using the current UI's
+        /// <see cref="DateTimeFormatInfo.ShortDatePattern" />.
         /// </summary>
         /// <returns>A string representation of this object.</returns>
         public override string ToString()
         {
-            return this.ToString(
-               CultureInfo.CurrentUICulture.DateTimeFormat.ShortDatePattern,
-               CultureInfo.CurrentUICulture.DateTimeFormat
-               );
+            return this.ToString(CultureInfo.CurrentUICulture.DateTimeFormat.ShortDatePattern, CultureInfo.CurrentUICulture.DateTimeFormat);
         }
 
-        /// <summary>
-        /// Creates a new object that is a copy of the current instance.
-        /// </summary>
+        /// <summary>Creates a new object that is a copy of the current instance.</summary>
         /// <returns>A new object that is a copy of this instance.</returns>
         public object Clone()
         {
@@ -256,24 +272,38 @@
         }
 
         /// <summary>
-        /// Returns a string representation of the native <see cref="Calendar"/> dependent date using the <see cref="IFormatProvider"/> <see cref="DateTimeFormatInfo"/>
+        /// Returns a string representation of the native <see cref="Calendar"/> dependent date using the <see cref="IFormatProvider"/>
+        /// <see cref="DateTimeFormatInfo"/>
         /// objects <see cref="DateTimeFormatInfo.ShortDatePattern"/>.
         /// </summary>
-        /// <param name="fp">The <see cref="IFormatProvider"/> to use for formatting.</param>
-        /// <returns>A string representation of this object.</returns>
+        /// <param name="fp">
+        /// The <see cref="IFormatProvider"/> to use for formatting.
+        /// </param>
+        /// <returns>
+        /// A string representation of this object.
+        /// </returns>
         public string ToString(IFormatProvider fp)
         {
             return this.ToString(null, fp);
         }
 
         /// <summary>
-        /// Returns a string representation of the native <see cref="Calendar"/> dependent date using the <see cref="IFormatProvider"/> and <paramref name="format"/>
+        /// Returns a string representation of the native <see cref="Calendar"/> dependent date using the <see cref="IFormatProvider"/> and
+        /// <paramref name="format"/>
         /// for formatting.
         /// </summary>
-        /// <param name="format">A string which holds the format pattern.</param>
-        /// <param name="fp">The <see cref="IFormatProvider"/> to use for formatting.</param>
-        /// <param name="nameProvider">The day and month name provider.</param>
-        /// <param name="nativeDigits">If not <c>null</c> and valid, uses for number representation the specified native digits.</param>
+        /// <param name="format">
+        /// A string which holds the format pattern.
+        /// </param>
+        /// <param name="fp">
+        /// The <see cref="IFormatProvider"/> to use for formatting.
+        /// </param>
+        /// <param name="nameProvider">
+        /// The day and month name provider.
+        /// </param>
+        /// <param name="nativeDigits">
+        /// If not <c>null</c> and valid, uses for number representation the specified native digits.
+        /// </param>
         /// <returns>
         /// A string representation of this object.
         /// </returns>
@@ -295,10 +325,20 @@
         /// <summary>
         /// Returns the gregorian date for the first day in the month.
         /// </summary>
-        /// <param name="cal">The <see cref="System.Globalization.Calendar"/> to use. If null the date <paramref name="year"/>.<paramref name="month"/>.<c>1</c> is returned.</param>
-        /// <param name="year">The year to use.</param>
-        /// <param name="month">The month to use.</param>
-        /// <returns>The gregorian date for the first date in the month specified by <paramref name="year"/>, <paramref name="month"/> and <paramref name="cal"/>.</returns>
+        /// <param name="cal">
+        /// The <see cref="System.Globalization.Calendar"/> to use. If null the date <paramref name="year"/>.<paramref name="month"/>.
+        /// <c>1</c> is returned.
+        /// </param>
+        /// <param name="year">
+        /// The year to use.
+        /// </param>
+        /// <param name="month">
+        /// The month to use.
+        /// </param>
+        /// <returns>
+        /// The gregorian date for the first date in the month specified by <paramref name="year"/>, <paramref name="month"/> and
+        /// <paramref name="cal"/>.
+        /// </returns>
         public static DateTime GetFirstOfMonth(Calendar cal, int year, int month)
         {
             if (cal == null)
@@ -312,8 +352,12 @@
         /// <summary>
         /// Calculates the date after adding the specified number of months.
         /// </summary>
-        /// <param name="months">The months to add.</param>
-        /// <returns>The resulting <see cref="DateTime"/> value.</returns>
+        /// <param name="months">
+        /// The months to add.
+        /// </param>
+        /// <returns>
+        /// The resulting <see cref="DateTime"/> value.
+        /// </returns>
         private DateTime InternalAddMonths(int months)
         {
             try
@@ -341,10 +385,18 @@
         /// <summary>
         /// Returns a string representation of this object.
         /// </summary>
-        /// <param name="format">The format pattern.</param>
-        /// <param name="dtfi">The <see cref="DateTimeFormatInfo"/> to use for formatting.</param>
-        /// <param name="nameProvider">The day and month name provider.</param>
-        /// <param name="nativeDigits">If not <c>null</c> and valid, uses for number representation the specified native digits.</param>
+        /// <param name="format">
+        /// The format pattern.
+        /// </param>
+        /// <param name="dtfi">
+        /// The <see cref="DateTimeFormatInfo"/> to use for formatting.
+        /// </param>
+        /// <param name="nameProvider">
+        /// The day and month name provider.
+        /// </param>
+        /// <param name="nativeDigits">
+        /// If not <c>null</c> and valid, uses for number representation the specified native digits.
+        /// </param>
         /// <returns>
         /// A <see cref="System.String"/> that represents this instance.
         /// </returns>
@@ -414,9 +466,10 @@
                         {
                             tokLen = CountChar(format, i, ch);
 
-                            sb.Append(tokLen <= 2
-                               ? DateMethods.GetNumberString(this.Day, nativeDigits, tokLen == 2)
-                               : GetDayName(c.GetDayOfWeek(this.Date), dtfi, nameProvider, tokLen == 3));
+                            sb.Append(
+                                tokLen <= 2
+                                    ? DateMethods.GetNumberString(this.Day, nativeDigits, tokLen == 2)
+                                    : GetDayName(c.GetDayOfWeek(this.Date), dtfi, nameProvider, tokLen == 3));
 
                             break;
                         }
@@ -425,9 +478,10 @@
                         {
                             tokLen = CountChar(format, i, ch);
 
-                            sb.Append(tokLen <= 2
-                               ? DateMethods.GetNumberString(this.Month, nativeDigits, tokLen == 2)
-                               : GetMonthName(this.Month, this.Year, dtfi, nameProvider, tokLen == 3));
+                            sb.Append(
+                                tokLen <= 2
+                                    ? DateMethods.GetNumberString(this.Month, nativeDigits, tokLen == 2)
+                                    : GetMonthName(this.Month, this.Year, dtfi, nameProvider, tokLen == 3));
 
                             break;
                         }
@@ -436,9 +490,10 @@
                         {
                             tokLen = CountChar(format, i, ch);
 
-                            sb.Append(tokLen <= 2
-                               ? DateMethods.GetNumberString(this.Year % 100, nativeDigits, true)
-                               : DateMethods.GetNumberString(this.Year, nativeDigits, false));
+                            sb.Append(
+                                tokLen <= 2
+                                    ? DateMethods.GetNumberString(this.Year % 100, nativeDigits, true)
+                                    : DateMethods.GetNumberString(this.Year, nativeDigits, false));
 
                             break;
                         }
@@ -447,9 +502,7 @@
                         {
                             tokLen = CountChar(format, i, ch);
 
-                            sb.Append(nameProvider != null
-                               ? nameProvider.GetEraName(c.GetEra(this.Date))
-                               : dtfi.GetEraName(c.GetEra(this.Date)));
+                            sb.Append(nameProvider != null ? nameProvider.GetEraName(c.GetEra(this.Date)) : dtfi.GetEraName(c.GetEra(this.Date)));
 
                             break;
                         }
@@ -458,9 +511,7 @@
                         {
                             tokLen = CountChar(format, i, ch);
 
-                            sb.Append(nameProvider != null
-                               ? nameProvider.DateSeparator
-                               : dtfi.DateSeparator);
+                            sb.Append(nameProvider != null ? nameProvider.DateSeparator : dtfi.DateSeparator);
 
                             break;
                         }
@@ -489,12 +540,21 @@
         }
 
         /// <summary>
-        /// Counts the specified <paramref name="c"/> at the position specified by <paramref name="p"/> in the string specified by <paramref name="fmt"/>.
+        /// Counts the specified <paramref name="c"/> at the position specified by <paramref name="p"/> in the string specified by
+        /// <paramref name="fmt"/>.
         /// </summary>
-        /// <param name="fmt">The string value to search.</param>
-        /// <param name="p">The position start at.</param>
-        /// <param name="c">The char value to count.</param>
-        /// <returns>The count of the char <paramref name="c"/> at the specified location.</returns>
+        /// <param name="fmt">
+        /// The string value to search.
+        /// </param>
+        /// <param name="p">
+        /// The position start at.
+        /// </param>
+        /// <param name="c">
+        /// The char value to count.
+        /// </param>
+        /// <returns>
+        /// The count of the char <paramref name="c"/> at the specified location.
+        /// </returns>
         private static int CountChar(string fmt, int p, char c)
         {
             int l = fmt.Length;
@@ -509,15 +569,25 @@
         }
 
         /// <summary>
-        /// Gets the abbreviated or full day name for the specified <see cref="DayOfWeek"/> value using,
-        /// if not null, the <paramref name="nameProvider"/> or the <see cref="DateTimeFormatInfo"/> specified by <paramref name="info"/>.
+        /// Gets the abbreviated or full day name for the specified <see cref="DayOfWeek"/> value using, if not null, the <paramref name="nameProvider"/> or
+        /// the <see cref="DateTimeFormatInfo"/> specified by <paramref name="info"/>.
         /// </summary>
-        /// <param name="dayofweek">The <see cref="DayOfWeek"/> value to get the day name for.</param>
-        /// <param name="info">The <see cref="DateTimeFormatInfo"/> to get the name.</param>
-        /// <param name="nameProvider">The <see cref="ICustomFormatProvider"/> to get the name.
-        /// This parameter has precedence before the <paramref name="info"/>. Can be <c>null</c>.</param>
-        /// <param name="abbreviated">true to get the abbreviated day name; false otherwise.</param>
-        /// <returns>The full or abbreviated day name specified by <paramref name="dayofweek"/> value.</returns>
+        /// <param name="dayofweek">
+        /// The <see cref="DayOfWeek"/> value to get the day name for.
+        /// </param>
+        /// <param name="info">
+        /// The <see cref="DateTimeFormatInfo"/> to get the name.
+        /// </param>
+        /// <param name="nameProvider">
+        /// The <see cref="ICustomFormatProvider"/> to get the name. This parameter has precedence before the
+        /// <paramref name="info"/>. Can be <c>null</c>.
+        /// </param>
+        /// <param name="abbreviated">
+        /// true to get the abbreviated day name; false otherwise.
+        /// </param>
+        /// <returns>
+        /// The full or abbreviated day name specified by <paramref name="dayofweek"/> value.
+        /// </returns>
         private static string GetDayName(DayOfWeek dayofweek, DateTimeFormatInfo info, ICustomFormatProvider nameProvider, bool abbreviated)
         {
             if (nameProvider != null)
@@ -529,23 +599,33 @@
         }
 
         /// <summary>
-        /// Gets the abbreviated or full month name for the specified <paramref name="month"/> and <paramref name="year"/> value,
-        /// using the <paramref name="nameProvider"/> if not null or the <see cref="DateTimeFormatInfo"/> specified by <paramref name="info"/>.
+        /// Gets the abbreviated or full month name for the specified <paramref name="month"/> and <paramref name="year"/> value, using the
+        /// <paramref name="nameProvider"/> if not null or the <see cref="DateTimeFormatInfo"/> specified by <paramref name="info"/>.
         /// </summary>
-        /// <param name="month">The month value to get the month name for.</param>
-        /// <param name="year">The year value to get the month name for.</param>
-        /// <param name="info">The <see cref="DateTimeFormatInfo"/> value to use.</param>
-        /// <param name="nameProvider">The <see cref="ICustomFormatProvider"/> to get the name.
-        /// This parameter has precedence before the <paramref name="info"/>. Can be <c>null</c>.</param>
-        /// <param name="abbreviated">true to get the abbreviated month name; false otherwise.</param>
-        /// <returns>The full or abbreviated month name specified by <paramref name="month"/> and <paramref name="year"/>.</returns>
+        /// <param name="month">
+        /// The month value to get the month name for.
+        /// </param>
+        /// <param name="year">
+        /// The year value to get the month name for.
+        /// </param>
+        /// <param name="info">
+        /// The <see cref="DateTimeFormatInfo"/> value to use.
+        /// </param>
+        /// <param name="nameProvider">
+        /// The <see cref="ICustomFormatProvider"/> to get the name. This parameter has precedence before the
+        /// <paramref name="info"/>. Can be <c>null</c>.
+        /// </param>
+        /// <param name="abbreviated">
+        /// true to get the abbreviated month name; false otherwise.
+        /// </param>
+        /// <returns>
+        /// The full or abbreviated month name specified by <paramref name="month"/> and <paramref name="year"/>.
+        /// </returns>
         private static string GetMonthName(int month, int year, DateTimeFormatInfo info, ICustomFormatProvider nameProvider, bool abbreviated)
         {
             if (nameProvider != null)
             {
-                return abbreviated
-                          ? nameProvider.GetAbbreviatedMonthName(year, month)
-                          : nameProvider.GetMonthName(year, month);
+                return abbreviated ? nameProvider.GetAbbreviatedMonthName(year, month) : nameProvider.GetMonthName(year, month);
             }
 
             return abbreviated ? info.GetAbbreviatedMonthName(month) : info.GetMonthName(month);

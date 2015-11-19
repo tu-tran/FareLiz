@@ -1,21 +1,52 @@
-﻿using System.Diagnostics;
-
-namespace SkyDean.FareLiz.Core.Data
+﻿namespace SkyDean.FareLiz.Core.Data
 {
-    public enum DataRequestState { Pending = 0, Requested = 1, NoData = 3, Failed = 4, Ok = 5 }
+    using System.Diagnostics;
 
+    /// <summary>The data request state.</summary>
+    public enum DataRequestState
+    {
+        /// <summary>The pending.</summary>
+        Pending = 0, 
+
+        /// <summary>The requested.</summary>
+        Requested = 1, 
+
+        /// <summary>The no data.</summary>
+        NoData = 3, 
+
+        /// <summary>The failed.</summary>
+        Failed = 4, 
+
+        /// <summary>The ok.</summary>
+        Ok = 5
+    }
+
+    /// <summary>The data request result.</summary>
     [DebuggerDisplay("{RequestState} - {ResultRoute}")]
     public struct DataRequestResult
     {
+        /// <summary>The empty.</summary>
+        public static readonly DataRequestResult Empty = new DataRequestResult(DataRequestState.Pending, null);
+
+        /// <summary>The request state.</summary>
         public readonly DataRequestState RequestState;
+
+        /// <summary>The result route.</summary>
         public readonly TravelRoute ResultRoute;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DataRequestResult"/> struct.
+        /// </summary>
+        /// <param name="requestState">
+        /// The request state.
+        /// </param>
+        /// <param name="resultRoute">
+        /// The result route.
+        /// </param>
         public DataRequestResult(DataRequestState requestState, TravelRoute resultRoute)
         {
-            RequestState = requestState;
-            ResultRoute = resultRoute;
+            this.RequestState = requestState;
+            this.ResultRoute = resultRoute;
         }
-
-        public static readonly DataRequestResult Empty = new DataRequestResult(DataRequestState.Pending, null);
     }
 }

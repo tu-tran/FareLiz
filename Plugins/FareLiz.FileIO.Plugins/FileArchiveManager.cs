@@ -1,19 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Text;
-using log4net;
-using SkyDean.FareLiz.Core;
-using SkyDean.FareLiz.Core.Config;
-using SkyDean.FareLiz.Core.Data;
-using SkyDean.FareLiz.Core.Presentation;
-using SkyDean.FareLiz.Core.Utils;
-
-namespace SkyDean.FareLiz.IO
+﻿namespace SkyDean.FareLiz.IO
 {
+    using System;
+    using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.Globalization;
+    using System.IO;
+    using System.Linq;
+    using System.Text;
+
+    using log4net;
+
+    using SkyDean.FareLiz.Core;
+    using SkyDean.FareLiz.Core.Config;
+    using SkyDean.FareLiz.Core.Data;
+    using SkyDean.FareLiz.Core.Presentation;
+    using SkyDean.FareLiz.Core.Utils;
+
     /// <summary>The file archive manager.</summary>
     [DisplayName("File Archive Manager")]
     [Description("Data Archive Manager using persistent file system storage")]
@@ -41,20 +43,24 @@ namespace SkyDean.FareLiz.IO
 
         #region Constructors and Destructors
 
-        /// <summary>Initializes a new instance of the <see cref="FileArchiveManager"/> class.</summary>
+        /// <summary>Initializes a new instance of the <see cref="FileArchiveManager" /> class.</summary>
         public FileArchiveManager()
         {
         }
 
-        /// <summary>Initializes a new instance of the <see cref="FileArchiveManager"/> class.</summary>
-        /// <param name="dataProvider">The data provider.</param>
-        /// <param name="fareDatabase">The fare database.</param>
-        /// <param name="logger">The logger.</param>
-        /// <param name="callback">The callback.</param>
-        public FileArchiveManager(
-            IFareDataProvider dataProvider, 
-            IFareDatabase fareDatabase, 
-            ILog logger)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileArchiveManager"/> class.
+        /// </summary>
+        /// <param name="dataProvider">
+        /// The data provider.
+        /// </param>
+        /// <param name="fareDatabase">
+        /// The fare database.
+        /// </param>
+        /// <param name="logger">
+        /// The logger.
+        /// </param>
+        public FileArchiveManager(IFareDataProvider dataProvider, IFareDatabase fareDatabase, ILog logger)
             : this()
         {
             this.FareDataProvider = dataProvider;
@@ -120,11 +126,24 @@ namespace SkyDean.FareLiz.IO
 
         #region Public Methods and Operators
 
-        /// <summary>The export data.</summary>
-        /// <param name="data">The data.</param>
-        /// <param name="destinationPath">The destination path.</param>
-        /// <param name="format">The format.</param>
-        /// <returns>The <see cref="string"/>.</returns>
+        /// <summary>
+        /// The export data.
+        /// </summary>
+        /// <param name="data">
+        /// The data.
+        /// </param>
+        /// <param name="destinationPath">
+        /// The destination path.
+        /// </param>
+        /// <param name="format">
+        /// The format.
+        /// </param>
+        /// <param name="callback">
+        /// The callback.
+        /// </param>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
         public string ExportData(IList<TravelRoute> data, string destinationPath, DataFormat format, IProgressCallback callback)
         {
             if (data == null || data.Count < 1)
@@ -156,12 +175,7 @@ namespace SkyDean.FareLiz.IO
             {
                 targetFile = Path.Combine(
                     destinationPath, 
-                    string.Format(
-                        CultureInfo.InvariantCulture, 
-                        "Exp_{0}_{1}{2}", 
-                        Guid.NewGuid(), 
-                        data.Count, 
-                        BIN_EXTENSION));
+                    string.Format(CultureInfo.InvariantCulture, "Exp_{0}_{1}{2}", Guid.NewGuid(), data.Count, BIN_EXTENSION));
                 var formatter = new ProtoBufTransfer(this.Logger);
                 formatter.ToRaw(data, targetFile);
             }
@@ -170,16 +184,29 @@ namespace SkyDean.FareLiz.IO
             return targetFile;
         }
 
-        /// <summary>The export data.</summary>
-        /// <param name="data">The data.</param>
-        /// <param name="destinationPath">The destination path.</param>
-        /// <param name="format">The format.</param>
-        /// <returns>The <see cref="string"/>.</returns>
+        /// <summary>
+        /// The export data.
+        /// </summary>
+        /// <param name="data">
+        /// The data.
+        /// </param>
+        /// <param name="destinationPath">
+        /// The destination path.
+        /// </param>
+        /// <param name="format">
+        /// The format.
+        /// </param>
+        /// <param name="callback">
+        /// The callback.
+        /// </param>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
         public string ExportData(TravelRoute data, string destinationPath, DataFormat format, IProgressCallback callback)
         {
             return this.ExportData(new List<TravelRoute> { data }, destinationPath, format, callback);
         }
-        
+
         /// <summary>The initialize.</summary>
         public void Initialize()
         {
@@ -198,11 +225,23 @@ namespace SkyDean.FareLiz.IO
 
         #region Methods
 
-        /// <summary>The import data.</summary>
-        /// <param name="path">The path.</param>
-        /// <param name="options">The options.</param>
-        /// <returns>The <see cref="IList"/>.</returns>
-        /// <exception cref="ArgumentException"></exception>
+        /// <summary>
+        /// The import data.
+        /// </summary>
+        /// <param name="path">
+        /// The path.
+        /// </param>
+        /// <param name="options">
+        /// The options.
+        /// </param>
+        /// <param name="callback">
+        /// The callback.
+        /// </param>
+        /// <returns>
+        /// The <see cref="IList"/>.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// </exception>
         public IList<TravelRoute> ImportData(string path, DataOptions options, IProgressCallback callback)
         {
             if (string.IsNullOrEmpty(path))
@@ -238,8 +277,8 @@ namespace SkyDean.FareLiz.IO
 
             int stackCount = 0, maxStack = this._config.ProcessBatchSize;
             long stackSizeBytes = 0, maxStackSizeBytes = 1024 * 1024 * 20;
-                
-                // If data size reaches the limit: Start processing file content
+
+            // If data size reaches the limit: Start processing file content
             var processRoutes = new List<TravelRoute>();
             var formatter = new ProtoBufTransfer(this.Logger);
             var processFiles = new List<string>();
@@ -314,8 +353,8 @@ namespace SkyDean.FareLiz.IO
 
                         stackCount += newRoute.Journeys.Count;
                         stackSizeBytes += 20 * fileSize;
-                            
-                            // XML file needs much more resource for processing: Add "padding" to the file size boundary
+
+                        // XML file needs much more resource for processing: Add "padding" to the file size boundary
                     }
                 }
 
@@ -328,7 +367,7 @@ namespace SkyDean.FareLiz.IO
                     if (options.ArchiveDataFiles)
                     {
                         callback.Text = string.Format("Archiving {0} data entries...", processFiles.Count);
-                        ExportData(processRoutes, this._config.ArchivePath, DataFormat.Binary, callback);
+                        this.ExportData(processRoutes, this._config.ArchivePath, DataFormat.Binary, callback);
 
                         foreach (var f in processFiles)
                         {
@@ -347,9 +386,15 @@ namespace SkyDean.FareLiz.IO
             return result;
         }
 
-        /// <summary>The generate file name.</summary>
-        /// <param name="route">The route.</param>
-        /// <returns>The <see cref="string"/>.</returns>
+        /// <summary>
+        /// The generate file name.
+        /// </summary>
+        /// <param name="route">
+        /// The route.
+        /// </param>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
         private string GenerateFileName(TravelRoute route)
         {
             string origin = route.Departure.IATA;

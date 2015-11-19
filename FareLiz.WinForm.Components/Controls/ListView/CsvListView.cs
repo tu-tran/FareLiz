@@ -1,6 +1,4 @@
-﻿using SkyDean.FareLiz.Data.Csv;
-
-namespace SkyDean.FareLiz.WinForm.Components.Controls.ListView
+﻿namespace SkyDean.FareLiz.WinForm.Components.Controls.ListView
 {
     using System;
     using System.Collections.Generic;
@@ -9,14 +7,47 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.ListView
 
     using SkyDean.FareLiz.Core.Data;
     using SkyDean.FareLiz.Core.Utils;
+    using SkyDean.FareLiz.Data.Csv;
 
-    public enum CsvDataType { CsvFile, CsvString }
+    /// <summary>
+    /// The csv data type.
+    /// </summary>
+    public enum CsvDataType
+    {
+        /// <summary>
+        /// The csv file.
+        /// </summary>
+        CsvFile, 
+
+        /// <summary>
+        /// The csv string.
+        /// </summary>
+        CsvString
+    }
+
+    /// <summary>
+    /// The csv list view.
+    /// </summary>
     public class CsvListView : EnhancedListView
     {
+        /// <summary>
+        /// The _data lines.
+        /// </summary>
         private readonly List<string[]> _dataLines = new List<string[]>();
+
+        /// <summary>
+        /// The _filtered lines.
+        /// </summary>
         private readonly List<string[]> _filteredLines = new List<string[]>();
+
+        /// <summary>
+        /// The _sorter.
+        /// </summary>
         private readonly CsvListViewColumnSorter _sorter = new CsvListViewColumnSorter();
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CsvListView"/> class.
+        /// </summary>
         public CsvListView()
         {
             this.ListViewItemSorter = this._sorter;
@@ -27,29 +58,69 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.ListView
             this.View = View.Details;
         }
 
+        /// <summary>
+        /// The csv list v iew virtual mode sort.
+        /// </summary>
+        /// <param name="listView">
+        /// The list view.
+        /// </param>
         private void CsvListVIewVirtualModeSort(EnhancedListView listView)
         {
             this._dataLines.Sort(this._sorter);
         }
 
+        /// <summary>
+        /// The csv list view virtual mode filter.
+        /// </summary>
+        /// <param name="listView">
+        /// The list view.
+        /// </param>
+        /// <param name="filters">
+        /// The filters.
+        /// </param>
         private void CsvListViewVirtualModeFilter(EnhancedListView listView, List<ListViewFilter> filters)
         {
-            if (DoFilter<string[]>(this._dataLines, this._filteredLines, filters, this.FilterLine))
+            if (DoFilter(this._dataLines, this._filteredLines, filters, this.FilterLine))
             {
                 this.VirtualListSize = this._dataLines.Count;
             }
         }
 
+        /// <summary>
+        /// The filter line.
+        /// </summary>
+        /// <param name="data">
+        /// The data.
+        /// </param>
+        /// <param name="filter">
+        /// The filter.
+        /// </param>
+        /// <returns>
+        /// The <see cref="bool"/>.
+        /// </returns>
         private bool FilterLine(string[] data, ListViewFilter filter)
         {
             int index = filter.Column;
             return data[index].IsMatch(filter.FilterString);
         }
 
+        /// <summary>
+        /// The bind data.
+        /// </summary>
+        /// <param name="data">
+        /// The data.
+        /// </param>
+        /// <param name="type">
+        /// The type.
+        /// </param>
+        /// <exception cref="ArgumentException">
+        /// </exception>
         public void BindData(string data, CsvDataType type)
         {
-            if (String.IsNullOrEmpty(data) || (type == CsvDataType.CsvFile && !File.Exists(data)))
+            if (string.IsNullOrEmpty(data) || (type == CsvDataType.CsvFile && !File.Exists(data)))
+            {
                 throw new ArgumentException("Invalid input data for CsvListView. Check that the data is not empty or the file exists");
+            }
 
             this.Clear();
             this._dataLines.Clear();
@@ -58,9 +129,13 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.ListView
 
             TextReader stream = null;
             if (type == CsvDataType.CsvFile)
+            {
                 stream = new StreamReader(data);
+            }
             else
+            {
                 stream = new StringReader(data);
+            }
 
             using (stream)
             {
@@ -80,7 +155,10 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.ListView
                     {
                         var item = new string[fieldCount];
                         for (int i = 0; i < fieldCount; i++)
+                        {
                             item[i] = reader[i];
+                        }
+
                         this._dataLines.Add(item);
                     }
                 }
@@ -90,18 +168,41 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.ListView
             this.Invalidate();
         }
 
+        /// <summary>
+        /// The csv list view_ retrieve virtual item.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void CsvListView_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e)
         {
             var itemIdx = e.ItemIndex;
             e.Item = new ListViewItem(this._dataLines[itemIdx]);
         }
 
+        /// <summary>
+        /// The csv list view column sorter.
+        /// </summary>
         private class CsvListViewColumnSorter : ListViewTextColumnSorter, IComparer<string[]>
         {
+            /// <summary>
+            /// The compare.
+            /// </summary>
+            /// <param name="x">
+            /// The x.
+            /// </param>
+            /// <param name="y">
+            /// The y.
+            /// </param>
+            /// <returns>
+            /// The <see cref="int"/>.
+            /// </returns>
             public int Compare(string[] x, string[] y)
             {
-                string xText = x[this.SortInfo.SortColumn],
-                       yText = y[this.SortInfo.SortColumn];
+                string xText = x[this.SortInfo.SortColumn], yText = y[this.SortInfo.SortColumn];
                 int result = StringLogicalComparer.Compare(xText, yText);
                 return this.SortInfo.SortAscending ? result : -result;
             }

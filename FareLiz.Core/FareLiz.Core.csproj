@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SkyDean.FareLiz.Core</RootNamespace>
     <AssemblyName>FareLiz.Core</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -27,6 +27,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
@@ -37,6 +38,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="log4net">
@@ -80,42 +82,6 @@
     <Compile Include="Utils\DataGrep.cs" />
     <Compile Include="Utils\FlightPriceComparer.cs" />
     <Compile Include="Utils\FlightPriceQualityComparer.cs" />
-    <Compile Include="Utils\HtmlAgilityPack\crc32.cs" />
-    <Compile Include="Utils\HtmlAgilityPack\EncodingFoundException.cs" />
-    <Compile Include="Utils\HtmlAgilityPack\HtmlAttribute.cs" />
-    <Compile Include="Utils\HtmlAgilityPack\HtmlAttributeCollection.cs" />
-    <Compile Include="Utils\HtmlAgilityPack\HtmlCmdLine.cs" />
-    <Compile Include="Utils\HtmlAgilityPack\HtmlCommentNode.cs" />
-    <Compile Include="Utils\HtmlAgilityPack\HtmlConsoleListener.cs" />
-    <Compile Include="Utils\HtmlAgilityPack\HtmlDocument.cs" />
-    <Compile Include="Utils\HtmlAgilityPack\HtmlDocument.Xpath.cs" />
-    <Compile Include="Utils\HtmlAgilityPack\HtmlElementFlag.cs" />
-    <Compile Include="Utils\HtmlAgilityPack\HtmlEntity.cs" />
-    <Compile Include="Utils\HtmlAgilityPack\HtmlNameTable.cs" />
-    <Compile Include="Utils\HtmlAgilityPack\HtmlNode.cs" />
-    <Compile Include="Utils\HtmlAgilityPack\HtmlNode.Xpath.cs" />
-    <Compile Include="Utils\HtmlAgilityPack\HtmlNodeCollection.cs" />
-    <Compile Include="Utils\HtmlAgilityPack\HtmlNodeNavigator.cs" />
-    <Compile Include="Utils\HtmlAgilityPack\HtmlNodeType.cs" />
-    <Compile Include="Utils\HtmlAgilityPack\HtmlParseError.cs" />
-    <Compile Include="Utils\HtmlAgilityPack\HtmlParseErrorCode.cs" />
-    <Compile Include="Utils\HtmlAgilityPack\HtmlTextNode.cs" />
-    <Compile Include="Utils\HtmlAgilityPack\HtmlWeb.cs" />
-    <Compile Include="Utils\HtmlAgilityPack\HtmlWeb.Xpath.cs" />
-    <Compile Include="Utils\HtmlAgilityPack\HtmlWebException.cs" />
-    <Compile Include="Utils\HtmlAgilityPack\IHtmlBaseNode.cs" />
-    <Compile Include="Utils\HtmlAgilityPack\IOLibrary.cs" />
-    <Compile Include="Utils\HtmlAgilityPack\MixedCodeDocument.cs" />
-    <Compile Include="Utils\HtmlAgilityPack\MixedCodeDocumentCodeFragment.cs" />
-    <Compile Include="Utils\HtmlAgilityPack\MixedCodeDocumentFragment.cs" />
-    <Compile Include="Utils\HtmlAgilityPack\MixedCodeDocumentFragmentList.cs" />
-    <Compile Include="Utils\HtmlAgilityPack\MixedCodeDocumentFragmentType.cs" />
-    <Compile Include="Utils\HtmlAgilityPack\MixedCodeDocumentTextFragment.cs" />
-    <Compile Include="Utils\HtmlAgilityPack\NameValuePair.cs" />
-    <Compile Include="Utils\HtmlAgilityPack\NameValuePairList.cs" />
-    <Compile Include="Utils\HtmlAgilityPack\Trace.cs" />
-    <Compile Include="Utils\HtmlAgilityPack\Trace.FullFramework.cs" />
-    <Compile Include="Utils\HtmlAgilityPack\Utilities.cs" />
     <Compile Include="Utils\IOUtils.cs" />
     <Compile Include="Utils\JourneyDateEqualityComparer.cs" />
     <Compile Include="Utils\NonSerialiazableTypeSurrogateSelector.cs" />

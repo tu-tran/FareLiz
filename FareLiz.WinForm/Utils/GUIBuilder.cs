@@ -1,35 +1,40 @@
-﻿using System;
-using System.Windows.Forms;
-
-namespace SkyDean.FareLiz.WinForm.Utils
+﻿namespace SkyDean.FareLiz.WinForm.Utils
 {
+    using System;
+    using System.Windows.Forms;
+
     using SkyDean.FareLiz.WinForm.Components.Utils;
 
-    /// <summary>
-    /// GUI Builder utility class
-    /// </summary>
+    /// <summary>GUI Builder utility class</summary>
     internal static class GUIBuilder
     {
         /// <summary>
         /// Attach the default context menu into tray icon for Win32 Window (for restoring form and exit application)
         /// </summary>
+        /// <param name="parent">
+        /// The parent.
+        /// </param>
+        /// <param name="trayIcon">
+        /// The tray Icon.
+        /// </param>
+        /// <param name="showInTaskbarOnRestore">
+        /// The show In Taskbar On Restore.
+        /// </param>
         internal static void AttachMenuToTrayIcon(Form parent, NotifyIcon trayIcon, bool showInTaskbarOnRestore)
         {
             // Restore window and put it to front
-            var restoreWindowHandler = new EventHandler((o, e) =>
-                {
-                    parent.Show();
-                    parent.ShowInTaskbar = showInTaskbarOnRestore;
-                    parent.WindowState = FormWindowState.Normal;
-                    NativeMethods.ShowToFront(parent.Handle);
-                });
+            var restoreWindowHandler = new EventHandler(
+                (o, e) =>
+                    {
+                        parent.Show();
+                        parent.ShowInTaskbar = showInTaskbarOnRestore;
+                        parent.WindowState = FormWindowState.Normal;
+                        NativeMethods.ShowToFront(parent.Handle);
+                    });
 
             var mnuShow = new ToolStripMenuItem("Show Main Window", null, restoreWindowHandler);
             var toolStripSeparator = new ToolStripSeparator();
-            var mnuExit = new ToolStripMenuItem("Exit", null, new EventHandler((o, e) =>
-            {
-                Environment.Exit(0);
-            }));
+            var mnuExit = new ToolStripMenuItem("Exit", null, (o, e) => { Environment.Exit(0); });
 
             var trayIconMenuStrip = new ContextMenuStrip();
             trayIconMenuStrip.Items.Add(mnuShow);

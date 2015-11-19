@@ -1,36 +1,96 @@
-﻿using log4net;
-using SkyDean.FareLiz.Core.Utils;
-using SkyDean.FareLiz.WinForm.Components.Dialog;
-
-namespace SkyDean.FareLiz.WinForm.Presentation.Views
+﻿namespace SkyDean.FareLiz.WinForm.Presentation.Views
 {
+    using System;
+
+    using log4net;
+
+    using SkyDean.FareLiz.Core.Utils;
+    using SkyDean.FareLiz.WinForm.Components.Dialog;
+
+    /// <summary>
+    /// The object browser dialog.
+    /// </summary>
     public partial class ObjectBrowserDialog : SmartForm
     {
-        public object ResultObject { get { return propertyGrid.SelectedObject; } }
-        private readonly object _originalObject;
+        /// <summary>
+        /// The _default object.
+        /// </summary>
         private readonly object _defaultObject;
+
+        /// <summary>
+        /// The _logger.
+        /// </summary>
         private readonly ILog _logger;
 
+        /// <summary>
+        /// The _original object.
+        /// </summary>
+        private readonly object _originalObject;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ObjectBrowserDialog"/> class.
+        /// </summary>
+        /// <param name="title">
+        /// The title.
+        /// </param>
+        /// <param name="targetObject">
+        /// The target object.
+        /// </param>
+        /// <param name="defaultObject">
+        /// The default object.
+        /// </param>
+        /// <param name="logger">
+        /// The logger.
+        /// </param>
         public ObjectBrowserDialog(string title, object targetObject, object defaultObject, ILog logger)
         {
-            InitializeComponent();
-            _originalObject = targetObject;
-            _defaultObject = defaultObject;
-            _logger = logger;
-            propertyGrid.SelectedObject = _originalObject.ReflectionDeepClone(_logger);
-            Text = title;
+            this.InitializeComponent();
+            this._originalObject = targetObject;
+            this._defaultObject = defaultObject;
+            this._logger = logger;
+            this.propertyGrid.SelectedObject = this._originalObject.ReflectionDeepClone(this._logger);
+            this.Text = title;
 
-            btnResetDefault.Visible = (_defaultObject != null);
+            this.btnResetDefault.Visible = this._defaultObject != null;
         }
 
-        private void btnReset_Click(object sender, System.EventArgs e)
+        /// <summary>
+        /// Gets the result object.
+        /// </summary>
+        public object ResultObject
         {
-            propertyGrid.SelectedObject = _originalObject.ReflectionDeepClone(_logger);
+            get
+            {
+                return this.propertyGrid.SelectedObject;
+            }
         }
 
-        private void btnResetDefault_Click(object sender, System.EventArgs e)
+        /// <summary>
+        /// The btn reset_ click.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
+        private void btnReset_Click(object sender, EventArgs e)
         {
-            propertyGrid.SelectedObject = _defaultObject.ReflectionDeepClone(_logger);
+            this.propertyGrid.SelectedObject = this._originalObject.ReflectionDeepClone(this._logger);
+        }
+
+        /// <summary>
+        /// The btn reset default_ click.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
+        private void btnResetDefault_Click(object sender, EventArgs e)
+        {
+            this.propertyGrid.SelectedObject = this._defaultObject.ReflectionDeepClone(this._logger);
         }
     }
 }

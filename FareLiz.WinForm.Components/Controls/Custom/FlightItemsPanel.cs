@@ -1,6 +1,4 @@
-﻿using SkyDean.FareLiz.Core.Data;
-
-namespace SkyDean.FareLiz.WinForm.Components.Controls.Custom
+﻿namespace SkyDean.FareLiz.WinForm.Components.Controls.Custom
 {
     using System;
     using System.Collections.Generic;
@@ -10,23 +8,91 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Custom
     using System.Windows.Forms;
 
     using SkyDean.FareLiz.Core;
+    using SkyDean.FareLiz.Core.Data;
     using SkyDean.FareLiz.Core.Utils;
+    using SkyDean.FareLiz.WinForm.Components.Properties;
     using SkyDean.FareLiz.WinForm.Components.Utils;
 
+    /// <summary>
+    /// The flight items panel.
+    /// </summary>
     public partial class FlightItemsPanel : UserControl
     {
+        /// <summary>
+        /// The _border pen.
+        /// </summary>
         private readonly Pen _borderPen = new Pen(Brushes.DarkSlateGray) { DashStyle = DashStyle.Dot };
-        private readonly Brush _newPriceBrush = Brushes.DeepSkyBlue;
-        private readonly Brush _incPriceBrush = Brushes.DeepPink;
-        private readonly Brush _decPriceBrush = Brushes.LimeGreen;
+
+        /// <summary>
+        /// The _dec price back color.
+        /// </summary>
         private readonly Color _decPriceBackColor = Color.FromArgb(241, 255, 242);
+
+        /// <summary>
+        /// The _dec price brush.
+        /// </summary>
+        private readonly Brush _decPriceBrush = Brushes.LimeGreen;
+
+        /// <summary>
+        /// The _inc price back color.
+        /// </summary>
         private readonly Color _incPriceBackColor = Color.FromArgb(255, 245, 242);
+
+        /// <summary>
+        /// The _inc price brush.
+        /// </summary>
+        private readonly Brush _incPriceBrush = Brushes.DeepPink;
+
+        /// <summary>
+        /// The _new price back color.
+        /// </summary>
         private readonly Color _newPriceBackColor = Color.FromArgb(255, 255, 242);
-        private readonly CultureInfo _numberCulture = new CultureInfo(CultureInfo.CurrentCulture.Name) { NumberFormat = new NumberFormatInfo { NumberDecimalSeparator = ".", NumberGroupSeparator = "," } };
+
+        /// <summary>
+        /// The _new price brush.
+        /// </summary>
+        private readonly Brush _newPriceBrush = Brushes.DeepSkyBlue;
+
+        /// <summary>
+        /// The _number culture.
+        /// </summary>
+        private readonly CultureInfo _numberCulture = new CultureInfo(CultureInfo.CurrentCulture.Name)
+                                                          {
+                                                              NumberFormat =
+                                                                  new NumberFormatInfo
+                                                                      {
+                                                                          NumberDecimalSeparator
+                                                                              = ".", 
+                                                                          NumberGroupSeparator
+                                                                              = ","
+                                                                      }
+                                                          };
+
+        /// <summary>
+        /// The _price font.
+        /// </summary>
         private readonly Font _priceFont;
 
+        /// <summary>
+        /// The _hover row.
+        /// </summary>
         private int _hoverRow = -1;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FlightItemsPanel"/> class.
+        /// </summary>
+        public FlightItemsPanel()
+        {
+            this.InitializeComponent();
+            this.colFirstPrice.DefaultCellStyle.Font =
+                this.colSecondPrice.DefaultCellStyle.Font = this._priceFont = new Font(this.Font, FontStyle.Bold);
+            this.gvFlightItems.BackgroundColor = this.BackColor;
+            this.gvFlightItems.CreateControl();
+        }
+
+        /// <summary>
+        /// Gets the expected height.
+        /// </summary>
         public int ExpectedHeight
         {
             get
@@ -37,14 +103,15 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Custom
             }
         }
 
-        public FlightItemsPanel()
-        {
-            this.InitializeComponent();
-            this.colFirstPrice.DefaultCellStyle.Font = this.colSecondPrice.DefaultCellStyle.Font = this._priceFont = new Font(this.Font, FontStyle.Bold);
-            this.gvFlightItems.BackgroundColor = this.BackColor;
-            this.gvFlightItems.CreateControl();
-        }
-
+        /// <summary>
+        /// The auto resize.
+        /// </summary>
+        /// <param name="maxHeight">
+        /// The max height.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Size"/>.
+        /// </returns>
         internal Size AutoResize(int maxHeight)
         {
             this.gvFlightItems.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCellsExceptHeader);
@@ -56,22 +123,36 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Custom
 
             int flightWidth = this.gvFlightItems.Columns.GetColumnsWidth(DataGridViewElementStates.Visible) + borderWidth;
             if (targetHeight >= maxHeight)
+            {
                 flightWidth += SystemInformation.VerticalScrollBarWidth;
-            int titleWidth = (this.lblHeader.Width + this.lblHeader.Padding.Left + this.lblHeader.Padding.Right);
+            }
 
-            int targetWidth = (titleWidth > flightWidth ? titleWidth : flightWidth);
+            int titleWidth = this.lblHeader.Width + this.lblHeader.Padding.Left + this.lblHeader.Padding.Right;
+
+            int targetWidth = titleWidth > flightWidth ? titleWidth : flightWidth;
 
             var result = new Size(targetWidth, targetHeight);
             this.colIcon.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
             return result;
         }
 
+        /// <summary>
+        /// The bind.
+        /// </summary>
+        /// <param name="header">
+        /// The header.
+        /// </param>
+        /// <param name="data">
+        /// The data.
+        /// </param>
         public void Bind(string header, IList<FlightMonitorItem> data)
         {
             this.lblHeader.Text = header;
-            this.lblHeader.AutoSize = !(String.IsNullOrEmpty(header));
+            this.lblHeader.AutoSize = !string.IsNullOrEmpty(header);
             if (!this.lblHeader.AutoSize)
+            {
                 this.lblHeader.Size = Size.Empty;
+            }
 
             this.gvFlightItems.SuspendLayout();
 
@@ -80,7 +161,9 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Custom
                 this.gvFlightItems.Rows.Clear();
                 DataGridViewRow[] rows = this.GetDataRows(data);
                 if (rows != null)
+                {
                     this.gvFlightItems.Rows.AddRange(rows);
+                }
             }
             finally
             {
@@ -88,11 +171,22 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Custom
             }
         }
 
+        /// <summary>
+        /// The get data rows.
+        /// </summary>
+        /// <param name="data">
+        /// The data.
+        /// </param>
+        /// <returns>
+        /// The <see cref="DataGridViewRow[]"/>.
+        /// </returns>
         private DataGridViewRow[] GetDataRows(IList<FlightMonitorItem> data)
         {
-            int dataCount = (data == null ? 0 : data.Count);
+            int dataCount = data == null ? 0 : data.Count;
             if (dataCount == 0)
+            {
                 return null;
+            }
 
             var currency = data[0].FlightData.JourneyData.Currency;
             var currencySymbol = AppContext.MonitorEnvironment.CurrencyProvider.GetCurrencyInfo(currency).Symbol;
@@ -107,7 +201,10 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Custom
                 var iconCell = new DataGridViewImageCell();
                 var opCell = new DataGridViewTextBoxCell { Value = flightData.Operator };
                 if (flightData.CanBePurchased)
+                {
                     opCell.Style.ForeColor = Color.SteelBlue;
+                }
+
                 var durationCell = new DataGridViewTextBoxCell { Value = flightData.Duration.ToHourMinuteString() };
 
                 double firstPrice = item.FlightStatus == FlightStatus.New ? flightData.Price : item.OldPrice;
@@ -119,13 +216,17 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Custom
                 newRow.Cells.AddRange(iconCell, opCell, durationCell, firstPriceCell, firstPriceCurrencyCell);
 
                 if (item.FlightStatus == FlightStatus.New)
+                {
                     newRow.DefaultCellStyle.BackColor = this._newPriceBackColor;
+                }
                 else
                 {
-                    newRow.DefaultCellStyle.BackColor = (item.FlightStatus == FlightStatus.PriceDecreased ? this._decPriceBackColor : this._incPriceBackColor);
+                    newRow.DefaultCellStyle.BackColor = item.FlightStatus == FlightStatus.PriceDecreased
+                                                             ? this._decPriceBackColor
+                                                             : this._incPriceBackColor;
 
                     // Price status
-                    var img = (item.FlightStatus == FlightStatus.PriceDecreased ? Properties.Resources.DownArrow : Properties.Resources.UpArrow);
+                    var img = item.FlightStatus == FlightStatus.PriceDecreased ? Resources.DownArrow : Resources.UpArrow;
                     var statusCell = new DataGridViewImageCell { Value = img };
 
                     // New price
@@ -135,17 +236,29 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Custom
 
                     newRow.Cells.AddRange(statusCell, secondPriceCell, secondPriceCurrencyCell);
                 }
+
                 result[i] = newRow;
             }
 
             return result;
         }
 
+        /// <summary>
+        /// The gv flight items_ cell painting.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void gvFlightItems_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
         {
             var rect = e.CellBounds;
             if (rect.Bottom < 0 || rect.Right < 0)
+            {
                 return;
+            }
 
             e.PaintBackground(rect, true);
 
@@ -167,33 +280,45 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Custom
                     }
                 }
                 else
+                {
                     e.PaintContent(rect);
+                }
             }
 
             rect.Inflate(0, -1 * (int)this._borderPen.Width);
 
-            var y = rect.Y + rect.Height;   // Draw dotted bottom border
+            var y = rect.Y + rect.Height; // Draw dotted bottom border
             e.Graphics.DrawLine(this._borderPen, rect.X, y, rect.Right, y);
             if (e.RowIndex == 0)
+            {
                 e.Graphics.DrawLine(this._borderPen, rect.X, rect.Y, rect.Right, rect.Y);
+            }
 
             using (Pen edgePen = (cellColumn == this.colIcon) ? new Pen(ControlPaint.Dark(e.CellStyle.BackColor), 3) : null)
             {
                 // Draw left border for all cells except for Operator cell and price section
                 if (cellColumn == this.colIcon || cellColumn == this.colDuration || cellColumn == this.colFirstPrice)
+                {
                     e.Graphics.DrawLine(edgePen ?? this._borderPen, rect.X, rect.Y, rect.X, rect.Bottom);
-                else if (cellColumn == this.colSecondPriceCurrency)    // Draw right border for the last column
+                }
+                else if (cellColumn == this.colSecondPriceCurrency)
+                {
+                    // Draw right border for the last column
                     e.Graphics.DrawLine(this._borderPen, rect.Right - 1, rect.Y, rect.Right - 1, rect.Bottom);
+                }
             }
 
-            if (e.ColumnIndex == 0) // Draw arrow on the first column (this is a walk-around for the tooltip)
+            if (e.ColumnIndex == 0)
             {
+                // Draw arrow on the first column (this is a walk-around for the tooltip)
                 var flightItem = this.gvFlightItems.Rows[e.RowIndex].Tag as FlightMonitorItem;
                 if (flightItem != null)
                 {
                     int edgeSize = rect.Height / 3;
                     var status = flightItem.FlightStatus;
-                    Brush brush = (status == FlightStatus.PriceIncreased ? this._incPriceBrush : (status == FlightStatus.PriceDecreased ? this._decPriceBrush : this._newPriceBrush));
+                    Brush brush = status == FlightStatus.PriceIncreased
+                                       ? this._incPriceBrush
+                                       : (status == FlightStatus.PriceDecreased ? this._decPriceBrush : this._newPriceBrush);
 
                     if (this._hoverRow == e.RowIndex)
                     {
@@ -207,12 +332,10 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Custom
                         int arrowYMiddle = arrowYTop + arrowSpan;
                         int arrowYBottom = arrowYMiddle + arrowSpan;
 
-                        var arrow = new Point[]
-                            {
-                                new Point(arrowXLeft, arrowYTop),
-                                new Point(arrowXMiddle, arrowYMiddle),
-                                new Point(arrowXLeft, arrowYBottom)
-                            };
+                        var arrow = new[]
+                                        {
+                                            new Point(arrowXLeft, arrowYTop), new Point(arrowXMiddle, arrowYMiddle), new Point(arrowXLeft, arrowYBottom)
+                                        };
 
                         using (var arrowBrush = new SolidBrush(this.toolTip.BackColor))
                         {
@@ -225,6 +348,15 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Custom
             e.Handled = true;
         }
 
+        /// <summary>
+        /// The gv flight items_ cell double click.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void gvFlightItems_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
             var flightItem = this.gvFlightItems.Rows[e.RowIndex].Tag as FlightMonitorItem;
@@ -247,6 +379,15 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Custom
             }
         }
 
+        /// <summary>
+        /// The gv flight items_ cell mouse enter.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void gvFlightItems_CellMouseEnter(object sender, DataGridViewCellEventArgs e)
         {
             var flightItem = this.gvFlightItems.Rows[e.RowIndex].Tag as FlightMonitorItem;
@@ -258,7 +399,7 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Custom
 
                 if (canPurchase)
                 {
-                    row.Cells[0].Value = Properties.Resources.Purchase;
+                    row.Cells[0].Value = Resources.Purchase;
                     this.Cursor = Cursors.Hand;
                 }
                 else
@@ -272,7 +413,8 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Custom
                     var rowRect = this.gvFlightItems.GetRowDisplayRectangle(e.RowIndex, true);
 
                     this._hoverRow = e.RowIndex;
-                    string caption = (canPurchase ? "Double-click to buy this ticket:" : "This ticket cannot be bought at the moment!") + Environment.NewLine + data.SummaryString;
+                    string caption = (canPurchase ? "Double-click to buy this ticket:" : "This ticket cannot be bought at the moment!")
+                                     + Environment.NewLine + data.SummaryString;
 
                     var rowScreenRect = this.gvFlightItems.RectangleToScreen(rowRect);
                     var relRowRect = this.lblHeader.RectangleToClient(rowScreenRect);
@@ -284,6 +426,15 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Custom
             }
         }
 
+        /// <summary>
+        /// The gv flight items_ cell mouse leave.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void gvFlightItems_CellMouseLeave(object sender, DataGridViewCellEventArgs e)
         {
             this.gvFlightItems.Rows[e.RowIndex].Cells[0].Value = null;
@@ -295,34 +446,62 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Custom
                 var rowRect = this.gvFlightItems.GetRowDisplayRectangle(this._hoverRow, true);
                 if (!rowRect.Contains(mouseLoc))
                 {
-                    this.toolTip.Hide(this.lblHeader);    // Hide tooltip if the mouse has changed to another row
+                    this.toolTip.Hide(this.lblHeader); // Hide tooltip if the mouse has changed to another row
                     this._hoverRow = -1;
                 }
             }
-
         }
 
+        /// <summary>
+        /// The gv flight items_ selection changed.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void gvFlightItems_SelectionChanged(object sender, EventArgs e)
         {
             this.gvFlightItems.ClearSelection();
         }
 
+        /// <summary>
+        /// The gv flight items_ mouse enter.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void gvFlightItems_MouseEnter(object sender, EventArgs e)
         {
             this.gvFlightItems.Focus();
         }
 
+        /// <summary>
+        /// The gv flight items_ mouse leave.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void gvFlightItems_MouseLeave(object sender, EventArgs e)
         {
             var mousePos = MousePosition;
             var mouseLoc = this.gvFlightItems.PointToClient(mousePos);
-            if (!this.gvFlightItems.Bounds.Contains(mouseLoc))   // The tooltip may have stolen the focus, thus this check is needed
+            if (!this.gvFlightItems.Bounds.Contains(mouseLoc))
             {
+                // The tooltip may have stolen the focus, thus this check is needed
                 if (this._hoverRow > -1)
                 {
                     this.gvFlightItems.InvalidateRow(this._hoverRow);
                     this._hoverRow = -1;
                 }
+
                 this.toolTip.Hide(this.lblHeader);
             }
         }

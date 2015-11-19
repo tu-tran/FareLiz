@@ -1,11 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-
-namespace SkyDean.FareLiz.Core.Utils
+﻿namespace SkyDean.FareLiz.Core.Utils
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Reflection;
+
+    /// <summary>The type extensions.</summary>
     public static class TypeExtensions
     {
+        /// <summary>
+        /// The get fields recursively.
+        /// </summary>
+        /// <param name="targetType">
+        /// The target type.
+        /// </param>
+        /// <param name="bindingFlags">
+        /// The binding flags.
+        /// </param>
+        /// <returns>
+        /// The <see cref="IEnumerable"/>.
+        /// </returns>
         public static IEnumerable<FieldInfo> GetFieldsRecursively(this Type targetType, BindingFlags bindingFlags)
         {
             Type type = targetType;
@@ -19,14 +32,18 @@ namespace SkyDean.FareLiz.Core.Utils
                 {
                     bool exist = false;
                     foreach (var item in result)
+                    {
                         if (item.Name == fi.Name)
                         {
                             exist = true;
                             break;
                         }
+                    }
 
                     if (!exist)
+                    {
                         result.Add(fi);
+                    }
                 }
 
                 type = type.BaseType;
@@ -35,6 +52,18 @@ namespace SkyDean.FareLiz.Core.Utils
             return result;
         }
 
+        /// <summary>
+        /// The get properties recursively.
+        /// </summary>
+        /// <param name="targetType">
+        /// The target type.
+        /// </param>
+        /// <param name="bindingFlags">
+        /// The binding flags.
+        /// </param>
+        /// <returns>
+        /// The <see cref="IEnumerable"/>.
+        /// </returns>
         public static IEnumerable<PropertyInfo> GetPropertiesRecursively(this Type targetType, BindingFlags bindingFlags)
         {
             Type type = targetType;
@@ -48,13 +77,18 @@ namespace SkyDean.FareLiz.Core.Utils
                 {
                     bool exist = false;
                     foreach (var item in result)
+                    {
                         if (item.Name == p.Name)
                         {
                             exist = true;
                             break;
                         }
+                    }
+
                     if (!exist)
+                    {
                         result.Add(p);
+                    }
                 }
 
                 type = type.BaseType;

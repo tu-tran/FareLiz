@@ -1,32 +1,35 @@
-﻿using System.Collections.Generic;
-using SkyDean.FareLiz.Core.Presentation;
-
-namespace SkyDean.FareLiz.Core
+﻿namespace SkyDean.FareLiz.Core
 {
-    /// <summary>
-    /// Interface for synchronizable objects
-    /// </summary>
+    using SkyDean.FareLiz.Core.Presentation;
+
+    /// <summary>Interface for synchronizable objects</summary>
     public interface ISyncable
     {
+        /// <summary>Get the helper object used for synchronizing</summary>
+        IDataSyncer DataSynchronizer { get; set; }
+
         /// <summary>
         /// Synchronize the object
         /// </summary>
-        /// <param name="operation">Operation (Upload or Download)</param>
-        /// <returns>Success</returns>
+        /// <param name="operation">
+        /// Operation (Upload or Download)
+        /// </param>
+        /// <param name="callback">
+        /// The callback.
+        /// </param>
+        /// <returns>
+        /// Success
+        /// </returns>
         bool Synchronize(SyncOperation operation, IProgressCallback callback);
-
-        /// <summary>
-        /// Get the helper object used for synchronizing
-        /// </summary>
-        IDataSyncer DataSynchronizer { get; set; }
     }
 
-    /// <summary>
-    /// Synchronization operation type enumeration
-    /// </summary>
+    /// <summary>Synchronization operation type enumeration</summary>
     public enum SyncOperation
     {
-        Download,
+        /// <summary>The download.</summary>
+        Download, 
+
+        /// <summary>The upload.</summary>
         Upload
     }
 }

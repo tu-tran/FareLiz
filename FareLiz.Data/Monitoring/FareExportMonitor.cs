@@ -1,6 +1,4 @@
-﻿using SkyDean.FareLiz.Core.Presentation;
-
-namespace SkyDean.FareLiz.Data.Monitoring
+﻿namespace SkyDean.FareLiz.Data.Monitoring
 {
     using System;
     using System.Collections.Generic;
@@ -10,32 +8,107 @@ namespace SkyDean.FareLiz.Data.Monitoring
 
     using SkyDean.FareLiz.Core;
     using SkyDean.FareLiz.Core.Data;
+    using SkyDean.FareLiz.Core.Presentation;
     using SkyDean.FareLiz.Core.Utils;
 
-    /// <summary>
-    /// Monitor used for exporting fare
-    /// </summary>
+    /// <summary>Monitor used for exporting fare</summary>
     public class FareExportMonitor : FareRequestMonitor
     {
+        /// <summary>
+        /// The _archive manager.
+        /// </summary>
         private readonly IArchiveManager _archiveManager;
+
+        /// <summary>
+        /// The _fare database.
+        /// </summary>
         private readonly IFareDatabase _fareDatabase;
+
+        /// <summary>
+        /// The _data path.
+        /// </summary>
         private readonly string _dataPath;
+
+        /// <summary>
+        /// The _cached routes.
+        /// </summary>
         private readonly List<TravelRoute> _cachedRoutes = new List<TravelRoute>();
+
+        /// <summary>
+        /// The _auto sync.
+        /// </summary>
         private readonly Func<bool> _autoSync;
+
+        /// <summary>
+        /// The _logger.
+        /// </summary>
         private readonly ILog _logger;
+
+        /// <summary>
+        /// The _lock obj.
+        /// </summary>
         private readonly object _lockObj = new object();
+
+        /// <summary>
+        /// The _lock stream.
+        /// </summary>
         private Stream _lockStream;
+
+        /// <summary>
+        /// The cach e_ amount.
+        /// </summary>
         private const int CACHE_AMOUNT = 100;
+
 #if DEBUG
-        private static readonly string LOCK_EXT = "";
+
+        /// <summary>
+        /// The loc k_ ext.
+        /// </summary>
+        private static readonly string LOCK_EXT = string.Empty;
 #else
         private static readonly string LOCK_EXT = ".{2559a1f2-21d7-11d4-bdaf-00c04f60b9f0}";
 #endif
-        public override OperationMode Mode { get { return OperationMode.GetFareAndSave; } }
 
+        /// <summary>
+        /// Gets the mode.
+        /// </summary>
+        public override OperationMode Mode
+        {
+            get
+            {
+                return OperationMode.GetFareAndSave;
+            }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FareExportMonitor"/> class.
+        /// </summary>
+        /// <param name="archiveManager">
+        /// The archive manager.
+        /// </param>
+        /// <param name="controlFactory">
+        /// The control factory.
+        /// </param>
+        /// <param name="autoSync">
+        /// The auto sync.
+        /// </param>
         public FareExportMonitor(IArchiveManager archiveManager, IFareBrowserControlFactory controlFactory, bool autoSync)
-            : this(archiveManager, controlFactory, () => autoSync) { }
+            : this(archiveManager, controlFactory, () => autoSync)
+        {
+        }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FareExportMonitor"/> class.
+        /// </summary>
+        /// <param name="archiveManager">
+        /// The archive manager.
+        /// </param>
+        /// <param name="controlFactory">
+        /// The control factory.
+        /// </param>
+        /// <param name="autoSync">
+        /// The auto sync.
+        /// </param>
         public FareExportMonitor(IArchiveManager archiveManager, IFareBrowserControlFactory controlFactory, Func<bool> autoSync)
             : base(controlFactory)
         {
@@ -53,6 +126,9 @@ namespace SkyDean.FareLiz.Data.Monitoring
             this.RequestCompleted += this.FareExportMonitor_OnRequestCompleted;
         }
 
+        /// <summary>
+        /// The dispose.
+        /// </summary>
         public override void Dispose()
         {
             this._logger.Debug("Disposing " + this.GetType());
@@ -60,13 +136,18 @@ namespace SkyDean.FareLiz.Data.Monitoring
             base.Dispose();
         }
 
+        /// <summary>
+        /// The release lock.
+        /// </summary>
         private void ReleaseLock()
         {
             this._logger.Debug("Releasing lock...");
             lock (this._lockObj)
             {
                 if (this._lockStream == null)
+                {
                     return;
+                }
 
                 if (this._lockStream != null)
                 {
@@ -75,10 +156,15 @@ namespace SkyDean.FareLiz.Data.Monitoring
                 }
 
                 if (Directory.Exists(this._dataPath))
+                {
                     Directory.Delete(this._dataPath, true);
+                }
             }
         }
 
+        /// <summary>
+        /// The save data to database.
+        /// </summary>
         private void SaveDataToDatabase()
         {
             IList<TravelRoute> newRoutes;
@@ -95,7 +181,9 @@ namespace SkyDean.FareLiz.Data.Monitoring
             }
 
             if (newRoutes == null || newRoutes.Count < 1)
+            {
                 return;
+            }
 
             var syncDb = this._fareDatabase as ISyncableDatabase;
             if (this._autoSync() && syncDb != null)
@@ -105,6 +193,15 @@ namespace SkyDean.FareLiz.Data.Monitoring
             }
         }
 
+        /// <summary>
+        /// The fare export monitor_ on request completed.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="args">
+        /// The args.
+        /// </param>
         private void FareExportMonitor_OnRequestCompleted(FareRequestMonitor sender, FareBrowserRequestArg args)
         {
             var browser = args.Request.BrowserControl;
@@ -123,10 +220,11 @@ namespace SkyDean.FareLiz.Data.Monitoring
                 bool isLastRequest = pendingCount == 0 && processCount == 0;
                 if (browser.RequestState == DataRequestState.Ok && route != null && route.Journeys.Count > 0)
                 {
-                    this._cachedRoutes.Add(route);   // Cache journeys
+                    this._cachedRoutes.Add(route); // Cache journeys
 
-                    if (this._cachedRoutes.Count >= CACHE_AMOUNT || isLastRequest) // Export journeys to file to reduce memory load
+                    if (this._cachedRoutes.Count >= CACHE_AMOUNT || isLastRequest)
                     {
+                        // Export journeys to file to reduce memory load
                         this.FlushCache();
                     }
                 }
@@ -139,10 +237,15 @@ namespace SkyDean.FareLiz.Data.Monitoring
             }
         }
 
+        /// <summary>
+        /// The flush cache.
+        /// </summary>
         private void FlushCache()
         {
             if (this._cachedRoutes.Count == 0)
+            {
                 this._logger.Info("There is no cached journey data... Nothing to flush");
+            }
             else
             {
                 // For now, the number of routes is also the number of journey data
@@ -153,6 +256,9 @@ namespace SkyDean.FareLiz.Data.Monitoring
             }
         }
 
+        /// <summary>
+        /// The finalize data.
+        /// </summary>
         private void FinalizeData()
         {
             this.FlushCache();

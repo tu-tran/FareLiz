@@ -1,57 +1,101 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using log4net;
-using SkyDean.FareLiz.Core;
-using SkyDean.FareLiz.Core.Config;
-using SkyDean.FareLiz.Core.Data;
-using SkyDean.FareLiz.Core.Utils;
-
-namespace SkyDean.FareLiz.Data.Config
+﻿namespace SkyDean.FareLiz.Data.Config
 {
-    /// <summary>
-    /// Helper class used for storing configurations in a file
-    /// </summary>
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+
+    using log4net;
+
+    using SkyDean.FareLiz.Core;
+    using SkyDean.FareLiz.Core.Config;
+    using SkyDean.FareLiz.Core.Data;
+    using SkyDean.FareLiz.Core.Utils;
+
+    /// <summary>Helper class used for storing configurations in a file</summary>
     public class FileConfigStore : IConfigStore
     {
-        public string ConfigFile { get; private set; }
-        public ILog Logger { get; set; }
-
+        /// <summary>
+        /// The _plugin resolver.
+        /// </summary>
         private readonly IPluginResolver _pluginResolver;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileConfigStore"/> class.
+        /// </summary>
+        /// <param name="configFileName">
+        /// The config file name.
+        /// </param>
+        /// <param name="pluginResolver">
+        /// The plugin resolver.
+        /// </param>
+        /// <param name="logger">
+        /// The logger.
+        /// </param>
         public FileConfigStore(string configFileName, IPluginResolver pluginResolver, ILog logger)
             : this()
         {
-            ConfigFile = configFileName;
-            _pluginResolver = pluginResolver;
-            Logger = logger;
+            this.ConfigFile = configFileName;
+            this._pluginResolver = pluginResolver;
+            this.Logger = logger;
         }
 
-        protected FileConfigStore() { }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileConfigStore"/> class.
+        /// </summary>
+        protected FileConfigStore()
+        {
+        }
 
+        /// <summary>
+        /// Gets the config file.
+        /// </summary>
+        public string ConfigFile { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the logger.
+        /// </summary>
+        public ILog Logger { get; set; }
+
+        /// <summary>
+        /// The load env.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="MonitorEnvironment"/>.
+        /// </returns>
         public MonitorEnvironment LoadEnv()
         {
-            return LoadEnv(ConfigFile);
+            return this.LoadEnv(this.ConfigFile);
         }
 
+        /// <summary>
+        /// The load env.
+        /// </summary>
+        /// <param name="filePath">
+        /// The file path.
+        /// </param>
+        /// <returns>
+        /// The <see cref="MonitorEnvironment"/>.
+        /// </returns>
         public MonitorEnvironment LoadEnv(string filePath)
         {
             try
             {
                 if (!File.Exists(filePath))
+                {
                     return null;
+                }
 
                 var configs = new Dictionary<Type, ConfigInfo>();
                 byte[][] rawData;
-                var formatter = new TolerantBinaryFormatter(Logger);
-                var typeResolver = new TypeResolver(Logger);
+                var formatter = new TolerantBinaryFormatter(this.Logger);
+                var typeResolver = new TypeResolver(this.Logger);
                 using (var stream = File.Open(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
                 {
                     using (var reader = new BinaryReader(stream))
                     {
                         var productName = reader.ReadString();
                         var productVersion = reader.ReadString();
-                        Logger.DebugFormat("Loading configuration for {0} {1}...", productName, productVersion);
+                        this.Logger.DebugFormat("Loading configuration for {0} {1}...", productName, productVersion);
                         rawData = formatter.Deserialize(stream) as byte[][];
                     }
                 }
@@ -73,7 +117,7 @@ namespace SkyDean.FareLiz.Data.Config
                         }
                         catch (Exception ex)
                         {
-                            Logger.Warn("Cannot read configuration: " + ex.Message);
+                            this.Logger.Warn("Cannot read configuration: " + ex.Message);
                         }
                     }
                 }
@@ -85,7 +129,7 @@ namespace SkyDean.FareLiz.Data.Config
                     ISyncableDatabase syncDb = null;
                     IFareDatabase fareDatabase = null;
                     ICurrencyProvider currencyProvider = null;
-                    BackgroundServiceManager backgroundServices = new BackgroundServiceManager(Logger);
+                    BackgroundServiceManager backgroundServices = new BackgroundServiceManager(this.Logger);
 
                     foreach (var pair in configs)
                     {
@@ -98,7 +142,9 @@ namespace SkyDean.FareLiz.Data.Config
                             {
                                 archiveManager = typeResolver.CreateInstance<IArchiveManager>(info.ConfiguredType);
                                 if (archiveManager != null)
-                                    archiveManager.Configuration = (info.TypeConfiguration ?? archiveManager.DefaultConfig);
+                                {
+                                    archiveManager.Configuration = info.TypeConfiguration ?? archiveManager.DefaultConfig;
+                                }
                             }
                         }
                         else if (type == typeof(IFareDataProvider))
@@ -107,9 +153,14 @@ namespace SkyDean.FareLiz.Data.Config
                             {
                                 fareDataProvider = typeResolver.CreateInstance<IFareDataProvider>(info.ConfiguredType);
                                 if (fareDataProvider != null)
-                                    fareDataProvider.Configuration = (info.TypeConfiguration ?? fareDataProvider.DefaultConfig);
+                                {
+                                    fareDataProvider.Configuration = info.TypeConfiguration ?? fareDataProvider.DefaultConfig;
+                                }
+
                                 if (archiveManager != null)
+                                {
                                     archiveManager.FareDataProvider = fareDataProvider;
+                                }
                             }
                         }
                         else if (type == typeof(IFareDatabase))
@@ -118,7 +169,10 @@ namespace SkyDean.FareLiz.Data.Config
                             {
                                 fareDatabase = typeResolver.CreateInstance<IFareDatabase>(info.ConfiguredType);
                                 if (fareDatabase != null)
-                                    fareDatabase.Configuration = (info.TypeConfiguration ?? fareDatabase.DefaultConfig);
+                                {
+                                    fareDatabase.Configuration = info.TypeConfiguration ?? fareDatabase.DefaultConfig;
+                                }
+
                                 syncDb = fareDatabase as ISyncableDatabase;
                             }
                         }
@@ -132,7 +186,7 @@ namespace SkyDean.FareLiz.Data.Config
                                     if (dbSyncer != null)
                                     {
                                         var dataSyncer = dbSyncer as IDataSyncer;
-                                        dbSyncer.Configuration = (info.TypeConfiguration ?? dbSyncer.DefaultConfig);
+                                        dbSyncer.Configuration = info.TypeConfiguration ?? dbSyncer.DefaultConfig;
                                         syncDb.DataSynchronizer = dataSyncer;
                                         syncDb.PackageSynchronizer = dbSyncer as IPackageSyncer<TravelRoute>;
                                     }
@@ -146,43 +200,74 @@ namespace SkyDean.FareLiz.Data.Config
                                 var newService = typeResolver.CreateInstance<IHelperService>(info.ConfiguredType);
                                 if (newService != null)
                                 {
-                                    newService.Configuration = (info.TypeConfiguration ?? newService.DefaultConfig);
+                                    newService.Configuration = info.TypeConfiguration ?? newService.DefaultConfig;
                                     backgroundServices.Add(newService, false);
                                     var currencyService = newService as ICurrencyProvider;
                                     if (currencyService != null)
+                                    {
                                         currencyProvider = currencyService;
+                                    }
                                 }
                             }
                         }
                     }
 
-                    return new MonitorEnvironment(this, _pluginResolver, fareDataProvider, fareDatabase, archiveManager, currencyProvider, backgroundServices, Logger);
+                    return new MonitorEnvironment(
+                        this, 
+                        this._pluginResolver, 
+                        fareDataProvider, 
+                        fareDatabase, 
+                        archiveManager, 
+                        currencyProvider, 
+                        backgroundServices, 
+                        this.Logger);
                 }
             }
             catch (Exception ex)
             {
-                Logger.ErrorFormat("Failed to load environment data: {0}", ex);
+                this.Logger.ErrorFormat("Failed to load environment data: {0}", ex);
             }
 
             return null;
         }
 
+        /// <summary>
+        /// The save env.
+        /// </summary>
+        /// <param name="env">
+        /// The env.
+        /// </param>
         public void SaveEnv(MonitorEnvironment env)
         {
-            SaveEnv(env, ConfigFile);
+            this.SaveEnv(env, this.ConfigFile);
         }
 
+        /// <summary>
+        /// The save env.
+        /// </summary>
+        /// <param name="env">
+        /// The env.
+        /// </param>
+        /// <param name="filePath">
+        /// The file path.
+        /// </param>
         public void SaveEnv(MonitorEnvironment env, string filePath)
         {
             var data = new List<KeyValue<Type, ConfigInfo>>();
             if (env.ArchiveManager != null)
+            {
                 data.Add(new KeyValue<Type, ConfigInfo>(typeof(IArchiveManager), new ConfigInfo(env.ArchiveManager)));
+            }
 
             if (env.FareDataProvider != null)
+            {
                 data.Add(new KeyValue<Type, ConfigInfo>(typeof(IFareDataProvider), new ConfigInfo(env.FareDataProvider)));
+            }
 
             if (env.FareDatabase != null)
+            {
                 data.Add(new KeyValue<Type, ConfigInfo>(typeof(IFareDatabase), new ConfigInfo(env.FareDatabase)));
+            }
 
             var syncDb = env.FareDatabase as ISyncableDatabase;
             if (syncDb != null && syncDb.DataSynchronizer != null)
@@ -191,7 +276,9 @@ namespace SkyDean.FareLiz.Data.Config
             }
 
             if (env.CurrencyProvider != null)
+            {
                 data.Add(new KeyValue<Type, ConfigInfo>(typeof(ICurrencyProvider), new ConfigInfo(env.CurrencyProvider)));
+            }
 
             if (env.BackgroundServices != null)
             {
@@ -199,12 +286,14 @@ namespace SkyDean.FareLiz.Data.Config
                 foreach (var s in allServices)
                 {
                     if (s != env.CurrencyProvider)
+                    {
                         data.Add(new KeyValue<Type, ConfigInfo>(s.GetType(), new ConfigInfo(s)));
+                    }
                 }
             }
 
             var rawData = new byte[data.Count][];
-            var formatter = new TolerantBinaryFormatter(Logger);
+            var formatter = new TolerantBinaryFormatter(this.Logger);
             using (var ms = new MemoryStream())
             {
                 for (int i = 0; i < data.Count; i++)

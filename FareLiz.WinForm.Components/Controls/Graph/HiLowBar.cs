@@ -1,28 +1,18 @@
 ﻿//============================================================================
 //ZedGraph Class Library - A Flexible Line Graph/Bar Graph Library in C#
 //Copyright © 2004  John Champion
-//
 //This library is free software; you can redistribute it and/or
 //modify it under the terms of the GNU Lesser General Public
 //License as published by the Free Software Foundation; either
 //version 2.1 of the License, or (at your option) any later version.
-//
 //This library is distributed in the hope that it will be useful,
 //but WITHOUT ANY WARRANTY; without even the implied warranty of
 //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //Lesser General Public License for more details.
-//
 //You should have received a copy of the GNU Lesser General Public
 //License along with this library; if not, write to the Free Software
 //Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //=============================================================================
-
-#region Using directives
-
-
-
-#endregion
-
 namespace SkyDean.FareLiz.WinForm.Components.Controls.Graph
 {
     using System;
@@ -31,220 +21,17 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Graph
     using System.Security.Permissions;
 
     /// <summary>
-	/// This class handles the drawing of the curve <see cref="HiLowBar"/> objects.
-	/// The Hi-Low Bars are the "floating" bars that have a lower and upper value and
-	/// appear at each defined point.
-	/// </summary>
-	/// 
-	/// <author> John Champion </author>
-	/// <version> $Revision: 3.18 $ $Date: 2007-10-26 08:19:49 $ </version>
-	[Serializable]
-	public class HiLowBar : Bar, ICloneable, ISerializable
-	{
+    /// This class handles the drawing of the curve <see cref="HiLowBar" /> objects. The Hi-Low Bars are the "floating" bars that have a lower and upper
+    /// value and appear at each defined point.
+    /// </summary>
+    /// <author> John Champion </author>
+    /// <version> $Revision: 3.18 $ $Date: 2007-10-26 08:19:49 $ </version>
+    [Serializable]
+    public class HiLowBar : Bar, ICloneable, ISerializable
+    {
+        #region Methods
 
-	#region Fields
-		/// <summary>
-		/// Private field that stores the size (width) of this
-        /// <see cref="HiLowBar"/> in points (1/72 inch).  Use the public
-        /// property <see cref="Size"/> to access this value.
-		/// </summary>
-		private float		_size;
-
-		/// <summary>
-		/// Private field that determines whether the bar width will be based on
-		/// the <see cref="Size"/> value, or it will be based on available
-		/// space similar to <see cref="BarItem"/> objects.  Use the public property
-		/// <see cref="IsAutoSize"/> to access this value.
-		/// </summary>
-		private bool _isAutoSize;
-
-		/// <summary>
-		/// The result of the autosize calculation, which is the size of the bars in
-		/// user scale units.  This is converted to pixels at draw time.
-		/// </summary>
-		internal double _userScaleSize = 1.0;
-
-	#endregion
-
-	#region Default
-		/// <summary>
-		/// A simple struct that defines the
-		/// default property values for the <see cref="HiLowBar"/> class.
-		/// </summary>
-		new public struct Default
-		{
-			// Default HiLowBar properties
-			/// <summary>
-			/// The default size (width) for the bars (<see cref="HiLowBar.Size"/> property),
-			/// in units of points.
-			/// </summary>
-			public static float Size = 7;
-
-			/// <summary>
-			/// Default value for the <see cref="HiLowBar.IsAutoSize" /> property.
-			/// </summary>
-			public static bool IsAutoSize = true;
-		}
-	#endregion
-
-	#region Constructors
-		/// <summary>
-		/// Default constructor that sets all <see cref="HiLowBar"/> properties to default
-		/// values as defined in the <see cref="Bar.Default"/> class.
-		/// </summary>
-		public HiLowBar() : this( Color.Empty )
-		{
-		}
-
-		/// <summary>
-		/// Default constructor that sets the 
-		/// <see cref="Color"/> as specified, and the remaining
-		/// <see cref="HiLowBar"/> properties to default
-		/// values as defined in the <see cref="Bar.Default"/> class.
-		/// The specified color is only applied to the
-		/// <see cref="Fill.Color"/>, and the <see cref="LineBase.Color"/>
-		/// will be defaulted.
-		/// </summary>
-		/// <param name="color">A <see cref="Color"/> value indicating
-		/// the <see cref="Fill.Color"/>
-		/// of the Bar.
-		/// </param>
-		public HiLowBar( Color color ) : this( color, Default.Size )
-		{
-		}
-
-		/// <summary>
-		/// Default constructor that sets the 
-		/// <see cref="Color"/> and <see cref="Size"/> as specified, and the remaining
-		/// <see cref="HiLowBar"/> properties to default
-		/// values as defined in the <see cref="Bar.Default"/> class.
-		/// The specified color is only applied to the
-		/// <see cref="Fill.Color"/>, and the <see cref="LineBase.Color"/>
-		/// will be defaulted.
-		/// </summary>
-		/// <param name="color">A <see cref="Color"/> value indicating
-		/// the <see cref="Fill.Color"/>
-		/// of the Bar.
-		/// </param>
-		/// <param name="size">The size (width) of the <see cref="HiLowBar"/>'s, in points
-		/// (1/72nd inch)</param>
-		public HiLowBar( Color color, float size ) : base( color )
-		{
-			this._size = size;
-			this._isAutoSize = Default.IsAutoSize;
-		}
-
-		/// <summary>
-		/// The Copy Constructor
-		/// </summary>
-		/// <param name="rhs">The <see cref="HiLowBar"/> object from which to copy</param>
-		public HiLowBar( HiLowBar rhs ) : base( rhs )
-		{
-			this._size = rhs._size;
-			this._isAutoSize = rhs._isAutoSize;
-		}
-
-		/// <summary>
-		/// Implement the <see cref="ICloneable" /> interface in a typesafe manner by just
-		/// calling the typed version of <see cref="Clone" />
-		/// </summary>
-		/// <returns>A deep copy of this object</returns>
-		object ICloneable.Clone()
-		{
-			return this.Clone();
-		}
-
-		/// <summary>
-		/// Typesafe, deep-copy clone method.
-		/// </summary>
-		/// <returns>A new, independent copy of this class</returns>
-		new public HiLowBar Clone()
-		{
-			return new HiLowBar( this );
-		}
-
-	#endregion
-
-	#region Serialization
-		/// <summary>
-		/// Current schema value that defines the version of the serialized file
-		/// </summary>
-		public const int schema2 = 10;
-
-		/// <summary>
-		/// Constructor for deserializing objects
-		/// </summary>
-		/// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data
-		/// </param>
-		/// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data
-		/// </param>
-		protected HiLowBar( SerializationInfo info, StreamingContext context ) : base( info, context )
-		{
-			// The schema value is just a file version parameter.  You can use it to make future versions
-			// backwards compatible as new member variables are added to classes
-			int sch = info.GetInt32( "schema2" );
-
-			this._size = info.GetSingle( "size" );
-			this._isAutoSize = info.GetBoolean( "isAutoSize" );
-		}
-		/// <summary>
-		/// Populates a <see cref="SerializationInfo"/> instance with the data needed to serialize the target object
-		/// </summary>
-		/// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
-		/// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
-		[SecurityPermission(SecurityAction.Demand,SerializationFormatter=true)]
-		public override void GetObjectData( SerializationInfo info, StreamingContext context )
-		{
-			base.GetObjectData( info, context );
-			info.AddValue( "schema2", schema2 );
-			info.AddValue( "size", this._size );
-			info.AddValue( "isAutoSize", this._isAutoSize );
-		}
-	#endregion
-
-	#region Properties
-		/// <summary>
-		/// Gets or sets the size of the <see cref="HiLowBar"/>
-		/// </summary>
-		/// <remarks>The size of the bars can be set by this value, which
-		/// is then scaled according to the scaleFactor (see
-		/// <see cref="PaneBase.CalcScaleFactor"/>).  Alternatively,
-		/// if <see cref="IsAutoSize"/> is true, the bar width will
-		/// be set according to the maximum available cluster width less
-		/// the cluster gap (see <see cref="BarSettings.GetClusterWidth"/>
-		/// and <see cref="BarSettings.MinClusterGap"/>).  That is, if
-		/// <see cref="IsAutoSize"/> is true, then the value of
-		/// <see cref="Size"/> will be ignored.  If you modify the value of Size,
-		/// then <see cref="IsAutoSize" /> will be automatically set to false.
-		/// </remarks>
-      /// <value>Size in points (1/72 inch)</value>
-      /// <seealso cref="Default.Size"/>
-		public float Size
-		{
-			get { return this._size; }
-			set { this._size = value; this._isAutoSize = false; }
-		}
-
-		/// <summary>
-		/// Determines whether the bar width will be based on
-		/// the <see cref="Size"/> value, or it will be based on available
-		/// space similar to <see cref="BarItem"/> objects.
-		/// </summary>
-		/// <remarks>If true, then the value of <see cref="Size"/> is ignored. 
-		/// If this value is true, then <see cref="BarSettings.MinClusterGap"/> will be used to
-		/// determine the total space between each bar.  If the base axis is non-ordinal, then
-		/// <see cref="BarSettings.ClusterScaleWidth" /> will be active.  In this case, you may
-		/// want to make sure that <see cref="BarSettings.ClusterScaleWidthAuto" /> is true.
-		/// </remarks>
-		public bool IsAutoSize
-		{
-			get { return this._isAutoSize; }
-			set { this._isAutoSize = value; }
-		}
-	#endregion
-
-	#region Methods
-		/*
+        /*
 		/// <summary>
 		/// Protected internal routine that draws the specified single bar (an individual "point")
 		/// of this series to the specified <see cref="Graphics"/> device.
@@ -343,36 +130,255 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Graph
 	   }
 		*/
 
-		/// <summary>
-		/// Returns the width of the bar, in pixels, based on the settings for
-		/// <see cref="Size"/> and <see cref="IsAutoSize"/>.
-		/// </summary>
-		/// <param name="pane">The parent <see cref="GraphPane"/> object.</param>
-		/// <param name="baseAxis">The <see cref="Axis"/> object that
-		/// represents the bar base (independent axis).</param>
-		/// <param name="scaleFactor">
-		/// The scaling factor to be used for rendering objects.  This is calculated and
-		/// passed down by the parent <see cref="GraphPane"/> object using the
-		/// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
-		/// font sizes, etc. according to the actual size of the graph.
-		/// </param>
-		/// <returns>The width of each bar, in pixel units</returns>
-		public float GetBarWidth( GraphPane pane, Axis baseAxis, float scaleFactor )
-		{
-			float width;
+        /// <summary>
+        /// Returns the width of the bar, in pixels, based on the settings for
+        /// <see cref="Size"/> and <see cref="IsAutoSize"/>.
+        /// </summary>
+        /// <param name="pane">
+        /// The parent <see cref="GraphPane"/> object.
+        /// </param>
+        /// <param name="baseAxis">
+        /// The <see cref="Axis"/> object that represents the bar base (independent axis).
+        /// </param>
+        /// <param name="scaleFactor">
+        /// The scaling factor to be used for rendering objects.  This is calculated and passed down by the parent <see cref="GraphPane"/> object using the
+        /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust font sizes, etc. according to the actual size of the graph.
+        /// </param>
+        /// <returns>
+        /// The width of each bar, in pixel units
+        /// </returns>
+        public float GetBarWidth(GraphPane pane, Axis baseAxis, float scaleFactor)
+        {
+            float width;
 
-			if ( this._isAutoSize )
-				width = baseAxis._scale.GetClusterWidth( this._userScaleSize ) /
-								( 1.0F + pane._barSettings.MinClusterGap );
-			else
-				width = (float) ( this._size * scaleFactor );
+            if (this._isAutoSize)
+            {
+                width = baseAxis._scale.GetClusterWidth(this._userScaleSize) / (1.0F + pane._barSettings.MinClusterGap);
+            }
+            else
+            {
+                width = this._size * scaleFactor;
+            }
 
-			// use integral size
-			return (int)( width + 0.5f );
-		}
-		
+            // use integral size
+            return (int)(width + 0.5f);
+        }
 
-	#endregion
+        #endregion
 
-	}
+        #region Default
+
+        /// <summary>A simple struct that defines the default property values for the <see cref="HiLowBar" /> class.</summary>
+        public new struct Default
+        {
+            // Default HiLowBar properties
+            /// <summary>The default size (width) for the bars (<see cref="HiLowBar.Size" /> property), in units of points.</summary>
+            public static float Size = 7;
+
+            /// <summary>Default value for the <see cref="HiLowBar.IsAutoSize" /> property.</summary>
+            public static bool IsAutoSize = true;
+        }
+
+        #endregion
+
+        #region Fields
+
+        /// <summary>
+        /// Private field that stores the size (width) of this
+        /// <see cref="HiLowBar" /> in points (1/72 inch).  Use the public property <see cref="Size" /> to access this value.
+        /// </summary>
+        private float _size;
+
+        /// <summary>
+        /// Private field that determines whether the bar width will be based on the <see cref="Size" /> value, or it will be based on available space similar to
+        /// <see cref="BarItem" /> objects.  Use the public property
+        /// <see cref="IsAutoSize" /> to access this value.
+        /// </summary>
+        private bool _isAutoSize;
+
+        /// <summary>The result of the autosize calculation, which is the size of the bars in user scale units.  This is converted to pixels at draw time.</summary>
+        internal double _userScaleSize = 1.0;
+
+        #endregion
+
+        #region Constructors
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HiLowBar"/> class. Default constructor that sets all <see cref="HiLowBar"/> properties to default values as defined in the <see cref="Bar.Default"/> class.
+        /// </summary>
+        public HiLowBar()
+            : this(Color.Empty)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HiLowBar"/> class. 
+        /// Default constructor that sets the
+        /// <see cref="Color"/> as specified, and the remaining
+        /// <see cref="HiLowBar"/> properties to default values as defined in the <see cref="Bar.Default"/> class. The specified color is only applied to the
+        /// <see cref="Fill.Color"/>, and the <see cref="LineBase.Color"/>
+        /// will be defaulted.
+        /// </summary>
+        /// <param name="color">
+        /// A <see cref="Color"/> value indicating the <see cref="Fill.Color"/>
+        /// of the Bar.
+        /// </param>
+        public HiLowBar(Color color)
+            : this(color, Default.Size)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HiLowBar"/> class. 
+        /// Default constructor that sets the
+        /// <see cref="Color"/> and <see cref="Size"/> as specified, and the remaining
+        /// <see cref="HiLowBar"/> properties to default values as defined in the <see cref="Bar.Default"/> class. The specified color is only applied to the
+        /// <see cref="Fill.Color"/>, and the <see cref="LineBase.Color"/>
+        /// will be defaulted.
+        /// </summary>
+        /// <param name="color">
+        /// A <see cref="Color"/> value indicating the <see cref="Fill.Color"/>
+        /// of the Bar.
+        /// </param>
+        /// <param name="size">
+        /// The size (width) of the <see cref="HiLowBar"/>'s, in points (1/72nd inch)
+        /// </param>
+        public HiLowBar(Color color, float size)
+            : base(color)
+        {
+            this._size = size;
+            this._isAutoSize = Default.IsAutoSize;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HiLowBar"/> class. 
+        /// The Copy Constructor
+        /// </summary>
+        /// <param name="rhs">
+        /// The <see cref="HiLowBar"/> object from which to copy
+        /// </param>
+        public HiLowBar(HiLowBar rhs)
+            : base(rhs)
+        {
+            this._size = rhs._size;
+            this._isAutoSize = rhs._isAutoSize;
+        }
+
+        /// <summary>Implement the <see cref="ICloneable" /> interface in a typesafe manner by just calling the typed version of <see cref="Clone" />
+        /// </summary>
+        /// <returns>A deep copy of this object</returns>
+        object ICloneable.Clone()
+        {
+            return this.Clone();
+        }
+
+        /// <summary>Typesafe, deep-copy clone method.</summary>
+        /// <returns>A new, independent copy of this class</returns>
+        public new HiLowBar Clone()
+        {
+            return new HiLowBar(this);
+        }
+
+        #endregion
+
+        #region Serialization
+
+        /// <summary>Current schema value that defines the version of the serialized file</summary>
+        public const int schema2 = 10;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HiLowBar"/> class. 
+        /// Constructor for deserializing objects
+        /// </summary>
+        /// <param name="info">
+        /// A <see cref="SerializationInfo"/> instance that defines the serialized data
+        /// </param>
+        /// <param name="context">
+        /// A <see cref="StreamingContext"/> instance that contains the serialized data
+        /// </param>
+        protected HiLowBar(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+            // The schema value is just a file version parameter.  You can use it to make future versions
+            // backwards compatible as new member variables are added to classes
+            int sch = info.GetInt32("schema2");
+
+            this._size = info.GetSingle("size");
+            this._isAutoSize = info.GetBoolean("isAutoSize");
+        }
+
+        /// <summary>
+        /// Populates a <see cref="SerializationInfo"/> instance with the data needed to serialize the target object
+        /// </summary>
+        /// <param name="info">
+        /// A <see cref="SerializationInfo"/> instance that defines the serialized data
+        /// </param>
+        /// <param name="context">
+        /// A <see cref="StreamingContext"/> instance that contains the serialized data
+        /// </param>
+        [SecurityPermission(SecurityAction.Demand, SerializationFormatter = true)]
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            base.GetObjectData(info, context);
+            info.AddValue("schema2", schema2);
+            info.AddValue("size", this._size);
+            info.AddValue("isAutoSize", this._isAutoSize);
+        }
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Gets or sets the size of the <see cref="HiLowBar" />
+        /// </summary>
+        /// <remarks>
+        /// The size of the bars can be set by this value, which is then scaled according to the scaleFactor (see
+        /// <see cref="PaneBase.CalcScaleFactor" />).  Alternatively, if <see cref="IsAutoSize" /> is true, the bar width will be set according to the maximum
+        /// available cluster width less the cluster gap (see <see cref="BarSettings.GetClusterWidth" />
+        /// and <see cref="BarSettings.MinClusterGap" />).  That is, if
+        /// <see cref="IsAutoSize" /> is true, then the value of
+        /// <see cref="Size" /> will be ignored.  If you modify the value of Size, then <see cref="IsAutoSize" /> will be automatically set to false.
+        /// </remarks>
+        /// <value>Size in points (1/72 inch)</value>
+        /// <seealso cref="Default.Size" />
+        public float Size
+        {
+            get
+            {
+                return this._size;
+            }
+
+            set
+            {
+                this._size = value;
+                this._isAutoSize = false;
+            }
+        }
+
+        /// <summary>
+        /// Determines whether the bar width will be based on the <see cref="Size" /> value, or it will be based on available space similar to
+        /// <see cref="BarItem" /> objects.
+        /// </summary>
+        /// <remarks>
+        /// If true, then the value of <see cref="Size" /> is ignored. If this value is true, then <see cref="BarSettings.MinClusterGap" /> will be used to
+        /// determine the total space between each bar.  If the base axis is non-ordinal, then
+        /// <see cref="BarSettings.ClusterScaleWidth" /> will be active.  In this case, you may want to make sure that
+        /// <see cref="BarSettings.ClusterScaleWidthAuto" /> is true.
+        /// </remarks>
+        public bool IsAutoSize
+        {
+            get
+            {
+                return this._isAutoSize;
+            }
+
+            set
+            {
+                this._isAutoSize = value;
+            }
+        }
+
+        #endregion
+    }
 }

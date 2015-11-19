@@ -1,165 +1,284 @@
-﻿using System;
-using System.Drawing;
-using System.Threading;
-using System.Windows.Forms;
-using DropNet;
-using DropNet.Models;
-using log4net;
-using SkyDean.FareLiz.Core;
-using SkyDean.FareLiz.Core.Presentation;
-using SkyDean.FareLiz.Core.Utils;
-using SkyDean.FareLiz.WinForm.Components.Controls;
-using SkyDean.FareLiz.WinForm.Components.Dialog;
-using SkyDean.FareLiz.WinForm.Components.Utils;
-
-namespace SkyDean.FareLiz.DropBox
+﻿namespace SkyDean.FareLiz.DropBox
 {
+    using System;
+    using System.Drawing;
+    using System.Threading;
+    using System.Windows.Forms;
+
+    using DropNet;
+    using DropNet.Models;
+
+    using log4net;
+
+    using SkyDean.FareLiz.Core;
+    using SkyDean.FareLiz.Core.Presentation;
+    using SkyDean.FareLiz.Core.Utils;
+    using SkyDean.FareLiz.WinForm.Components.Controls;
+    using SkyDean.FareLiz.WinForm.Components.Dialog;
+    using SkyDean.FareLiz.WinForm.Components.Utils;
+
+    /// <summary>
+    /// The drop box config dialog.
+    /// </summary>
     public partial class DropBoxConfigDialog : SmartForm
     {
-        const string validateStr = "Validating current DropBox authorization status...",
-                     successStr = "DropBox authorization is successful",
-                     failStr = "DropBox authorization failed!";
+        /// <summary>
+        /// The validate str.
+        /// </summary>
+        private const string validateStr = "Validating current DropBox authorization status...";
 
-        public DropBoxSyncerConfig ResultConfig { get; private set; }
+        /// <summary>
+        /// The success str.
+        /// </summary>
+        private const string successStr = "DropBox authorization is successful";
+
+        /// <summary>
+        /// The fail str.
+        /// </summary>
+        private const string failStr = "DropBox authorization failed!";
+
+        /// <summary>
+        /// The _client.
+        /// </summary>
         private readonly DropNetClient _client;
-        private readonly bool _needSave = false;
+
+        /// <summary>
+        /// The _data grep.
+        /// </summary>
         private readonly DataGrep _dataGrep;
+
+        /// <summary>
+        /// The _need save.
+        /// </summary>
+        private readonly bool _needSave;
+
+        /// <summary>
+        /// The _logger.
+        /// </summary>
         private ILog _logger;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DropBoxConfigDialog"/> class.
+        /// </summary>
+        /// <param name="apiKey">
+        /// The api key.
+        /// </param>
+        /// <param name="apiSecret">
+        /// The api secret.
+        /// </param>
+        /// <param name="curConfig">
+        /// The cur config.
+        /// </param>
+        /// <param name="dataGrep">
+        /// The data grep.
+        /// </param>
+        /// <param name="logger">
+        /// The logger.
+        /// </param>
         public DropBoxConfigDialog(byte[] apiKey, byte[] apiSecret, DropBoxSyncerConfig curConfig, DataGrep dataGrep, ILog logger)
         {
-            InitializeComponent();
-            _dataGrep = dataGrep;
-            _client = new DropNetClient(_dataGrep.Convert(apiKey), _dataGrep.Convert(apiSecret),
-                _dataGrep.Convert(curConfig.UserToken), _dataGrep.Convert(curConfig.UserSecret));
-            ResultConfig = (curConfig == null ? new DropBoxSyncerConfig() : curConfig.ReflectionDeepClone(logger));
-            ResultConfig.ApiKey = apiKey;
-            ResultConfig.ApiSecret = apiSecret;
-            txtDropBoxFolder.DataBindings.Clear();
-            txtDropBoxFolder.DataBindings.Add("Text", ResultConfig, "DropBoxBaseFolder");
+            this.InitializeComponent();
+            this._dataGrep = dataGrep;
+            this._client = new DropNetClient(
+                this._dataGrep.Convert(apiKey), 
+                this._dataGrep.Convert(apiSecret), 
+                this._dataGrep.Convert(curConfig.UserToken), 
+                this._dataGrep.Convert(curConfig.UserSecret));
+            this.ResultConfig = curConfig == null ? new DropBoxSyncerConfig() : curConfig.ReflectionDeepClone(logger);
+            this.ResultConfig.ApiKey = apiKey;
+            this.ResultConfig.ApiSecret = apiSecret;
+            this.txtDropBoxFolder.DataBindings.Clear();
+            this.txtDropBoxFolder.DataBindings.Add("Text", this.ResultConfig, "DropBoxBaseFolder");
 
             if (curConfig.ApiKey != null && curConfig.ApiSecret != null)
-                _needSave = (!ObjectExtension.AreEquals(curConfig.ApiKey, apiKey) || !ObjectExtension.AreEquals(curConfig.ApiSecret, apiSecret));
+            {
+                this._needSave = !ObjectExtension.AreEquals(curConfig.ApiKey, apiKey) || !ObjectExtension.AreEquals(curConfig.ApiSecret, apiSecret);
+            }
 
-            _logger = logger;
+            this._logger = logger;
         }
 
-        private void btnAuthorize_Click(object sender, System.EventArgs e)
+        /// <summary>
+        /// Gets the result config.
+        /// </summary>
+        public DropBoxSyncerConfig ResultConfig { get; private set; }
+
+        /// <summary>
+        /// The btn authorize_ click.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
+        private void btnAuthorize_Click(object sender, EventArgs e)
         {
             try
             {
-                btnAuthorize.Enabled = false;
-                string url = GetAuthorizeUrl();
-                AppContext.ProgressCallback.Inform(this, "In order for " + AppUtil.ProductName + @" to synchronize your fare data with DropBox, you need to login into your account and authorize via DropBox website.
+                this.btnAuthorize.Enabled = false;
+                string url = this.GetAuthorizeUrl();
+                AppContext.ProgressCallback.Inform(
+                    this, 
+                    "In order for " + AppUtil.ProductName
+                    + @" to synchronize your fare data with DropBox, you need to login into your account and authorize via DropBox website.
 
-After you have authorized, the application will ONLY have RESTRICTED access to its own data folder. DropBox will create a new folder for " + AppUtil.ProductName + @" under [Apps] folder. If you delete that folder accidentally, you will need to return here and re-authenticate!
+After you have authorized, the application will ONLY have RESTRICTED access to its own data folder. DropBox will create a new folder for "
+                    + AppUtil.ProductName
+                    + @" under [Apps] folder. If you delete that folder accidentally, you will need to return here and re-authenticate!
 
 You will now be redirected to DropBox Authentication website. Please return to this form after you have authorized the application!
-The web URL will also be copied to your clipboard. In case a new browser window is not automatically opened, you can also paste the URL to your favorite web browser!", "DropBox Authorization", NotificationType.Info);
+The web URL will also be copied to your clipboard. In case a new browser window is not automatically opened, you can also paste the URL to your favorite web browser!", 
+                    "DropBox Authorization", 
+                    NotificationType.Info);
                 Clipboard.SetText(url);
                 BrowserUtils.Open(url);
-                lblStatus.Text = validateStr;
-                lblStatus.ForeColor = Color.DarkGoldenrod;
+                this.lblStatus.Text = validateStr;
+                this.lblStatus.ForeColor = Color.DarkGoldenrod;
 
                 UserLogin accessToken = null;
-                ThreadPool.QueueUserWorkItem(new WaitCallback((o) =>
-                    {
-                        AppUtil.NameCurrentThread(GetType().Name + "-Validate");
-                        Thread.Sleep(3000);
-                        while (accessToken == null)
+                ThreadPool.QueueUserWorkItem(
+                    o =>
                         {
-                            try
+                            AppUtil.NameCurrentThread(this.GetType().Name + "-Validate");
+                            Thread.Sleep(3000);
+                            while (accessToken == null)
                             {
-                                accessToken = _client.GetAccessToken(); // Get token                            
+                                try
+                                {
+                                    accessToken = this._client.GetAccessToken(); // Get token                            
+                                }
+                                catch
+                                {
+                                }
+
+                                if (this.IsDestructed())
+                                {
+                                    return;
+                                }
+
+                                Thread.Sleep(1000);
                             }
-                            catch { }
 
-                            if (this.IsDestructed())
-                                return;
+                            this.ResultConfig.UserToken = this._dataGrep.Convert(accessToken.Token);
+                            this.ResultConfig.UserSecret = this._dataGrep.Convert(accessToken.Secret);
 
-                            Thread.Sleep(1000);
-                        }
-
-                        ResultConfig.UserToken = _dataGrep.Convert(accessToken.Token);
-                        ResultConfig.UserSecret = _dataGrep.Convert(accessToken.Secret);
-
-                        this.SafeInvoke(new Action(() =>
-                        {
-                            lblStatus.Text = successStr;
-                            lblStatus.ForeColor = Color.ForestGreen;
-                            btnAuthorize.Enabled = true;
-                        }));
-                    }));
+                            this.SafeInvoke(
+                                new Action(
+                                    () =>
+                                        {
+                                            this.lblStatus.Text = successStr;
+                                            this.lblStatus.ForeColor = Color.ForestGreen;
+                                            this.btnAuthorize.Enabled = true;
+                                        }));
+                        });
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Could not connect to DropBox. Make sure that you are connected to the Internet and your connection setting is correct", "Connection problem", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                _logger.Error("Failed to authorize DropBox", ex);
-                btnAuthorize.Enabled = true;
+                MessageBox.Show(
+                    "Could not connect to DropBox. Make sure that you are connected to the Internet and your connection setting is correct", 
+                    "Connection problem", 
+                    MessageBoxButtons.OK, 
+                    MessageBoxIcon.Error);
+                this._logger.Error("Failed to authorize DropBox", ex);
+                this.btnAuthorize.Enabled = true;
             }
         }
 
+        /// <summary>
+        /// The get authorize url.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
         private string GetAuthorizeUrl()
         {
             string result = null;
-            ProgressDialog.ExecuteTask(this, "DropBox Configuration", "Connecting to DropBox...", "AuthorizeDropBox", ProgressBarStyle.Marquee, _logger, new CallbackDelegate(callback =>
-            {
-                _client.GetToken();
-                result = _client.BuildAuthorizeUrl();
-            }));
+            ProgressDialog.ExecuteTask(
+                this, 
+                "DropBox Configuration", 
+                "Connecting to DropBox...", 
+                "AuthorizeDropBox", 
+                ProgressBarStyle.Marquee, 
+                this._logger, 
+                callback =>
+                    {
+                        this._client.GetToken();
+                        result = this._client.BuildAuthorizeUrl();
+                    });
             return result;
         }
 
+        /// <summary>
+        /// The drop box config dialog_ load.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void DropBoxConfigDialog_Load(object sender, EventArgs e)
         {
-            if (_needSave)
-                MessageBox.Show(this, "The current version of plugin has been changed and the configuration needs to be updated. Please save the configuration afterwards!", "Configuration Changes");
+            if (this._needSave)
+            {
+                MessageBox.Show(
+                    this, 
+                    "The current version of plugin has been changed and the configuration needs to be updated. Please save the configuration afterwards!", 
+                    "Configuration Changes");
+            }
 
-            lblStatus.Text = validateStr;
-            ThreadPool.QueueUserWorkItem(new WaitCallback((o) =>
-                {
-                    AppUtil.NameCurrentThread(GetType().Name + "-InitialLoad-Validate");
-                    bool valid = false;
-
-                    if (_client.UserLogin != null && _client.UserLogin.Token != null && _client.UserLogin.Secret != null)
+            this.lblStatus.Text = validateStr;
+            ThreadPool.QueueUserWorkItem(
+                o =>
                     {
-                        try
-                        {
-                            var acc = _client.AccountInfo();
-                            valid = true;
-                        }
-                        catch (Exception ex)
-                        {
-                            var realEx = DropBoxExceptionHandler.HandleException(ex);
-                            if (realEx != null)
-                            {
-                                string err = "Failed to authenticate with DropBox: " + realEx.Message;
-                                _logger.Warn(err);
-                            }
-                            valid = false;
-                        }
-                    }
+                        AppUtil.NameCurrentThread(this.GetType().Name + "-InitialLoad-Validate");
+                        bool valid = false;
 
-                    if (this.IsDestructed())
-                        return;
-
-                    this.SafeInvoke(new Action(() =>
-                    {
-                        if (lblStatus.Text == validateStr)
+                        if (this._client.UserLogin != null && this._client.UserLogin.Token != null && this._client.UserLogin.Secret != null)
                         {
-                            if (valid)
+                            try
                             {
-                                lblStatus.Text = successStr;
-                                lblStatus.ForeColor = Color.ForestGreen;
+                                var acc = this._client.AccountInfo();
+                                valid = true;
                             }
-                            else
+                            catch (Exception ex)
                             {
-                                lblStatus.Text = failStr;
-                                lblStatus.ForeColor = Color.Red;
+                                var realEx = DropBoxExceptionHandler.HandleException(ex);
+                                if (realEx != null)
+                                {
+                                    string err = "Failed to authenticate with DropBox: " + realEx.Message;
+                                    this._logger.Warn(err);
+                                }
+
+                                valid = false;
                             }
                         }
-                    }));
-                }));
+
+                        if (this.IsDestructed())
+                        {
+                            return;
+                        }
+
+                        this.SafeInvoke(
+                            new Action(
+                                () =>
+                                    {
+                                        if (this.lblStatus.Text == validateStr)
+                                        {
+                                            if (valid)
+                                            {
+                                                this.lblStatus.Text = successStr;
+                                                this.lblStatus.ForeColor = Color.ForestGreen;
+                                            }
+                                            else
+                                            {
+                                                this.lblStatus.Text = failStr;
+                                                this.lblStatus.ForeColor = Color.Red;
+                                            }
+                                        }
+                                    }));
+                    });
         }
     }
 }

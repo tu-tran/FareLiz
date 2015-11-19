@@ -6,22 +6,34 @@
     using SkyDean.FareLiz.WinForm.Components.Utils;
 
     /// <summary>
-    /// This is an indexer to the filter values for each column.  This
-    /// is the most complex access to the HDITEM data since the filter
-    /// data must be get/set via the HDTEXTFILTER structure referenced
-    /// in the HDITEM structure.  It is simple to Marshall this, but
-    /// figuring that out in the first place took alot of effort.
+    /// This is an indexer to the filter values for each column.  This is the most complex access to the HDITEM data since the filter data must be get/set
+    /// via the HDTEXTFILTER structure referenced in the HDITEM structure.  It is simple to Marshall this, but figuring that out in the first place took alot
+    /// of effort.
     /// </summary>
     public class ColumnFilterCollection
     {
+        /// <summary>
+        /// The _header.
+        /// </summary>
         private readonly ListViewColumnHeader _header; // owning header control
+
+        /// <summary>
+        /// The _hditem.
+        /// </summary>
         private HDITEM _hditem; // HDITEM instance
+
+        /// <summary>
+        /// The _hd text filter.
+        /// </summary>
         private HDTEXTFILTER _hdTextFilter; // HDTEXTFILTER instance
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="ColumnFilterCollection"/> class. 
         /// Constructor this must be given the header instance for access to the Handle property so that messages can be sent to it.
         /// </summary>
-        /// <param name="header">HeaderControl</param>
+        /// <param name="header">
+        /// HeaderControl
+        /// </param>
         public ColumnFilterCollection(ListViewColumnHeader header)
         {
             this._header = header;
@@ -30,12 +42,21 @@
         /// <summary>
         /// Indexer method to get/set the filter text for the column.
         /// </summary>
+        /// <param name="index">
+        /// The index.
+        /// </param>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
         public string this[int index]
         {
             get
             {
                 // if the column is invalid return nothing
-                if (index >= this.Count || index < 0) return "";
+                if (index >= this.Count || index < 0)
+                {
+                    return string.Empty;
+                }
 
                 // this is tricky since it involves marshalling pointers
                 // to structures that are used as a reference in another
@@ -48,26 +69,29 @@
                 this._hditem.type = (uint)W32_HDFT.HDFT_ISSTRING;
 
                 // marshall memory big enough to contain a HDTEXTFILTER 
-                this._hditem.pvFilter = Marshal.AllocCoTaskMem(
-                    Marshal.SizeOf(this._hdTextFilter));
+                this._hditem.pvFilter = Marshal.AllocCoTaskMem(Marshal.SizeOf(this._hdTextFilter));
 
                 // now copy the HDTEXTFILTER structure to the marshalled memory
                 Marshal.StructureToPtr(this._hdTextFilter, this._hditem.pvFilter, false);
 
-                NativeMethods.SendMessage(this._header.Handle, W32_HDM.HDM_GETITEMW, index, ref this._hditem);    // First check if the header fileter is empty or not
-                this._hdTextFilter = (HDTEXTFILTER)Marshal.PtrToStructure(this._hditem.pvFilter, typeof(HDTEXTFILTER));  // un-marshall the memory back into the HDTEXTFILTER structure                
+                NativeMethods.SendMessage(this._header.Handle, W32_HDM.HDM_GETITEMW, index, ref this._hditem);
 
-                if (!String.IsNullOrEmpty(this._hdTextFilter.pszText))
+                    // First check if the header fileter is empty or not
+                this._hdTextFilter = (HDTEXTFILTER)Marshal.PtrToStructure(this._hditem.pvFilter, typeof(HDTEXTFILTER));
+
+                    // un-marshall the memory back into the HDTEXTFILTER structure                
+                if (!string.IsNullOrEmpty(this._hdTextFilter.pszText))
                 {
                     NativeMethods.SendMessage(this._header.Handle, W32_HDM.HDM_GETITEMA, index, ref this._hditem);
                     this._hdTextFilter = (HDTEXTFILTER)Marshal.PtrToStructure(this._hditem.pvFilter, typeof(HDTEXTFILTER));
                 }
 
-                Marshal.FreeCoTaskMem(this._hditem.pvFilter);    // remember to free the marshalled IntPtr memory...
+                Marshal.FreeCoTaskMem(this._hditem.pvFilter); // remember to free the marshalled IntPtr memory...
 
                 // return the string in the text filter area
                 return this._hdTextFilter.pszText;
             }
+
             set
             {
                 // ensure that the column exists before attempting this
@@ -89,12 +113,13 @@
             }
         }
 
-        /// <summary>
-        /// Return the number of columns in the header.
-        /// </summary>
+        /// <summary>Return the number of columns in the header.</summary>
         public int Count
         {
-            get { return NativeMethods.SendMessage(this._header.Handle, W32_HDM.HDM_GETITEMCOUNT, 0, IntPtr.Zero); }
+            get
+            {
+                return NativeMethods.SendMessage(this._header.Handle, W32_HDM.HDM_GETITEMCOUNT, 0, IntPtr.Zero);
+            }
         }
     }
 }

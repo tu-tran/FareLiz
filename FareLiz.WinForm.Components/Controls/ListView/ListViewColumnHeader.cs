@@ -5,62 +5,53 @@
 
     using SkyDean.FareLiz.WinForm.Components.Utils;
 
+    /// <summary>
+    /// The list view column header.
+    /// </summary>
     public class ListViewColumnHeader : NativeWindow
     {
+        /// <summary>
+        /// The _sort info.
+        /// </summary>
+        private readonly SortInfo _sortInfo = new SortInfo(-1, true);
+
+        /// <summary>Indexer to the alignment by column.</summary>
+        public readonly ColumnAlignmentCollection Alignment;
+
+        /// <summary>Indexer to the data types by column.</summary>
+        public readonly ColumnDataTypeCollection DataType;
+
+        /// <summary>Indexer to the column filter text.</summary>
+        public readonly ColumnFilterCollection Filters;
+
+        /// <summary>Indexer to the column name text.</summary>
+        public readonly ColumnNamesCollection Names;
+
+        /// <summary>Indexer to the column size (Width and Left as Height).</summary>
+        public readonly ColumnSizeInfoCollection SizeInfo;
+
+        /// <summary>
+        /// The _owner list view.
+        /// </summary>
         private EnhancedListView _ownerListView; // owning listview control        
+
+        /// <summary>
+        /// The hdr_filter.
+        /// </summary>
+        private bool hdr_filter; // show filterbar in header
+
+        /// <summary>
+        /// The hdr_hditem.
+        /// </summary>
         private HDITEM hdr_hditem; // instance container
 
         /// <summary>
-        /// Indexer to the alignment by column.
-        /// </summary>
-        public readonly ColumnAlignmentCollection Alignment;
-
-        /// <summary>
-        /// Indexer to the data types by column.
-        /// </summary>
-        public readonly ColumnDataTypeCollection DataType;
-
-        /// <summary>
-        /// Indexer to the column filter text.
-        /// </summary>
-        public readonly ColumnFilterCollection Filters;
-
-        /// <summary>
-        /// Indexer to the column name text.
-        /// </summary>
-        public readonly ColumnNamesCollection Names;
-
-        /// <summary>
-        /// Indexer to the column size (Width and Left as Height).
-        /// </summary>
-        public readonly ColumnSizeInfoCollection SizeInfo;
-
-        private bool hdr_filter; // show filterbar in header
-        /// <summary>
-        /// When the Filtered property changes update the window style.
-        /// </summary>
-        public bool Filtered
-        {
-            get { return this.hdr_filter; }
-            set
-            {
-                if (this.hdr_filter != value)
-                {
-                    this.hdr_filter = value;
-                    this.ChangeFiltered();
-                }
-            }
-        }
-
-        private readonly SortInfo _sortInfo = new SortInfo(-1, true);
-        public SortInfo SortInfo
-        {
-            get { return this._sortInfo; }
-        }
-
-        /// <summary>
+        /// Initializes a new instance of the <see cref="ListViewColumnHeader"/> class. 
         /// Class constructor.  Initializes various elements
         /// </summary>
+        /// <param name="filtered">
+        /// The filtered.
+        /// </param>
         public ListViewColumnHeader(bool filtered)
         {
             // create the collection properties
@@ -72,6 +63,41 @@
             this.Filtered = filtered;
         }
 
+        /// <summary>When the Filtered property changes update the window style.</summary>
+        public bool Filtered
+        {
+            get
+            {
+                return this.hdr_filter;
+            }
+
+            set
+            {
+                if (this.hdr_filter != value)
+                {
+                    this.hdr_filter = value;
+                    this.ChangeFiltered();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the sort info.
+        /// </summary>
+        public SortInfo SortInfo
+        {
+            get
+            {
+                return this._sortInfo;
+            }
+        }
+
+        /// <summary>
+        /// The attach.
+        /// </summary>
+        /// <param name="listView">
+        /// The list view.
+        /// </param>
         public void Attach(EnhancedListView listView)
         {
             this._ownerListView = listView;
@@ -80,21 +106,26 @@
             if ((int)headerHandle != 0)
             {
                 if ((int)this.Handle != 0)
+                {
                     this.ReleaseHandle();
+                }
+
                 this.AssignHandle(headerHandle); // set the handle to this control.  the first dialog item for a listview is this header control...
             }
         }
 
+        /// <summary>
+        /// The clear all filters.
+        /// </summary>
         public void ClearAllFilters()
         {
             for (int i = 0; i < this.Filters.Count; i++)
-                this.Filters[i] = "";
+            {
+                this.Filters[i] = string.Empty;
+            }
         }
 
-        /// <summary>
-        ///     Set the window style to reflect the value of the Filtered
-        ///     property.  This is done when the Handle or property change.
-        /// </summary>
+        /// <summary>Set the window style to reflect the value of the Filtered property.  This is done when the Handle or property change.</summary>
         private void ChangeFiltered()
         {
             // we need to set a new style value for this control to turn
@@ -106,8 +137,15 @@
             if (((style & HDS_FILTR) != 0) != this.hdr_filter)
             {
                 // set/reset the flag for the filterbar
-                if (this.hdr_filter) style |= HDS_FILTR;
-                else style ^= HDS_FILTR;
+                if (this.hdr_filter)
+                {
+                    style |= HDS_FILTR;
+                }
+                else
+                {
+                    style ^= HDS_FILTR;
+                }
+
                 NativeMethods.SetWindowLong(this.Handle, W32_GWL.GWL_STYLE, style);
 
                 // now we have to resize this control.  we do this by sending
@@ -115,25 +153,30 @@
                 // is a kludge but the invalidate and others just don't work.
                 this.hdr_hditem.mask = W32_HDI.HDI_HEIGHT;
                 NativeMethods.SendMessage(this.Handle, W32_HDM.HDM_GETITEMW, 0, ref this.hdr_hditem);
-                this.hdr_hditem.cxy += (this.hdr_filter) ? 1 : -1;
+                this.hdr_hditem.cxy += this.hdr_filter ? 1 : -1;
                 NativeMethods.SendMessage(this.Handle, W32_HDM.HDM_SETITEMW, 0, ref this.hdr_hditem);
             }
 
             // it can't hurt to set the filter timeout limit to .5 seconds
-            //NativeMethods.SendMessage(Handle, W32_HDM.HDM_SETFILTERCHANGETIMEOUT, 0, 500);
+            // NativeMethods.SendMessage(Handle, W32_HDM.HDM_SETFILTERCHANGETIMEOUT, 0, 500);
 
             // it is necessary to clear all filters which will cause a 
             // notification be sent to the ListView with -1 column.
             NativeMethods.SendMessage(this.Handle, W32_HDM.HDM_CLEARFILTER, -1, IntPtr.Zero);
         }
 
+        /// <summary>
+        /// The on handle change.
+        /// </summary>
         protected override void OnHandleChange()
         {
             base.OnHandleChange();
+
             // reset the filter settings if there is a handle
             if (this.Handle != (IntPtr)0)
+            {
                 this.ChangeFiltered();
-
+            }
         }
     }
 }

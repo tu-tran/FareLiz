@@ -1,74 +1,113 @@
-﻿using log4net;
-using SkyDean.FareLiz.Core;
-using SkyDean.FareLiz.Core.Utils;
-using SkyDean.FareLiz.Data.Config;
-using SkyDean.FareLiz.Data.Monitoring;
-using SkyDean.FareLiz.WinForm.Config;
-using SkyDean.FareLiz.WinForm.Presentation;
-using SkyDean.FareLiz.WinForm.Presentation.Controllers;
-using SkyDean.FareLiz.WinForm.Presentation.Views;
-using SkyDean.FareLiz.WinForm.Utils;
-using System;
-using System.IO;
-using System.Windows.Forms;
-
-namespace SkyDean.FareLiz.WinForm
+﻿namespace SkyDean.FareLiz.WinForm
 {
+    using System;
+    using System.IO;
+    using System.Windows.Forms;
+
+    using log4net;
+
+    using SkyDean.FareLiz.Core;
+    using SkyDean.FareLiz.Core.Utils;
+    using SkyDean.FareLiz.Data.Config;
+    using SkyDean.FareLiz.Data.Monitoring;
+    using SkyDean.FareLiz.WinForm.Presentation.Controllers;
+    using SkyDean.FareLiz.WinForm.Presentation.Views;
+    using SkyDean.FareLiz.WinForm.Utils;
+
+    /// <summary>
+    /// The boot strap.
+    /// </summary>
     internal class BootStrap
     {
+        /// <summary>
+        /// The en v_ confi g_ filename.
+        /// </summary>
+        private readonly string ENV_CONFIG_FILENAME = "Environment.bin";
+
+        /// <summary>
+        /// The gu i_ in i_ filename.
+        /// </summary>
+        private readonly string GUI_INI_FILENAME = AppUtil.ProductName + ".ini";
+
+        /// <summary>
+        /// The histor y_ filename.
+        /// </summary>
+        private readonly string HISTORY_FILENAME = "History.txt";
+
+        /// <summary>
+        /// The logger.
+        /// </summary>
         private readonly ILog Logger;
 
-        private readonly string ENV_CONFIG_FILENAME = "Environment.bin",
-                                GUI_INI_FILENAME = AppUtil.ProductName + ".ini",
-                                HISTORY_FILENAME = "History.txt";
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BootStrap"/> class.
+        /// </summary>
+        /// <param name="logger">
+        /// The logger.
+        /// </param>
+        /// <exception cref="ArgumentException">
+        /// </exception>
         internal BootStrap(ILog logger)
         {
             if (logger == null)
+            {
                 throw new ArgumentException("Logger cannot be null");
+            }
 
-            Logger = logger;
+            this.Logger = logger;
         }
 
+        /// <summary>
+        /// The run.
+        /// </summary>
+        /// <param name="args">
+        /// The args.
+        /// </param>
         internal void Run(string[] args)
         {
             ExecutionParam executionParam;
-            if (!ExecutionParam.Parse(args, AppUtil.GetLocalDataPath(GUI_INI_FILENAME), Logger, out executionParam))
+            if (!ExecutionParam.Parse(args, AppUtil.GetLocalDataPath(this.GUI_INI_FILENAME), this.Logger, out executionParam))
             {
                 ExecutionParam.ShowHelp();
                 return;
             }
 
-            Logger.InfoFormat("Application {0} {1} was started!", AppUtil.ProductName, AppUtil.ProductVersion);
-            MuteApplicationVolume();
+            this.Logger.InfoFormat("Application {0} {1} was started!", AppUtil.ProductName, AppUtil.ProductVersion);
+            this.MuteApplicationVolume();
 
-            if (args.Length < 1 && !SingleInstance.Start()) // Show up other instance if no parameter was specified
+            if (args.Length < 1 && !SingleInstance.Start())
             {
-                if (MessageBox.Show("Another instance was already running. Do you want to start a new instance ?", AppUtil.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+                // Show up other instance if no parameter was specified
+                if (MessageBox.Show(
+                    "Another instance was already running. Do you want to start a new instance ?", 
+                    AppUtil.ProductName, 
+                    MessageBoxButtons.YesNo, 
+                    MessageBoxIcon.Question) == DialogResult.No)
                 {
                     SingleInstance.ShowFirstInstance();
                     return;
                 }
             }
 
-            string historyFile = AppUtil.GetLocalDataPath(HISTORY_FILENAME);
+            string historyFile = AppUtil.GetLocalDataPath(this.HISTORY_FILENAME);
             bool firstStart = !File.Exists(historyFile);
             if (firstStart)
             {
                 Directory.CreateDirectory(AppUtil.LocalProductDataPath);
                 File.Create(historyFile);
-                using (var introForm = new IntroForm())
-                    introForm.ShowDialog();
+                using (var introForm = new IntroForm()) introForm.ShowDialog();
             }
 
-            var globalContext = WinFormGlobalContext.GetInstance(Logger);
+            var globalContext = WinFormGlobalContext.GetInstance(this.Logger);
             globalContext.SetFirstStart(firstStart);
 
-            MonitorEnvironment env = GetEnvironment(executionParam, globalContext);
+            MonitorEnvironment env = this.GetEnvironment(executionParam, globalContext);
             if (env == null)
+            {
                 Environment.Exit(1);
+            }
 
-            env.Logger = Logger;
+            env.Logger = this.Logger;
             globalContext.SetEnvironment(env);
             AppContext.Initialize(globalContext);
             var mainForm = new FlightStatisticForm(null, executionParam, true);
@@ -87,30 +126,45 @@ namespace SkyDean.FareLiz.WinForm
                     checkFareForm.WindowState = FormWindowState.Minimized;
                     checkFareForm.ShowInTaskbar = false;
                 }
+
                 checkFareForm.Show();
             }
 
             Application.Run(mainForm);
             SingleInstance.Stop();
-            Logger.Info("Application stopped");
+            this.Logger.Info("Application stopped");
         }
 
+        /// <summary>
+        /// The get environment.
+        /// </summary>
+        /// <param name="executionParam">
+        /// The execution param.
+        /// </param>
+        /// <param name="globalContext">
+        /// The global context.
+        /// </param>
+        /// <returns>
+        /// The <see cref="MonitorEnvironment"/>.
+        /// </returns>
         private MonitorEnvironment GetEnvironment(ExecutionParam executionParam, WinFormGlobalContext globalContext)
         {
-            var pluginResolver = new AssemblyPluginResolver(Logger);
+            var pluginResolver = new AssemblyPluginResolver(this.Logger);
             pluginResolver.LoadPlugins();
-            var configStore = new FileConfigStore(AppUtil.GetLocalDataPath(ENV_CONFIG_FILENAME), pluginResolver, Logger);
+            var configStore = new FileConfigStore(AppUtil.GetLocalDataPath(this.ENV_CONFIG_FILENAME), pluginResolver, this.Logger);
 
             MonitorEnvironment env = configStore.LoadEnv();
 
             if (env == null || env.ArchiveManager == null || env.FareDatabase == null || env.FareDataProvider == null)
             {
-                env = new MonitorEnvironment(configStore, pluginResolver, new BackgroundServiceManager(Logger), Logger);
+                env = new MonitorEnvironment(configStore, pluginResolver, new BackgroundServiceManager(this.Logger), this.Logger);
                 globalContext.AddServices(env);
                 using (var configDialog = new EnvConfiguratorDialog(env, executionParam))
                 {
                     if (configDialog.ShowDialog() == DialogResult.OK)
+                    {
                         env = configDialog.ResultEnvironment;
+                    }
                     else
                     {
                         env.Close();
@@ -122,17 +176,19 @@ namespace SkyDean.FareLiz.WinForm
             return env;
         }
 
+        /// <summary>
+        /// The mute application volume.
+        /// </summary>
         private void MuteApplicationVolume()
         {
             try
             {
                 WinApi.SetVolume(0);
-                WinApi.CoInternetSetFeatureEnabled(WinApi.FEATURE_DISABLE_NAVIGATION_SOUNDS,
-                                                   WinApi.SET_FEATURE_ON_PROCESS, true);
+                WinApi.CoInternetSetFeatureEnabled(WinApi.FEATURE_DISABLE_NAVIGATION_SOUNDS, WinApi.SET_FEATURE_ON_PROCESS, true);
             }
             catch (Exception e)
             {
-                Logger.Error("Failed to mute volume: " + e);
+                this.Logger.Error("Failed to mute volume: " + e);
             }
         }
     }

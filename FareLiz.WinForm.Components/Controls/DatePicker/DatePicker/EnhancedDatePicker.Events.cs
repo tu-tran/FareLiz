@@ -9,24 +9,29 @@
     using SkyDean.FareLiz.WinForm.Components.Controls.DatePicker.EventClasses;
     using SkyDean.FareLiz.WinForm.Components.Properties;
 
+    /// <summary>
+    /// The enhanced date picker.
+    /// </summary>
     partial class EnhancedDatePicker
     {
+        /// <summary>
+        /// The value changed.
+        /// </summary>
         [Category("Action")]
         [Description("Is Raised when the date value changed.")]
         public event EventHandler<CheckDateEventArgs> ValueChanged;
 
-        /// <summary>
-        /// Is raised when the mouse is over an date.
-        /// </summary>
+        /// <summary>Is raised when the mouse is over an date.</summary>
         [Category("Action")]
         [Description("Is raised when the mouse is over an date.")]
         public event EventHandler<ActiveDateChangedEventArgs> ActiveDateChanged;
 
-
         /// <summary>
         /// Paints the control.
         /// </summary>
-        /// <param name="e">The event args.</param>
+        /// <param name="e">
+        /// The event args.
+        /// </param>
         protected override void OnPaint(PaintEventArgs e)
         {
             Rectangle rect = this.ClientRectangle;
@@ -49,35 +54,44 @@
             this._buttonBounds = rect;
 
             var isMouseOverDropDownButton = rect.Contains(mouseLoc);
-            if (isMouseOverDropDownButton)  // Draw background only if the mouse if over
-                ButtonRenderer.DrawButton(e.Graphics, rect,
+            if (isMouseOverDropDownButton)
+            {
+                // Draw background only if the mouse if over
+                ButtonRenderer.DrawButton(
+                    e.Graphics, 
+                    rect, 
                     this._buttonState == ComboButtonState.Pressed ? PushButtonState.Pressed : PushButtonState.Hot);
+            }
 
             e.Graphics.DrawImage(Resources.CalendarToggle, new Point(rect.X + 2, rect.Y + 2));
 
             var arrowHeight = this.Height / 6;
             var arrowWidth = arrowHeight * 0.8;
-            var arrawLoc = new Point((int)(rect.Right - arrowWidth * 4), (int)(rect.Height / 2));
+            var arrawLoc = new Point((int)(rect.Right - arrowWidth * 4), rect.Height / 2);
 
-            //if the width is odd - favor pushing it over one pixel right.
-
+            // if the width is odd - favor pushing it over one pixel right.
             var arrow = new[]
-                {
-                    new Point((int)(arrawLoc.X - arrowWidth), arrawLoc.Y - 1),
-                    new Point((int)(arrawLoc.X + arrowWidth + 1), arrawLoc.Y - 1),
-                    new Point(arrawLoc.X, arrawLoc.Y + arrowHeight)
-                };
+                            {
+                                new Point((int)(arrawLoc.X - arrowWidth), arrawLoc.Y - 1), new Point((int)(arrawLoc.X + arrowWidth + 1), arrawLoc.Y - 1), 
+                                new Point(arrawLoc.X, arrawLoc.Y + arrowHeight)
+                            };
 
             if (this.Enabled)
+            {
                 e.Graphics.FillPolygon(SystemBrushes.ControlText, arrow);
+            }
             else
+            {
                 e.Graphics.FillPolygon(SystemBrushes.ButtonShadow, arrow);
+            }
         }
 
         /// <summary>
         /// Raises the mouse enter event.
         /// </summary>
-        /// <param name="e">The event args.</param>
+        /// <param name="e">
+        /// The event args.
+        /// </param>
         protected override void OnMouseEnter(EventArgs e)
         {
             if (!this._isDropped)
@@ -92,7 +106,9 @@
         /// <summary>
         /// Raises the mouse leave event.
         /// </summary>
-        /// <param name="e">The event args.</param>
+        /// <param name="e">
+        /// The event args.
+        /// </param>
         protected override void OnMouseLeave(EventArgs e)
         {
             if (!this._isDropped)
@@ -107,7 +123,9 @@
         /// <summary>
         /// Raises the mouse down event.
         /// </summary>
-        /// <param name="e">The event args.</param>
+        /// <param name="e">
+        /// The event args.
+        /// </param>
         protected override void OnMouseDown(MouseEventArgs e)
         {
             this.Focus();
@@ -124,17 +142,18 @@
         /// <summary>
         /// Raises the <see cref="Control.MouseMove"/> event.
         /// </summary>
-        /// <param name="e">A <see cref="MouseEventArgs"/> that contains the event data.</param>
+        /// <param name="e">
+        /// A <see cref="MouseEventArgs"/> that contains the event data.
+        /// </param>
         protected override void OnMouseMove(MouseEventArgs e)
         {
             base.OnMouseMove(e);
 
             if (e.Button == MouseButtons.None && !this._isDropped)
             {
-                EnhancedDatePicker.ComboButtonState st = this._buttonState;
+                ComboButtonState st = this._buttonState;
 
-                this._buttonState = this._buttonBounds.Contains(e.Location) ?
-                   ComboButtonState.Hot : ComboButtonState.Normal;
+                this._buttonState = this._buttonBounds.Contains(e.Location) ? ComboButtonState.Hot : ComboButtonState.Normal;
 
                 if (st != this._buttonState)
                 {
@@ -146,7 +165,9 @@
         /// <summary>
         /// Raises the <see cref="Control.LostFocus"/> event.
         /// </summary>
-        /// <param name="e">A <see cref="EventArgs"/> that contains the event data.</param>
+        /// <param name="e">
+        /// A <see cref="EventArgs"/> that contains the event data.
+        /// </param>
         protected override void OnLostFocus(EventArgs e)
         {
             if (!this._isDropped)
@@ -165,7 +186,9 @@
         /// <summary>
         /// Raises the <see cref="Control.GotFocus"/> event.
         /// </summary>
-        /// <param name="e">A <see cref="EventArgs"/> that contains the event data.</param>
+        /// <param name="e">
+        /// A <see cref="EventArgs"/> that contains the event data.
+        /// </param>
         protected override void OnGotFocus(EventArgs e)
         {
             base.OnGotFocus(e);
@@ -176,7 +199,9 @@
         /// <summary>
         /// Raises the <see cref="Control.FontChanged"/> event.
         /// </summary>
-        /// <param name="e">A <see cref="EventArgs"/> that contains the event data.</param>
+        /// <param name="e">
+        /// A <see cref="EventArgs"/> that contains the event data.
+        /// </param>
         protected override void OnFontChanged(EventArgs e)
         {
             base.OnFontChanged(e);
@@ -189,7 +214,9 @@
         /// <summary>
         /// Raises the <see cref="Control.ForeColorChanged"/> event.
         /// </summary>
-        /// <param name="e">A <see cref="EventArgs"/> that contains the event data.</param>
+        /// <param name="e">
+        /// A <see cref="EventArgs"/> that contains the event data.
+        /// </param>
         protected override void OnForeColorChanged(EventArgs e)
         {
             if (this.dateTextBox != null)
@@ -203,7 +230,9 @@
         /// <summary>
         /// Raises the <see cref="Control.EnabledChanged"/> event.
         /// </summary>
-        /// <param name="e">A <see cref="EventArgs"/> that contains the event data.</param>
+        /// <param name="e">
+        /// A <see cref="EventArgs"/> that contains the event data.
+        /// </param>
         protected override void OnEnabledChanged(EventArgs e)
         {
             base.OnEnabledChanged(e);
@@ -214,7 +243,9 @@
         /// <summary>
         /// Raises the <see cref="Control.RightToLeftChanged"/> event.
         /// </summary>
-        /// <param name="e">A <see cref="EventArgs"/> that contains the event data.</param>
+        /// <param name="e">
+        /// A <see cref="EventArgs"/> that contains the event data.
+        /// </param>
         protected override void OnRightToLeftChanged(EventArgs e)
         {
             base.OnRightToLeftChanged(e);
@@ -226,7 +257,9 @@
         /// <summary>
         /// Raises the <see cref="ValueChanged"/> event.
         /// </summary>
-        /// <param name="e">A <see cref="EventArgs"/> that contains the event data.</param>
+        /// <param name="e">
+        /// A <see cref="EventArgs"/> that contains the event data.
+        /// </param>
         private void OnValueChanged(CheckDateEventArgs e)
         {
             if (this.ValueChanged != null)
@@ -238,7 +271,9 @@
         /// <summary>
         /// Raises the <see cref="ActiveDateChanged"/> event.
         /// </summary>
-        /// <param name="e">A <see cref="ActiveDateChangedEventArgs"/> that contains the event data.</param>
+        /// <param name="e">
+        /// A <see cref="ActiveDateChangedEventArgs"/> that contains the event data.
+        /// </param>
         private void OnActiveDateChanged(ActiveDateChangedEventArgs e)
         {
             if (this.ActiveDateChanged != null)

@@ -1,73 +1,139 @@
-﻿using SkyDean.FareLiz.Core;
-using SkyDean.FareLiz.Service.LiveUpdate;
-using SkyDean.FareLiz.WinForm.Components.Dialog;
-using SkyDean.FareLiz.WinForm.Data;
-using System;
-
-namespace SkyDean.FareLiz.WinForm
+﻿namespace SkyDean.FareLiz.WinForm
 {
+    using System;
+
     using log4net;
 
+    using SkyDean.FareLiz.Core;
+    using SkyDean.FareLiz.Service.LiveUpdate;
+    using SkyDean.FareLiz.WinForm.Components.Dialog;
+    using SkyDean.FareLiz.WinForm.Data;
+    using SkyDean.FareLiz.WinForm.Properties;
+
+    /// <summary>
+    /// The win form global context.
+    /// </summary>
     internal class WinFormGlobalContext : AppContext
     {
-        private static WinFormGlobalContext _instance = null;
+        /// <summary>
+        /// The _instance.
+        /// </summary>
+        private static WinFormGlobalContext _instance;
 
+        /// <summary>
+        /// The _is first start set.
+        /// </summary>
+        private static bool _isFirstStartSet;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="WinFormGlobalContext"/> class.
+        /// </summary>
+        /// <param name="logger">
+        /// The logger.
+        /// </param>
+        private WinFormGlobalContext(ILog logger)
+        {
+            this._logger = logger;
+            this._progressCallback = new ProgressDialog();
+        }
+
+        /// <summary>
+        /// The get instance.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="WinFormGlobalContext"/>.
+        /// </returns>
         internal static WinFormGlobalContext GetInstance()
         {
             return GetInstance(LogManager.GetLogger("WinFormGlobalContext"));
         }
+
+        /// <summary>
+        /// The get instance.
+        /// </summary>
+        /// <param name="logger">
+        /// The logger.
+        /// </param>
+        /// <returns>
+        /// The <see cref="WinFormGlobalContext"/>.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// </exception>
         internal static WinFormGlobalContext GetInstance(ILog logger)
         {
             if (logger == null)
+            {
                 throw new ArgumentException("Logger cannot be null for Global Context instance");
+            }
+
             if (_instance == null)
+            {
                 _instance = new WinFormGlobalContext(logger);
+            }
             else
+            {
                 _instance._logger = logger;
+            }
 
             return _instance;
         }
 
-        private WinFormGlobalContext(ILog logger)
-        {
-            _logger = logger;
-            _progressCallback = new ProgressDialog();
-        }
-
+        /// <summary>
+        /// The set first start.
+        /// </summary>
+        /// <param name="firstStart">
+        /// The first start.
+        /// </param>
+        /// <exception cref="ApplicationException">
+        /// </exception>
         internal void SetFirstStart(bool firstStart)
         {
             if (_isFirstStartSet)
+            {
                 throw new ApplicationException("This property cannot be set more than once!");
-            _isFirstStartSet = true;
-            _firstStart = firstStart;
-        }
-        private static bool _isFirstStartSet = false;
+            }
 
+            _isFirstStartSet = true;
+            this._firstStart = firstStart;
+        }
+
+        /// <summary>
+        /// The set environment.
+        /// </summary>
+        /// <param name="env">
+        /// The env.
+        /// </param>
         internal void SetEnvironment(MonitorEnvironment env)
         {
-            _err = null;
+            this._err = null;
             if (env != null)
             {
-                _logger.Debug("Closing global environment...");
+                this._logger.Debug("Closing global environment...");
                 env.Close();
             }
 
-            _logger.Info("Setting new global environment...");
-            AddServices(env);   // Add needed services to this environment instance
-            _env = env;
+            this._logger.Info("Setting new global environment...");
+            this.AddServices(env); // Add needed services to this environment instance
+            this._env = env;
 
-            if (_env != null)
+            if (this._env != null)
             {
-                _logger.Debug("Initializing global environment...");
-                var result = _env.Initialize();
+                this._logger.Debug("Initializing global environment...");
+                var result = this._env.Initialize();
                 if (!result.Succeeded)
                 {
-                    _err = result.ErrorMessage;
-                    _logger.Warn("Error initializing environment: " + _err);
+                    this._err = result.ErrorMessage;
+                    this._logger.Warn("Error initializing environment: " + this._err);
                 }
             }
         }
 
+        /// <summary>
+        /// The add services.
+        /// </summary>
+        /// <param name="env">
+        /// The env.
+        /// </param>
         internal void AddServices(MonitorEnvironment env)
         {
             LiveUpdateService liveUpdateService = null;
@@ -77,29 +143,34 @@ namespace SkyDean.FareLiz.WinForm
             foreach (var svc in activeServices)
             {
                 if (svc is LiveUpdateService)
+                {
                     liveUpdateService = (LiveUpdateService)svc;
+                }
                 else if (svc is OnlineCurrencyProvider)
+                {
                     currencyProvider = (OnlineCurrencyProvider)svc;
+                }
             }
 
             if (liveUpdateService == null)
             {
-                _logger.Debug("Adding Live Update Service...");
+                this._logger.Debug("Adding Live Update Service...");
                 liveUpdateService = new LiveUpdateService();
                 liveUpdateService.Configuration = liveUpdateService.DefaultConfig;
                 env.BackgroundServices.Add(liveUpdateService, false);
             }
-            liveUpdateService.ProductLogo = Properties.Resources.FareLiz;
+
+            liveUpdateService.ProductLogo = Resources.FareLiz;
 
             if (currencyProvider == null)
             {
-                _logger.Debug("Adding Currency Provider...");
+                this._logger.Debug("Adding Currency Provider...");
                 env.CurrencyProvider = currencyProvider = new OnlineCurrencyProvider();
                 currencyProvider.Configuration = currencyProvider.DefaultConfig;
                 env.BackgroundServices.Add(currencyProvider, false);
             }
 
-            _logger.Info("Total loaded services: " + env.BackgroundServices.Count);
+            this._logger.Info("Total loaded services: " + env.BackgroundServices.Count);
         }
     }
 }

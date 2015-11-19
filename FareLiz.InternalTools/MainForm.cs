@@ -17,6 +17,17 @@
     /// <summary>The main form.</summary>
     public partial class MainForm : SmartForm
     {
+        #region Constructors and Destructors
+
+        /// <summary>Initializes a new instance of the <see cref="MainForm" /> class.</summary>
+        public MainForm()
+        {
+            this.InitializeComponent();
+            this.InitializeGreps();
+        }
+
+        #endregion
+
         #region Fields
 
         /// <summary>The _active grep.</summary>
@@ -27,22 +38,17 @@
 
         #endregion
 
-        #region Constructors and Destructors
-
-        /// <summary>Initializes a new instance of the <see cref="MainForm"/> class.</summary>
-        public MainForm()
-        {
-            this.InitializeComponent();
-            this.InitializeGreps();
-        }
-
-        #endregion
-
         #region Methods
 
-        /// <summary>The generate bytes string.</summary>
-        /// <param name="input">The input.</param>
-        /// <returns>The <see cref="string"/>.</returns>
+        /// <summary>
+        /// The generate bytes string.
+        /// </summary>
+        /// <param name="input">
+        /// The input.
+        /// </param>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
         private string GenerateBytesString(string input)
         {
             var bytes = this._activeGrep.Convert(input);
@@ -57,8 +63,12 @@
             return result;
         }
 
-        /// <summary>The generate data.</summary>
-        /// <param name="sender">The sender.</param>
+        /// <summary>
+        /// The generate data.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
         private void GenerateData(object sender)
         {
             if (sender == this.txtRaw)
@@ -103,8 +113,7 @@
             var curLoc = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var files = Directory.GetFiles(curLoc, "*.dll");
             var greps = new List<FieldInfo>();
-            const BindingFlags flags =
-                BindingFlags.Instance | BindingFlags.FlattenHierarchy | BindingFlags.Public | BindingFlags.NonPublic;
+            const BindingFlags flags = BindingFlags.Instance | BindingFlags.FlattenHierarchy | BindingFlags.Public | BindingFlags.NonPublic;
 
             foreach (var fi in files)
             {
@@ -137,9 +146,15 @@
             this.cbGrep.DataSource = greps;
         }
 
-        /// <summary>The text box_ key down.</summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The e.</param>
+        /// <summary>
+        /// The text box_ key down.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void TextBox_KeyDown(object sender, KeyEventArgs e)
         {
             var txt = (TextBox)sender;
@@ -149,9 +164,15 @@
             }
         }
 
-        /// <summary>The text box_ text changed.</summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The e.</param>
+        /// <summary>
+        /// The text box_ text changed.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void TextBox_TextChanged(object sender, EventArgs e)
         {
             if (this._isChanging)
@@ -164,9 +185,15 @@
             this._isChanging = false;
         }
 
-        /// <summary>The cb grep_ selected index changed.</summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The e.</param>
+        /// <summary>
+        /// The cb grep_ selected index changed.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void cbGrep_SelectedIndexChanged(object sender, EventArgs e)
         {
             var f = this.cbGrep.SelectedItem as FieldInfo;

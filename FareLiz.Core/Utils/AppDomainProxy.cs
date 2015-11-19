@@ -1,40 +1,57 @@
-﻿using System;
-using System.IO;
-
-namespace SkyDean.FareLiz.Core.Utils
+﻿namespace SkyDean.FareLiz.Core.Utils
 {
-    public class AppDomainProxy<T> : IDisposable where T : MarshalByRefObject
+    using System;
+    using System.IO;
+
+    /// <summary>
+    /// The app domain proxy.
+    /// </summary>
+    /// <typeparam name="T">
+    /// </typeparam>
+    public class AppDomainProxy<T> : IDisposable
+        where T : MarshalByRefObject
     {
+        /// <summary>Initializes a new instance of the <see cref="AppDomainProxy{T}" /> class.</summary>
+        protected AppDomainProxy()
+        {
+        }
+
+        /// <summary>Gets or sets the on dispose.</summary>
         public Action OnDispose { get; set; }
+
+        /// <summary>Gets or sets the instance.</summary>
         public T Instance { get; set; }
 
+        /// <summary>The dispose.</summary>
         void IDisposable.Dispose()
         {
-            if (OnDispose != null)
+            if (this.OnDispose != null)
             {
-                OnDispose();
-                OnDispose = null;
+                this.OnDispose();
+                this.OnDispose = null;
             }
         }
 
-        protected AppDomainProxy() { }
-
+        /// <summary>
+        /// The get proxy.
+        /// </summary>
+        /// <param name="privatePath">
+        /// The private path.
+        /// </param>
+        /// <returns>
+        /// The <see cref="AppDomainProxy"/>.
+        /// </returns>
         public static AppDomainProxy<T> GetProxy(string privatePath)
         {
             Type wrappedType = typeof(T);
             string newDomainName = Guid.NewGuid().ToString();
             string basePath = Path.GetDirectoryName(wrappedType.Assembly.Location);
 
-            AppDomainSetup setup = new AppDomainSetup()
-            {
-                ApplicationName = newDomainName,
-                ApplicationBase = basePath,
-                PrivateBinPath = privatePath
-            };
+            AppDomainSetup setup = new AppDomainSetup { ApplicationName = newDomainName, ApplicationBase = basePath, PrivateBinPath = privatePath };
 
             var domain = AppDomain.CreateDomain(newDomainName, AppDomain.CurrentDomain.Evidence, setup);
             var instance = (T)domain.CreateInstanceAndUnwrap(wrappedType.Assembly.FullName, wrappedType.FullName);
-            return new AppDomainProxy<T>() { OnDispose = () => AppDomain.Unload(domain), Instance = (T)instance };
+            return new AppDomainProxy<T> { OnDispose = () => AppDomain.Unload(domain), Instance = instance };
         }
     }
 }

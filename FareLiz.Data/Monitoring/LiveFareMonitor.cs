@@ -9,18 +9,36 @@
     using SkyDean.FareLiz.Core.Presentation;
     using SkyDean.FareLiz.Core.Utils;
 
-    /// <summary>
-    /// Monitor used for live fare
-    /// </summary>
+    /// <summary>Monitor used for live fare</summary>
     public sealed class LiveFareMonitor : FareRequestMonitor
     {
-        private readonly IFareStorage _fareStorage;
-        private readonly IFlightNotifier _notifier;
+        /// <summary>
+        /// The _current monitor journeys.
+        /// </summary>
         private readonly List<Journey> _currentMonitorJourneys = new List<Journey>();
 
-        public double PriceLimit { get; set; }
-        public override OperationMode Mode { get { return OperationMode.LiveMonitor; } }
+        /// <summary>
+        /// The _fare storage.
+        /// </summary>
+        private readonly IFareStorage _fareStorage;
 
+        /// <summary>
+        /// The _notifier.
+        /// </summary>
+        private readonly IFlightNotifier _notifier;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LiveFareMonitor"/> class.
+        /// </summary>
+        /// <param name="fareStorage">
+        /// The fare storage.
+        /// </param>
+        /// <param name="notifier">
+        /// The notifier.
+        /// </param>
+        /// <param name="controlFactory">
+        /// The control factory.
+        /// </param>
         public LiveFareMonitor(IFareStorage fareStorage, IFlightNotifier notifier, IFareBrowserControlFactory controlFactory)
             : base(controlFactory)
         {
@@ -29,32 +47,67 @@
             this.RequestCompleted += this.LiveFareMonitor_OnRequestCompleted;
         }
 
-        void LiveFareMonitor_OnRequestCompleted(FareRequestMonitor sender, FareBrowserRequestArg args)
+        /// <summary>
+        /// Gets or sets the price limit.
+        /// </summary>
+        public double PriceLimit { get; set; }
+
+        /// <summary>
+        /// Gets the mode.
+        /// </summary>
+        public override OperationMode Mode
+        {
+            get
+            {
+                return OperationMode.LiveMonitor;
+            }
+        }
+
+        /// <summary>
+        /// The live fare monitor_ on request completed.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="args">
+        /// The args.
+        /// </param>
+        private void LiveFareMonitor_OnRequestCompleted(FareRequestMonitor sender, FareBrowserRequestArg args)
         {
             var request = args.Request;
             var browser = args.Request.BrowserControl;
             if (browser == null)
+            {
                 return;
+            }
 
-            lock (_notifier)
+            lock (this._notifier)
             {
                 try
                 {
                     string travelPeriodStr = StringUtil.GetPeriodString(request.DepartureDate, request.ReturnDate);
                     if (browser.RequestState == DataRequestState.NoData)
                     {
-                        string header = travelPeriodStr + Environment.NewLine +
-                            "From: " + request.Departure + Environment.NewLine +
-                            "To: " + request.Destination;
-                        _notifier.Show("No AirportData", "There is no flight data for this travel period" + Environment.NewLine + header, null, 7000, NotificationType.Warning, true);
+                        string header = travelPeriodStr + Environment.NewLine + "From: " + request.Departure + Environment.NewLine + "To: "
+                                        + request.Destination;
+                        this._notifier.Show(
+                            "No AirportData", 
+                            "There is no flight data for this travel period" + Environment.NewLine + header, 
+                            null, 
+                            7000, 
+                            NotificationType.Warning, 
+                            true);
                         return;
                     }
 
                     var route = browser.LastRetrievedRoute;
                     if (route == null || route.Journeys.Count < 1 || route.Journeys[0].Data.Count < 1)
+                    {
                         return;
+                    }
 
                     var curJourney = route.Journeys[0];
+
                     // Live Monitor: Store the current journey data
                     Journey oldJourney = this._currentMonitorJourneys.FirstOrDefault(j => j.IsSameTrip(curJourney));
                     var flightData = curJourney.Data[0].Flights;
@@ -67,23 +120,32 @@
                     else
                     {
                         var oldFlights = oldJourney.Data[0].Flights;
+
                         // Compare each flight
                         foreach (Flight currentFlight in flightData)
                         {
                             Flight comparableFlight = oldFlights.FirstOrDefault(f => f.IsSameFlight(currentFlight));
-                            if (comparableFlight == null) // New flight was found (or first appearance)
+                            if (comparableFlight == null)
                             {
+                                // New flight was found (or first appearance)
                                 flightItems.Add(currentFlight, FlightStatus.New, 0);
                             }
                             else
                             {
                                 double priceDiff = currentFlight.Price - comparableFlight.Price;
-                                if (Math.Abs(priceDiff) > 1) // Minimum price change is 1 EUR
+                                if (Math.Abs(priceDiff) > 1)
                                 {
-                                    if ((priceDiff > 0 && comparableFlight.Price < this.PriceLimit)  // If price was increased and old price is still within price limit
-                                        || currentFlight.Price <= this.PriceLimit)                   // or prices has been decreased enough to the limit
+                                    // Minimum price change is 1 EUR
+                                    if ((priceDiff > 0 && comparableFlight.Price < this.PriceLimit)
+
+                                        // If price was increased and old price is still within price limit
+                                        || currentFlight.Price <= this.PriceLimit)
                                     {
-                                        flightItems.Add(currentFlight, priceDiff > 0 ? FlightStatus.PriceIncreased : FlightStatus.PriceDecreased, comparableFlight.Price);
+                                        // or prices has been decreased enough to the limit
+                                        flightItems.Add(
+                                            currentFlight, 
+                                            priceDiff > 0 ? FlightStatus.PriceIncreased : FlightStatus.PriceDecreased, 
+                                            comparableFlight.Price);
                                     }
                                 }
                             }
@@ -102,20 +164,29 @@
                             catch (Exception ex)
                             {
                                 AppContext.Logger.ErrorFormat("Could not save live data [{0}]: {1}", travelPeriodStr, ex);
-                                _notifier.Show(travelPeriodStr, "Could not save live data: " + ex.Message, null, 5000, NotificationType.Error, true);
+                                this._notifier.Show(
+                                    travelPeriodStr, 
+                                    "Could not save live data: " + ex.Message, 
+                                    null, 
+                                    5000, 
+                                    NotificationType.Error, 
+                                    true);
                             }
                         }
 
                         string currencyCode = curJourney.Data[0].Currency;
                         string currencySymbol = AppContext.MonitorEnvironment.CurrencyProvider.GetCurrencyInfo(currencyCode).Symbol;
-                        string header = travelPeriodStr + " (Currency: " + currencyCode + (currencySymbol == currencyCode ? null : " - " + currencySymbol) + ")" + Environment.NewLine +
-                            "From: " + request.Departure + Environment.NewLine +
-                            "To: " + request.Destination;
-                        _notifier.Show("Fare data was updated", header, flightItems, 5000, NotificationType.Info, true);
+                        string header = travelPeriodStr + " (Currency: " + currencyCode
+                                        + (currencySymbol == currencyCode ? null : " - " + currencySymbol) + ")" + Environment.NewLine + "From: "
+                                        + request.Departure + Environment.NewLine + "To: " + request.Destination;
+                        this._notifier.Show("Fare data was updated", header, flightItems, 5000, NotificationType.Info, true);
                     }
 
                     if (oldJourney != null)
+                    {
                         this._currentMonitorJourneys.Remove(oldJourney);
+                    }
+
                     this._currentMonitorJourneys.Add(curJourney);
                 }
                 finally
@@ -124,7 +195,7 @@
                     if (this.State == MonitorState.Running && browser.RequestState != DataRequestState.NoData)
                     {
                         args.Request.Reset();
-#if !DEBUG  // Put some delay if we are not running DEBUG mode
+#if !DEBUG // Put some delay if we are not running DEBUG mode
                     var interval = TimeSpan.FromMinutes(1 + PendingRequests.Count);
                     System.Threading.Thread.Sleep(interval);
 #endif

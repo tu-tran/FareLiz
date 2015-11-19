@@ -1,27 +1,30 @@
-﻿using System;
-
-namespace SkyDean.FareLiz.Core.Data
+﻿namespace SkyDean.FareLiz.Core.Data
 {
-    /// <summary>
-    /// Attribute for storing the publisher information of the assembly
-    /// </summary>
+    using System;
+
+    /// <summary>Attribute for storing the publisher information of the assembly</summary>
     [AttributeUsage(AttributeTargets.Assembly)]
     public class AssemblyPublisherAttribute : Attribute
     {
         /// <summary>
-        /// Web URL of the publisher
+        /// Initializes a new instance of the <see cref="AssemblyPublisherAttribute"/> class.
         /// </summary>
-        public string PublisherUrl { get; private set; }
-
-        /// <summary>
-        /// Contact email of the publisher
-        /// </summary>
-        public string PublisherEmail { get; private set; }
-
+        /// <param name="url">
+        /// The url.
+        /// </param>
+        /// <param name="email">
+        /// The email.
+        /// </param>
         public AssemblyPublisherAttribute(string url, string email)
         {
-            PublisherUrl = url;
-            PublisherEmail = email;
+            this.PublisherUrl = url;
+            this.PublisherEmail = email;
         }
+
+        /// <summary>Web URL of the publisher</summary>
+        public string PublisherUrl { get; private set; }
+
+        /// <summary>Contact email of the publisher</summary>
+        public string PublisherEmail { get; private set; }
     }
 }

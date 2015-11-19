@@ -1,126 +1,238 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
-using log4net;
-using SkyDean.FareLiz.Core;
-using SkyDean.FareLiz.Core.Config;
-using SkyDean.FareLiz.Core.Data;
-using SkyDean.FareLiz.Core.Presentation;
-using SkyDean.FareLiz.Core.Utils;
-using SkyDean.FareLiz.WinForm.Components.Dialog;
-using SkyDean.FareLiz.WinForm.Config;
-using SkyDean.FareLiz.WinForm.Properties;
-
-namespace SkyDean.FareLiz.WinForm.Presentation.Views
+﻿namespace SkyDean.FareLiz.WinForm.Presentation.Views
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Windows.Forms;
+
+    using log4net;
+
+    using SkyDean.FareLiz.Core;
+    using SkyDean.FareLiz.Core.Config;
+    using SkyDean.FareLiz.Core.Data;
+    using SkyDean.FareLiz.Core.Presentation;
+    using SkyDean.FareLiz.Core.Utils;
+    using SkyDean.FareLiz.WinForm.Components.Dialog;
+    using SkyDean.FareLiz.WinForm.Config;
+    using SkyDean.FareLiz.WinForm.Properties;
+
+    /// <summary>
+    /// The env configurator dialog.
+    /// </summary>
     internal partial class EnvConfiguratorDialog : SmartForm
     {
+        /// <summary>
+        /// The _execution param.
+        /// </summary>
+        private readonly ExecutionParam _executionParam;
+
+        /// <summary>
+        /// The _instance data.
+        /// </summary>
         private readonly Dictionary<Type, IPlugin> _instanceData = new Dictionary<Type, IPlugin>();
-        private volatile bool _initialized = false;
+
+        /// <summary>
+        /// The _logger.
+        /// </summary>
         private readonly ILog _logger;
+
+        /// <summary>
+        /// The _type resolver.
+        /// </summary>
         private readonly TypeResolver _typeResolver;
 
+        /// <summary>
+        /// The _env.
+        /// </summary>
         private MonitorEnvironment _env;
-        internal MonitorEnvironment ResultEnvironment { get { return _env; } }
 
-        private readonly ExecutionParam _executionParam;
-        internal ExecutionParam ResultParam { get { return _executionParam; } }
+        /// <summary>
+        /// The _initialized.
+        /// </summary>
+        private volatile bool _initialized;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EnvConfiguratorDialog"/> class.
+        /// </summary>
         protected EnvConfiguratorDialog()
         {
-            InitializeComponent();
+            this.InitializeComponent();
 
-            btnInfoArchiveManager.Tag = btnResetArchiveManager.Tag = btnConfigArchiveManager.Tag = cbArchiveManager;
-            btnInfoFareProvider.Tag = btnResetFareProvider.Tag = btnConfigFareProvider.Tag = cbFareDataProvider;
-            btnInfoFareDatabase.Tag = btnResetFareDatabase.Tag = btnConfigFareDatabase.Tag = cbFareDatabase;
-            btnInfoDbSyncer.Tag = btnResetDbSyncer.Tag = btnConfigDbSyncer.Tag = cbDbSyncer;
+            this.btnInfoArchiveManager.Tag = this.btnResetArchiveManager.Tag = this.btnConfigArchiveManager.Tag = this.cbArchiveManager;
+            this.btnInfoFareProvider.Tag = this.btnResetFareProvider.Tag = this.btnConfigFareProvider.Tag = this.cbFareDataProvider;
+            this.btnInfoFareDatabase.Tag = this.btnResetFareDatabase.Tag = this.btnConfigFareDatabase.Tag = this.cbFareDatabase;
+            this.btnInfoDbSyncer.Tag = this.btnResetDbSyncer.Tag = this.btnConfigDbSyncer.Tag = this.cbDbSyncer;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EnvConfiguratorDialog"/> class.
+        /// </summary>
+        /// <param name="environment">
+        /// The environment.
+        /// </param>
+        /// <param name="executionParam">
+        /// The execution param.
+        /// </param>
+        /// <exception cref="ArgumentException">
+        /// </exception>
         internal EnvConfiguratorDialog(MonitorEnvironment environment, ExecutionParam executionParam)
             : this()
         {
             if (environment == null)
+            {
                 throw new ArgumentException("Environment cannot be null");
+            }
+
             if (environment.Logger == null)
+            {
                 throw new ArgumentException("Environment logger cannot be null");
+            }
+
             if (environment.ConfigStore == null)
+            {
                 throw new ArgumentException("Environment config store cannot be null");
+            }
+
             if (executionParam.ConfigHandler == null)
+            {
                 throw new ArgumentException("Execution param config store cannot be null");
+            }
 
-            _logger = environment.Logger;
-            _typeResolver = new TypeResolver(_logger);
-            _executionParam = executionParam.ReflectionDeepClone(_logger);
+            this._logger = environment.Logger;
+            this._typeResolver = new TypeResolver(this._logger);
+            this._executionParam = executionParam.ReflectionDeepClone(this._logger);
 
-            Height -= pnlTop.Height;
-            _env = environment.ReflectionDeepClone(_logger);
+            this.Height -= this.pnlTop.Height;
+            this._env = environment.ReflectionDeepClone(this._logger);
 #if DEBUG
-            _env.Id = Guid.NewGuid().ToString();
+            this._env.Id = Guid.NewGuid().ToString();
 #endif
 
-            InitializeData();
+            this.InitializeData();
         }
 
+        /// <summary>
+        /// Gets the result environment.
+        /// </summary>
+        internal MonitorEnvironment ResultEnvironment
+        {
+            get
+            {
+                return this._env;
+            }
+        }
+
+        /// <summary>
+        /// Gets the result param.
+        /// </summary>
+        internal ExecutionParam ResultParam
+        {
+            get
+            {
+                return this._executionParam;
+            }
+        }
+
+        /// <summary>
+        /// The initialize data.
+        /// </summary>
         private void InitializeData()
         {
-            _initialized = false;
-            _instanceData.Clear();
-            if (_env.ArchiveManager != null) _instanceData.Add(_env.ArchiveManager.GetType(), _env.ArchiveManager);
-            if (_env.FareDataProvider != null) _instanceData.Add(_env.FareDataProvider.GetType(), _env.FareDataProvider);
-            if (_env.FareDatabase != null)
+            this._initialized = false;
+            this._instanceData.Clear();
+            if (this._env.ArchiveManager != null)
             {
-                _instanceData.Add(_env.FareDatabase.GetType(), _env.FareDatabase);
-                var syncDb = _env.FareDatabase as ISyncableDatabase;
+                this._instanceData.Add(this._env.ArchiveManager.GetType(), this._env.ArchiveManager);
+            }
+
+            if (this._env.FareDataProvider != null)
+            {
+                this._instanceData.Add(this._env.FareDataProvider.GetType(), this._env.FareDataProvider);
+            }
+
+            if (this._env.FareDatabase != null)
+            {
+                this._instanceData.Add(this._env.FareDatabase.GetType(), this._env.FareDatabase);
+                var syncDb = this._env.FareDatabase as ISyncableDatabase;
                 if (syncDb != null && syncDb.DataSynchronizer != null)
                 {
-                    _instanceData.Add(syncDb.DataSynchronizer.GetType(), syncDb.DataSynchronizer);
+                    this._instanceData.Add(syncDb.DataSynchronizer.GetType(), syncDb.DataSynchronizer);
                 }
             }
 
-            var resolver = _env.PluginResolver;
-            Bind(cbArchiveManager, resolver.GetArchiveManagerTypes(), _env.ArchiveManager);
-            Bind(cbFareDataProvider, resolver.GetFareDataProviderTypes(), _env.FareDataProvider);
-            Bind(cbFareDatabase, resolver.GetFareDatabaseTypes(), _env.FareDatabase);
-            BindCurrencies(_env);
-            _initialized = true;
-            ApplyChanges();
-            ValidateEnvironment();
+            var resolver = this._env.PluginResolver;
+            this.Bind(this.cbArchiveManager, resolver.GetArchiveManagerTypes(), this._env.ArchiveManager);
+            this.Bind(this.cbFareDataProvider, resolver.GetFareDataProviderTypes(), this._env.FareDataProvider);
+            this.Bind(this.cbFareDatabase, resolver.GetFareDatabaseTypes(), this._env.FareDatabase);
+            this.BindCurrencies(this._env);
+            this._initialized = true;
+            this.ApplyChanges();
+            this.ValidateEnvironment();
 
-            txtDeparture.SelectedAirport = _executionParam.Departure;
-            txtDestination.SelectedAirport = _executionParam.Destination;
+            this.txtDeparture.SelectedAirport = this._executionParam.Departure;
+            this.txtDestination.SelectedAirport = this._executionParam.Destination;
         }
 
+        /// <summary>
+        /// The fill syncer combo box.
+        /// </summary>
+        /// <param name="targetDbType">
+        /// The target db type.
+        /// </param>
         private void FillSyncerComboBox(Type targetDbType)
         {
             if (typeof(ISyncableDatabase).IsAssignableFrom(targetDbType))
             {
-                var selectedSyncer = GetActiveDbSyncer();
-                Bind(cbDbSyncer, _env.PluginResolver.GetDbSyncerTypes(targetDbType), selectedSyncer);
+                var selectedSyncer = this.GetActiveDbSyncer();
+                this.Bind(this.cbDbSyncer, this._env.PluginResolver.GetDbSyncerTypes(targetDbType), selectedSyncer);
             }
         }
 
+        /// <summary>
+        /// The get active db syncer.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="object"/>.
+        /// </returns>
         private object GetActiveDbSyncer()
         {
-            if (_env.FareDatabase != null)
+            if (this._env.FareDatabase != null)
             {
-                var syncDb = _env.FareDatabase as ISyncableDatabase;
+                var syncDb = this._env.FareDatabase as ISyncableDatabase;
                 if (syncDb != null)
+                {
                     return syncDb.DataSynchronizer;
+                }
             }
 
             return null;
         }
 
+        /// <summary>
+        /// The bind.
+        /// </summary>
+        /// <param name="cb">
+        /// The cb.
+        /// </param>
+        /// <param name="data">
+        /// The data.
+        /// </param>
+        /// <param name="selectedInstance">
+        /// The selected instance.
+        /// </param>
         private void Bind(ComboBox cb, IList<Type> data, object selectedInstance)
         {
             if (data == null || data.Count < 1)
+            {
                 cb.DataSource = null;
+            }
             else
             {
                 var ds = new PluginInfoHolder[data.Count];
                 for (int i = 0; i < data.Count; i++)
+                {
                     ds[i] = new PluginInfoHolder(data[i]);
+                }
 
                 cb.DisplayMember = "Name";
                 cb.ValueMember = "Type";
@@ -130,7 +242,9 @@ namespace SkyDean.FareLiz.WinForm.Presentation.Views
             if (selectedInstance == null)
             {
                 if (data != null && data.Count > 0)
+                {
                     cb.SelectedIndex = 0;
+                }
             }
             else
             {
@@ -138,129 +252,178 @@ namespace SkyDean.FareLiz.WinForm.Presentation.Views
             }
         }
 
+        /// <summary>
+        /// The bind currencies.
+        /// </summary>
+        /// <param name="env">
+        /// The env.
+        /// </param>
+        /// <exception cref="ArgumentException">
+        /// </exception>
         private void BindCurrencies(MonitorEnvironment env)
         {
             ICurrencyProvider provider = env.CurrencyProvider;
             if (provider == null)
+            {
                 throw new ArgumentException("Missing Currency Provider");
+            }
 
             var allCurrencies = provider.GetCurrencies();
             if (provider.Configuration == null)
+            {
                 provider.Configuration = provider.DefaultConfig;
+            }
 
             int index = 0;
             var sel = provider.AllowedCurrencies;
-            lstCurrency.Items.Clear();  // Clear the list of items before repopulating the default currency list
+            this.lstCurrency.Items.Clear(); // Clear the list of items before repopulating the default currency list
             foreach (var item in allCurrencies)
             {
-                lstCurrency.Items.Add(item);
-                bool isSelected = (sel != null && sel.Contains(item.Key));
-                lstCurrency.SetItemChecked(index, isSelected);
+                this.lstCurrency.Items.Add(item);
+                bool isSelected = sel != null && sel.Contains(item.Key);
+                this.lstCurrency.SetItemChecked(index, isSelected);
                 index++;
             }
         }
 
+        /// <summary>
+        /// The apply changes.
+        /// </summary>
         private void ApplyChanges()
         {
-            if (!_initialized)
+            if (!this._initialized)
+            {
                 return;
+            }
 
-            var selType = cbArchiveManager.SelectedValue as Type;
+            var selType = this.cbArchiveManager.SelectedValue as Type;
             if (selType != null)
             {
-                if (_instanceData.ContainsKey(selType))
-                    ResultEnvironment.ArchiveManager = _instanceData[selType] as IArchiveManager;
+                if (this._instanceData.ContainsKey(selType))
+                {
+                    this.ResultEnvironment.ArchiveManager = this._instanceData[selType] as IArchiveManager;
+                }
                 else
                 {
-                    ResultEnvironment.ArchiveManager = _typeResolver.CreateInstance<IArchiveManager>(selType);
-                    ResultEnvironment.ArchiveManager.Configuration = ResultEnvironment.ArchiveManager.DefaultConfig;
+                    this.ResultEnvironment.ArchiveManager = this._typeResolver.CreateInstance<IArchiveManager>(selType);
+                    this.ResultEnvironment.ArchiveManager.Configuration = this.ResultEnvironment.ArchiveManager.DefaultConfig;
                 }
             }
 
-            selType = cbFareDatabase.SelectedValue as Type;
+            selType = this.cbFareDatabase.SelectedValue as Type;
             if (selType != null)
             {
-                if (_instanceData.ContainsKey(selType))
-                    ResultEnvironment.FareDatabase = _instanceData[selType] as IFareDatabase;
+                if (this._instanceData.ContainsKey(selType))
+                {
+                    this.ResultEnvironment.FareDatabase = this._instanceData[selType] as IFareDatabase;
+                }
                 else
                 {
-                    ResultEnvironment.FareDatabase = _typeResolver.CreateInstance<IFareDatabase>(selType);
-                    ResultEnvironment.FareDatabase.Configuration = ResultEnvironment.FareDatabase.DefaultConfig;
+                    this.ResultEnvironment.FareDatabase = this._typeResolver.CreateInstance<IFareDatabase>(selType);
+                    this.ResultEnvironment.FareDatabase.Configuration = this.ResultEnvironment.FareDatabase.DefaultConfig;
                 }
             }
 
-            selType = cbFareDataProvider.SelectedValue as Type;
+            selType = this.cbFareDataProvider.SelectedValue as Type;
             if (selType != null)
             {
-                if (_instanceData.ContainsKey(selType))
-                    ResultEnvironment.FareDataProvider = _instanceData[selType] as IFareDataProvider;
+                if (this._instanceData.ContainsKey(selType))
+                {
+                    this.ResultEnvironment.FareDataProvider = this._instanceData[selType] as IFareDataProvider;
+                }
                 else
                 {
-
-                    ResultEnvironment.FareDataProvider = _typeResolver.CreateInstance<IFareDataProvider>(selType) as IFareDataProvider;
-                    ResultEnvironment.FareDataProvider.Configuration = ResultEnvironment.FareDataProvider.DefaultConfig;
+                    this.ResultEnvironment.FareDataProvider = this._typeResolver.CreateInstance<IFareDataProvider>(selType);
+                    this.ResultEnvironment.FareDataProvider.Configuration = this.ResultEnvironment.FareDataProvider.DefaultConfig;
                 }
             }
 
-            var syncDb = ResultEnvironment.FareDatabase as ISyncableDatabase;
+            var syncDb = this.ResultEnvironment.FareDatabase as ISyncableDatabase;
             if (syncDb != null)
             {
-                selType = cbDbSyncer.SelectedValue as Type;
+                selType = this.cbDbSyncer.SelectedValue as Type;
                 if (selType != null)
                 {
                     IDataSyncer syncer;
-                    if (_instanceData.ContainsKey(selType))
-                        syncer = _instanceData[selType] as IDataSyncer;
+                    if (this._instanceData.ContainsKey(selType))
+                    {
+                        syncer = this._instanceData[selType] as IDataSyncer;
+                    }
                     else
-                        syncer = _typeResolver.CreateInstance<IDataSyncer>(selType);
+                    {
+                        syncer = this._typeResolver.CreateInstance<IDataSyncer>(selType);
+                    }
 
                     syncDb.DataSynchronizer = syncer;
                     syncDb.PackageSynchronizer = syncer as IPackageSyncer<TravelRoute>;
                 }
             }
 
-            var currencyProvider = ResultEnvironment.CurrencyProvider;
+            var currencyProvider = this.ResultEnvironment.CurrencyProvider;
             if (currencyProvider != null)
             {
                 var selCurrencies = new List<string>();
-                foreach (var item in lstCurrency.CheckedItems)
+                foreach (var item in this.lstCurrency.CheckedItems)
                 {
                     var cur = (KeyValuePair<string, CurrencyInfo>)item;
                     selCurrencies.Add(cur.Key);
                 }
+
                 currencyProvider.AllowedCurrencies = selCurrencies;
             }
         }
 
+        /// <summary>
+        /// The update buttons.
+        /// </summary>
         private void UpdateButtons()
         {
-            btnImportToDatabase.Enabled = btnExportDatabase.Enabled = (ResultEnvironment.FareDatabase != null && ResultEnvironment.ArchiveManager != null);
-            btnRepairDatabase.Enabled = btnResetDatabase.Enabled = btnDbStat.Enabled = ResultEnvironment.FareDatabase != null;
-            grpDatabaseSync.Enabled = (ResultEnvironment.FareDatabase != null && cbDbSyncer.SelectedValue != null
-                && imgSyncerStatus.Tag != null && (bool)imgSyncerStatus.Tag);
+            this.btnImportToDatabase.Enabled =
+                this.btnExportDatabase.Enabled = this.ResultEnvironment.FareDatabase != null && this.ResultEnvironment.ArchiveManager != null;
+            this.btnRepairDatabase.Enabled = this.btnResetDatabase.Enabled = this.btnDbStat.Enabled = this.ResultEnvironment.FareDatabase != null;
+            this.grpDatabaseSync.Enabled = this.ResultEnvironment.FareDatabase != null && this.cbDbSyncer.SelectedValue != null
+                                            && this.imgSyncerStatus.Tag != null && (bool)this.imgSyncerStatus.Tag;
         }
 
+        /// <summary>
+        /// The validate environment.
+        /// </summary>
         private void ValidateEnvironment()
         {
-            Validate(ResultEnvironment.ArchiveManager, imgArchiveStatus);
-            Validate(ResultEnvironment.FareDatabase, imgDatabaseStatus);
-            Validate(ResultEnvironment.FareDataProvider, imgHandlerStatus);
-            ISyncableDatabase syncDb = ResultEnvironment.FareDatabase as ISyncableDatabase;
+            this.Validate(this.ResultEnvironment.ArchiveManager, this.imgArchiveStatus);
+            this.Validate(this.ResultEnvironment.FareDatabase, this.imgDatabaseStatus);
+            this.Validate(this.ResultEnvironment.FareDataProvider, this.imgHandlerStatus);
+            ISyncableDatabase syncDb = this.ResultEnvironment.FareDatabase as ISyncableDatabase;
             if (syncDb != null)
             {
-                Validate(syncDb.DataSynchronizer, imgSyncerStatus);
+                this.Validate(syncDb.DataSynchronizer, this.imgSyncerStatus);
             }
 
-            UpdateButtons();
+            this.UpdateButtons();
         }
 
+        /// <summary>
+        /// The validate.
+        /// </summary>
+        /// <param name="target">
+        /// The target.
+        /// </param>
+        /// <param name="targetPictureBox">
+        /// The target picture box.
+        /// </param>
+        /// <returns>
+        /// The <see cref="bool"/>.
+        /// </returns>
         private bool Validate(IPlugin target, PictureBox targetPictureBox)
         {
             string status = "Ok";
             bool isValid = false;
 
             if (target == null)
+            {
                 status = "You have not selected any item!";
+            }
+
             if (target != null)
             {
                 isValid = true;
@@ -268,18 +431,29 @@ namespace SkyDean.FareLiz.WinForm.Presentation.Views
                 {
                     var valResult = target.Configuration.Validate();
                     if (!(isValid = valResult.Succeeded))
+                    {
                         status = valResult.ErrorMessage;
+                    }
                 }
             }
 
-            targetPictureBox.Image = (isValid ? Resources.Success : Resources.Warning);
-            targetPictureBox.Cursor = (isValid ? Cursors.Default : Cursors.Hand);
+            targetPictureBox.Image = isValid ? Resources.Success : Resources.Warning;
+            targetPictureBox.Cursor = isValid ? Cursors.Default : Cursors.Hand;
             targetPictureBox.Tag = isValid;
-            toolTip.SetToolTip(targetPictureBox, status);
+            this.toolTip.SetToolTip(targetPictureBox, status);
 
             return isValid;
         }
 
+        /// <summary>
+        /// The btn info_ click.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void btnInfo_Click(object sender, EventArgs e)
         {
             var cb = ((Control)sender).Tag as ComboBox;
@@ -294,6 +468,15 @@ namespace SkyDean.FareLiz.WinForm.Presentation.Views
             }
         }
 
+        /// <summary>
+        /// The btn reset_ click.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void btnReset_Click(object sender, EventArgs e)
         {
             var cb = ((Control)sender).Tag as ComboBox;
@@ -303,29 +486,51 @@ namespace SkyDean.FareLiz.WinForm.Presentation.Views
                 if (selItem != null)
                 {
                     IPlugin instance = null;
-                    if (_instanceData.ContainsKey(selItem))
-                        instance = _instanceData[selItem];
+                    if (this._instanceData.ContainsKey(selItem))
+                    {
+                        instance = this._instanceData[selItem];
+                    }
                     else
                     {
-                        instance = _typeResolver.CreateInstance<IPlugin>(selItem);
-                        _instanceData.Add(selItem, instance);
+                        instance = this._typeResolver.CreateInstance<IPlugin>(selItem);
+                        this._instanceData.Add(selItem, instance);
                     }
 
                     var defaultConf = instance.DefaultConfig;
 
                     if (defaultConf == null)
-                        MessageBox.Show(this, "This type does not need to be configured", "No configuration", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-                    else if (MessageBox.Show(this, "Are you sure you want to reset the default settings for this plugin?", "Reset Settings", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
-                        == DialogResult.Yes)
+                    {
+                        MessageBox.Show(
+                            this, 
+                            "This type does not need to be configured", 
+                            "No configuration", 
+                            MessageBoxButtons.OK, 
+                            MessageBoxIcon.Asterisk);
+                    }
+                    else if (MessageBox.Show(
+                        this, 
+                        "Are you sure you want to reset the default settings for this plugin?", 
+                        "Reset Settings", 
+                        MessageBoxButtons.YesNo, 
+                        MessageBoxIcon.Question) == DialogResult.Yes)
                     {
                         instance.Configuration = defaultConf;
-                        ApplyChanges();
-                        ValidateEnvironment();
+                        this.ApplyChanges();
+                        this.ValidateEnvironment();
                     }
                 }
             }
         }
 
+        /// <summary>
+        /// The btn config_ click.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void btnConfig_Click(object sender, EventArgs e)
         {
             var cb = ((Control)sender).Tag as ComboBox;
@@ -335,37 +540,59 @@ namespace SkyDean.FareLiz.WinForm.Presentation.Views
                 if (selItem != null)
                 {
                     IPlugin instance = null;
-                    if (_instanceData.ContainsKey(selItem))
-                        instance = _instanceData[selItem];
+                    if (this._instanceData.ContainsKey(selItem))
+                    {
+                        instance = this._instanceData[selItem];
+                    }
                     else
                     {
-                        instance = _typeResolver.CreateInstance<IPlugin>(selItem);
-                        instance.Logger = _logger;
-                        _instanceData.Add(selItem, instance);
+                        instance = this._typeResolver.CreateInstance<IPlugin>(selItem);
+                        instance.Logger = this._logger;
+                        this._instanceData.Add(selItem, instance);
                     }
 
                     if (instance.Configuration == null)
+                    {
                         instance.Configuration = instance.DefaultConfig;
+                    }
 
                     IConfig config = instance.Configuration;
                     if (instance.Configuration == null)
-                        MessageBox.Show(this, "This type does not need to be configured", "No configuration", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                    {
+                        MessageBox.Show(
+                            this, 
+                            "This type does not need to be configured", 
+                            "No configuration", 
+                            MessageBoxButtons.OK, 
+                            MessageBoxIcon.Asterisk);
+                    }
                     else
                     {
                         if (instance.CustomConfigBuilder != null)
+                        {
                             instance.Configuration = instance.CustomConfigBuilder.Configure(instance);
+                        }
                         else
                         {
-                            instance.Configuration = (new DefaultConfigBuilder(_logger).Configure(instance));
+                            instance.Configuration = new DefaultConfigBuilder(this._logger).Configure(instance);
                         }
                     }
                 }
             }
 
-            ApplyChanges();
-            ValidateEnvironment();
+            this.ApplyChanges();
+            this.ValidateEnvironment();
         }
 
+        /// <summary>
+        /// The cb fare database_ selected index changed.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void cbFareDatabase_SelectedIndexChanged(object sender, EventArgs e)
         {
             var cb = sender as ComboBox;
@@ -374,100 +601,187 @@ namespace SkyDean.FareLiz.WinForm.Presentation.Views
                 var selItem = cb.SelectedValue as Type;
                 if (selItem != null && typeof(ISyncableDatabase).IsAssignableFrom(selItem))
                 {
-                    FillSyncerComboBox(selItem);
+                    this.FillSyncerComboBox(selItem);
                 }
             }
         }
 
+        /// <summary>
+        /// The btn save_ click.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void btnSave_Click(object sender, EventArgs e)
         {
-            if (txtDeparture.SelectedAirportCode == txtDestination.SelectedAirportCode)
+            if (this.txtDeparture.SelectedAirportCode == this.txtDestination.SelectedAirportCode)
             {
-                MessageBox.Show(this, "Default departure and destination airport cannot be the same!" + Environment.NewLine + 
-                    "You selected: " + txtDeparture.SelectedAirport, "Invalid setting",
-                    MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                DialogResult = DialogResult.None;
+                MessageBox.Show(
+                    this, 
+                    "Default departure and destination airport cannot be the same!" + Environment.NewLine + "You selected: "
+                    + this.txtDeparture.SelectedAirport, 
+                    "Invalid setting", 
+                    MessageBoxButtons.OK, 
+                    MessageBoxIcon.Exclamation);
+                this.DialogResult = DialogResult.None;
                 return;
             }
 
-            ApplyChanges();
-            _executionParam.Departure = txtDeparture.SelectedAirport;
-            _executionParam.Destination = txtDestination.SelectedAirport;
-            _executionParam.ConfigHandler.SaveData(_executionParam);
+            this.ApplyChanges();
+            this._executionParam.Departure = this.txtDeparture.SelectedAirport;
+            this._executionParam.Destination = this.txtDestination.SelectedAirport;
+            this._executionParam.ConfigHandler.SaveData(this._executionParam);
 
-            ResultEnvironment.ConfigStore.SaveEnv(ResultEnvironment);
+            this.ResultEnvironment.ConfigStore.SaveEnv(this.ResultEnvironment);
         }
 
+        /// <summary>
+        /// The btn backup sync db_ click.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void btnBackupSyncDb_Click(object sender, EventArgs e)
         {
-            var syncDb = GetSyncDatabase();
+            var syncDb = this.GetSyncDatabase();
             if (syncDb != null)
+            {
                 syncDb.Synchronize(SyncOperation.Upload, AppContext.ProgressCallback);
+            }
         }
 
+        /// <summary>
+        /// The btn restore sync db_ click.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void btnRestoreSyncDb_Click(object sender, EventArgs e)
         {
-            var syncDb = GetSyncDatabase();
+            var syncDb = this.GetSyncDatabase();
             if (syncDb != null)
+            {
                 syncDb.Synchronize(SyncOperation.Download, AppContext.ProgressCallback);
+            }
         }
 
+        /// <summary>
+        /// The get sync database.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="ISyncableDatabase"/>.
+        /// </returns>
         private ISyncableDatabase GetSyncDatabase()
         {
-            ApplyChanges();
+            this.ApplyChanges();
             ISyncableDatabase result = null;
-            var syncDb = ResultEnvironment.FareDatabase as ISyncableDatabase;
+            var syncDb = this.ResultEnvironment.FareDatabase as ISyncableDatabase;
             if (syncDb == null)
-                MessageBox.Show(this, "The selected database is not syncable", "Unsupported Operation", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            {
+                MessageBox.Show(
+                    this, 
+                    "The selected database is not syncable", 
+                    "Unsupported Operation", 
+                    MessageBoxButtons.OK, 
+                    MessageBoxIcon.Exclamation);
+            }
             else
             {
                 if (syncDb.DataSynchronizer == null)
-                    MessageBox.Show(this, "There is no compatible database synchronizer selected for the fare database", "Unsupported Operation", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                {
+                    MessageBox.Show(
+                        this, 
+                        "There is no compatible database synchronizer selected for the fare database", 
+                        "Unsupported Operation", 
+                        MessageBoxButtons.OK, 
+                        MessageBoxIcon.Exclamation);
+                }
                 else
+                {
                     result = syncDb;
+                }
             }
 
             return result;
         }
 
+        /// <summary>
+        /// The export database.
+        /// </summary>
+        /// <param name="format">
+        /// The format.
+        /// </param>
         private void ExportDatabase(DataFormat format)
         {
-            ApplyChanges();
+            this.ApplyChanges();
             using (var selectPath = new FolderBrowserDialog())
             {
                 selectPath.SelectedPath = AppDomain.CurrentDomain.BaseDirectory;
                 if (selectPath.ShowDialog(this) == DialogResult.OK)
                 {
                     var exportPath = selectPath.SelectedPath;
-                    ProgressDialog.ExecuteTask(this, "Exporting database", "Please wait...", GetType().Name + "-ExportDb", ProgressBarStyle.Continuous, _logger, callback =>
-                    {
-                        callback.Begin();
-                        DoExportDatabase(exportPath, format, format == DataFormat.Binary ? 500 : 30, callback);
-                    });
+                    ProgressDialog.ExecuteTask(
+                        this, 
+                        "Exporting database", 
+                        "Please wait...", 
+                        this.GetType().Name + "-ExportDb", 
+                        ProgressBarStyle.Continuous, 
+                        this._logger, 
+                        callback =>
+                            {
+                                callback.Begin();
+                                this.DoExportDatabase(exportPath, format, format == DataFormat.Binary ? 500 : 30, callback);
+                            });
                 }
             }
         }
 
+        /// <summary>
+        /// The do export database.
+        /// </summary>
+        /// <param name="exportPath">
+        /// The export path.
+        /// </param>
+        /// <param name="format">
+        /// The format.
+        /// </param>
+        /// <param name="batchSize">
+        /// The batch size.
+        /// </param>
+        /// <param name="callback">
+        /// The callback.
+        /// </param>
         private void DoExportDatabase(string exportPath, DataFormat format, int batchSize, IProgressCallback callback)
         {
-            var routes = ResultEnvironment.FareDatabase.GetRoutes(true, false, false, false, callback);
+            var routes = this.ResultEnvironment.FareDatabase.GetRoutes(true, false, false, false, callback);
             var journeyBatch = new List<Journey>();
             var routesBatch = new List<TravelRoute>();
             var jCount = routes.Sum(r => r.Journeys.Count);
             int stackCount = 0;
 
             callback.Begin(0, jCount);
-            callback.Title = String.Format("Processing {0} journeys...", jCount);
+            callback.Title = string.Format("Processing {0} journeys...", jCount);
             int routesCount = routes.Count;
             int lastRoutesIdx = routesCount - 1;
 
             for (int i = 0; i < routesCount; i++)
             {
                 if (callback.IsAborting)
+                {
                     return;
+                }
 
                 TravelRoute route = routes[i];
-                callback.Text = String.Format("{0} - {1}", route.Departure, route.Destination);
+                callback.Text = string.Format("{0} - {1}", route.Departure, route.Destination);
                 var journeys = route.Journeys;
                 int journeysCount = journeys.Count;
                 int lastJourneyIdx = journeysCount - 1;
@@ -477,11 +791,12 @@ namespace SkyDean.FareLiz.WinForm.Presentation.Views
                     {
                         var journey = journeys[j];
                         journeyBatch.Add(journey);
-                        if (journeyBatch.Count >= batchSize || j == lastJourneyIdx) // Batch is full or this is the last item
+                        if (journeyBatch.Count >= batchSize || j == lastJourneyIdx)
                         {
-                            var expRoute = new TravelRoute(route);  // Gather journeys into 1 exported route
+                            // Batch is full or this is the last item
+                            var expRoute = new TravelRoute(route); // Gather journeys into 1 exported route
                             expRoute.AddJourney(journeyBatch, false);
-                            ResultEnvironment.FareDatabase.LoadData(journeyBatch, true, AppContext.ProgressCallback);
+                            this.ResultEnvironment.FareDatabase.LoadData(journeyBatch, true, AppContext.ProgressCallback);
                             routesBatch.Add(expRoute);
                             stackCount += journeyBatch.Count;
                             journeyBatch.Clear();
@@ -491,21 +806,32 @@ namespace SkyDean.FareLiz.WinForm.Presentation.Views
                         {
                             if (routesBatch.Count > 0)
                             {
-                                ResultEnvironment.ArchiveManager.ExportData(routesBatch, exportPath, format, AppContext.ProgressCallback);
+                                this.ResultEnvironment.ArchiveManager.ExportData(routesBatch, exportPath, format, AppContext.ProgressCallback);
                                 routesBatch.Clear();
                             }
+
                             callback.Increment(stackCount);
                             stackCount = 0;
                         }
                     }
                 }
+
                 callback.Increment(1);
             }
         }
 
+        /// <summary>
+        /// The btn import to database_ click.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void btnImportToDatabase_Click(object sender, EventArgs e)
         {
-            ApplyChanges();
+            this.ApplyChanges();
             using (var selectPath = new FolderBrowserDialog())
             {
                 selectPath.SelectedPath = AppDomain.CurrentDomain.BaseDirectory;
@@ -513,115 +839,239 @@ namespace SkyDean.FareLiz.WinForm.Presentation.Views
                 {
                     var importPath = selectPath.SelectedPath;
                     var dataOptions = new DataOptions { ArchiveDataFiles = false, ShowProgressDialog = true };
-                    ResultEnvironment.ArchiveManager.ImportData(importPath, dataOptions, AppContext.ProgressCallback);
+                    this.ResultEnvironment.ArchiveManager.ImportData(importPath, dataOptions, AppContext.ProgressCallback);
                 }
             }
         }
 
+        /// <summary>
+        /// The btn repair database_ click.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void btnRepairDatabase_Click(object sender, EventArgs e)
         {
             try
             {
-                ApplyChanges();
-                ResultEnvironment.FareDatabase.RepairDatabase(AppContext.ProgressCallback);
+                this.ApplyChanges();
+                this.ResultEnvironment.FareDatabase.RepairDatabase(AppContext.ProgressCallback);
                 MessageBox.Show(this, "Database was successfully repaired!", "Database Maintenance", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
                 string err = "Failed to repair database: " + ex.Message;
-                _logger.Error(err + Environment.NewLine + ex.StackTrace);
+                this._logger.Error(err + Environment.NewLine + ex.StackTrace);
                 MessageBox.Show(this, err, "Database Maintenance", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
+        /// <summary>
+        /// The btn reset database_ click.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void btnResetDatabase_Click(object sender, EventArgs e)
         {
-            if (MessageBox.Show(this,
-@"Are you sure you want to empty the whole database?
+            if (MessageBox.Show(this, @"Are you sure you want to empty the whole database?
 (ALL DATA WILL BE LOST)", "Database Reset", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
-
                 try
                 {
-                    ApplyChanges();
-                    ResultEnvironment.FareDatabase.Reset(AppContext.ProgressCallback);
-                    MessageBox.Show(this, "Database was successfully reset!", "Database Maintenance", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    this.ApplyChanges();
+                    this.ResultEnvironment.FareDatabase.Reset(AppContext.ProgressCallback);
+                    MessageBox.Show(
+                        this, 
+                        "Database was successfully reset!", 
+                        "Database Maintenance", 
+                        MessageBoxButtons.OK, 
+                        MessageBoxIcon.Information);
                 }
                 catch (Exception ex)
                 {
                     string err = "Failed to reset database: " + ex.Message;
-                    _logger.Error(err + Environment.NewLine + ex.StackTrace);
+                    this._logger.Error(err + Environment.NewLine + ex.StackTrace);
                     MessageBox.Show(this, err, "Database Maintenance", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
 
+        /// <summary>
+        /// The btn db stat_ click.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void btnDbStat_Click(object sender, EventArgs e)
         {
             try
             {
-                ApplyChanges();
-                MessageBox.Show(this, ResultEnvironment.FareDatabase.GetStatistics(AppContext.ProgressCallback), "Database Statistics", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                this.ApplyChanges();
+                MessageBox.Show(
+                    this, 
+                    this.ResultEnvironment.FareDatabase.GetStatistics(AppContext.ProgressCallback), 
+                    "Database Statistics", 
+                    MessageBoxButtons.OK, 
+                    MessageBoxIcon.Asterisk);
             }
             catch (Exception ex)
             {
                 string err = "Failed to gather statistics for database: " + ex.Message;
-                _logger.Error(err + Environment.NewLine + ex.StackTrace);
+                this._logger.Error(err + Environment.NewLine + ex.StackTrace);
                 MessageBox.Show(this, err, "Database Query", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
+        /// <summary>
+        /// The export db xml tool strip menu item_ click.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void exportDbXmlToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ExportDatabase(DataFormat.XML);
+            this.ExportDatabase(DataFormat.XML);
         }
 
+        /// <summary>
+        /// The export db binary tool strip menu item_ click.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void exportDbBinaryToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ExportDatabase(DataFormat.Binary);
+            this.ExportDatabase(DataFormat.Binary);
         }
 
+        /// <summary>
+        /// The btn export database_ click.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void btnExportDatabase_Click(object sender, EventArgs e)
         {
-            btnExportDatabase.ShowContextMenuStrip();
+            this.btnExportDatabase.ShowContextMenuStrip();
         }
 
+        /// <summary>
+        /// The btn select all currency_ click.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void btnSelectAllCurrency_Click(object sender, EventArgs e)
         {
-            CheckAllCurrencies(true);
+            this.CheckAllCurrencies(true);
         }
 
+        /// <summary>
+        /// The btn select none currency_ click.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void btnSelectNoneCurrency_Click(object sender, EventArgs e)
         {
-            CheckAllCurrencies(false);
+            this.CheckAllCurrencies(false);
         }
 
+        /// <summary>
+        /// The check all currencies.
+        /// </summary>
+        /// <param name="newState">
+        /// The new state.
+        /// </param>
         private void CheckAllCurrencies(bool newState)
         {
-            for (int i = 0; i < lstCurrency.Items.Count; i++)
-                lstCurrency.SetItemChecked(i, newState);
-        }
-
-        private void configChanged_EventHandler(object sender, EventArgs e)
-        {
-            if (!_initialized)
-                return;
-
-            ApplyChanges();
-            ValidateEnvironment();
-        }
-
-        private void btnDefaultCurrency_Click(object sender, EventArgs e)
-        {
-            if (ResultEnvironment.CurrencyProvider == null)
-                MessageBox.Show(this, "There is no currency provider available", "Invalid Operation", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-            else
+            for (int i = 0; i < this.lstCurrency.Items.Count; i++)
             {
-                ResultEnvironment.CurrencyProvider.Configuration = ResultEnvironment.CurrencyProvider.DefaultConfig;
-                BindCurrencies(ResultEnvironment);
+                this.lstCurrency.SetItemChecked(i, newState);
             }
         }
 
+        /// <summary>
+        /// The config changed_ event handler.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
+        private void configChanged_EventHandler(object sender, EventArgs e)
+        {
+            if (!this._initialized)
+            {
+                return;
+            }
+
+            this.ApplyChanges();
+            this.ValidateEnvironment();
+        }
+
+        /// <summary>
+        /// The btn default currency_ click.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
+        private void btnDefaultCurrency_Click(object sender, EventArgs e)
+        {
+            if (this.ResultEnvironment.CurrencyProvider == null)
+            {
+                MessageBox.Show(
+                    this, 
+                    "There is no currency provider available", 
+                    "Invalid Operation", 
+                    MessageBoxButtons.OK, 
+                    MessageBoxIcon.Exclamation);
+            }
+            else
+            {
+                this.ResultEnvironment.CurrencyProvider.Configuration = this.ResultEnvironment.CurrencyProvider.DefaultConfig;
+                this.BindCurrencies(this.ResultEnvironment);
+            }
+        }
+
+        /// <summary>
+        /// The btn import config_ click.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void btnImportConfig_Click(object sender, EventArgs e)
         {
             using (var selectFileDlg = new OpenFileDialog())
@@ -634,22 +1084,41 @@ namespace SkyDean.FareLiz.WinForm.Presentation.Views
                     MonitorEnvironment newEnv = null;
                     try
                     {
-                        newEnv = _env.ConfigStore.LoadEnv(selectFileDlg.FileName);
+                        newEnv = this._env.ConfigStore.LoadEnv(selectFileDlg.FileName);
                     }
-                    catch (Exception ex) { Console.Error.WriteLine(ex.ToString()); }
+                    catch (Exception ex)
+                    {
+                        Console.Error.WriteLine(ex.ToString());
+                    }
 
                     if (newEnv == null)
-                        MessageBox.Show(this, "The selected configuration file is corrupted or does not have a valid file format", "Invalid configuration file", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    {
+                        MessageBox.Show(
+                            this, 
+                            "The selected configuration file is corrupted or does not have a valid file format", 
+                            "Invalid configuration file", 
+                            MessageBoxButtons.OK, 
+                            MessageBoxIcon.Exclamation);
+                    }
                     else
                     {
-                        newEnv.ConfigStore = _env.ConfigStore;
-                        _env = newEnv;
-                        InitializeData();
+                        newEnv.ConfigStore = this._env.ConfigStore;
+                        this._env = newEnv;
+                        this.InitializeData();
                     }
                 }
             }
         }
 
+        /// <summary>
+        /// The btn export config_ click.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void btnExportConfig_Click(object sender, EventArgs e)
         {
             using (var selectFileDlg = new SaveFileDialog())
@@ -661,33 +1130,71 @@ namespace SkyDean.FareLiz.WinForm.Presentation.Views
                 {
                     try
                     {
-                        ApplyChanges();
-                        _env.ConfigStore.SaveEnv(_env, selectFileDlg.FileName);
+                        this.ApplyChanges();
+                        this._env.ConfigStore.SaveEnv(this._env, selectFileDlg.FileName);
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show(this, "Failed to export configuration file:" + Environment.NewLine + ex.Message, "Configuration export failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show(
+                            this, 
+                            "Failed to export configuration file:" + Environment.NewLine + ex.Message, 
+                            "Configuration export failed", 
+                            MessageBoxButtons.OK, 
+                            MessageBoxIcon.Error);
                     }
                 }
             }
         }
     }
 
+    /// <summary>
+    /// The plugin info holder.
+    /// </summary>
     public class PluginInfoHolder
     {
-        public string Name { get { return Type.GetPluginDetail().Key; } }
-        public Type Type { get; private set; }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PluginInfoHolder"/> class.
+        /// </summary>
+        /// <param name="targetType">
+        /// The target type.
+        /// </param>
+        /// <exception cref="ArgumentException">
+        /// </exception>
         public PluginInfoHolder(Type targetType)
         {
             if (targetType == null)
+            {
                 throw new ArgumentException("Type cannot be null");
+            }
 
-            Type = targetType;
+            this.Type = targetType;
         }
 
+        /// <summary>
+        /// Gets the name.
+        /// </summary>
+        public string Name
+        {
+            get
+            {
+                return this.Type.GetPluginDetail().Key;
+            }
+        }
+
+        /// <summary>
+        /// Gets the type.
+        /// </summary>
+        public Type Type { get; private set; }
+
+        /// <summary>
+        /// The to string.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
         public override string ToString()
         {
-            return Name;
+            return this.Name;
         }
     }
 }

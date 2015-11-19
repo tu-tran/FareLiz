@@ -4,19 +4,26 @@
 
     using SkyDean.FareLiz.WinForm.Components.Utils;
 
-    /// <summary>
-    /// This is an indexer to the LVDataType values for each column.
-    /// The data is stored in the lParam value of the column.
-    /// </summary>
+    /// <summary>This is an indexer to the LVDataType values for each column. The data is stored in the lParam value of the column.</summary>
     public class ColumnDataTypeCollection
     {
+        /// <summary>
+        /// The _header.
+        /// </summary>
         private readonly ListViewColumnHeader _header; // owning header control
+
+        /// <summary>
+        /// The _hd item.
+        /// </summary>
         private HDITEM _hdItem; // HDITEM instance
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="ColumnDataTypeCollection"/> class. 
         /// Constructor this must be given the header instance for access to the Handle property so that messages can be sent to it.
         /// </summary>
-        /// <param name="header">HeaderControl</param>
+        /// <param name="header">
+        /// HeaderControl
+        /// </param>
         public ColumnDataTypeCollection(ListViewColumnHeader header)
         {
             this._header = header;
@@ -25,6 +32,12 @@
         /// <summary>
         /// Indexer method to get/set the LVDataType for the column.
         /// </summary>
+        /// <param name="index">
+        /// The index.
+        /// </param>
+        /// <returns>
+        /// The <see cref="FilterDataType"/>.
+        /// </returns>
         public FilterDataType this[int index]
         {
             get
@@ -37,6 +50,7 @@
                 NativeMethods.SendMessage(this._header.Handle, W32_HDM.HDM_GETITEMW, index, ref this._hdItem);
                 return (FilterDataType)this._hdItem.lParam;
             }
+
             set
             {
                 // ensure that this is a valid column
@@ -50,12 +64,13 @@
             }
         }
 
-        /// <summary>
-        /// Return the number of columns in the header.
-        /// </summary>
+        /// <summary>Return the number of columns in the header.</summary>
         public int Count
         {
-            get { return NativeMethods.SendMessage(this._header.Handle, W32_HDM.HDM_GETITEMCOUNT, 0, IntPtr.Zero); }
+            get
+            {
+                return NativeMethods.SendMessage(this._header.Handle, W32_HDM.HDM_GETITEMCOUNT, 0, IntPtr.Zero);
+            }
         }
     }
 }

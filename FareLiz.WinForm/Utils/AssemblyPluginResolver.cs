@@ -1,45 +1,87 @@
-﻿using log4net;
-using SkyDean.FareLiz.Core;
-using SkyDean.FareLiz.Core.Utils;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-
-namespace SkyDean.FareLiz.WinForm.Utils
+﻿namespace SkyDean.FareLiz.WinForm.Utils
 {
-    /// <summary>
-    /// Helper class used for resolving installed plugins
-    /// </summary>
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.IO;
+    using System.Linq;
+    using System.Reflection;
+
+    using log4net;
+
+    using SkyDean.FareLiz.Core;
+    using SkyDean.FareLiz.Core.Utils;
+
+    /// <summary>Helper class used for resolving installed plugins</summary>
     public sealed class AssemblyPluginResolver : IPluginResolver
     {
+        /// <summary>
+        /// The _loaded plugins.
+        /// </summary>
+        private static readonly HashSet<Assembly> _loadedPlugins = new HashSet<Assembly>();
+
+        /// <summary>
+        /// The _logger.
+        /// </summary>
         private readonly ILog _logger;
+
+        /// <summary>
+        /// The _type resolver.
+        /// </summary>
         private readonly TypeResolver _typeResolver;
 
-        private static readonly HashSet<Assembly> _loadedPlugins = new HashSet<Assembly>();
-        public static HashSet<Assembly> LoadedPlugins { get { return _loadedPlugins; } }
-
+        /// <summary>
+        /// Initializes static members of the <see cref="AssemblyPluginResolver"/> class.
+        /// </summary>
         static AssemblyPluginResolver()
         {
             var exeAsm = Assembly.GetExecutingAssembly();
             _loadedPlugins.Add(exeAsm);
             var entryAsm = Assembly.GetEntryAssembly();
             if (entryAsm != exeAsm)
+            {
                 _loadedPlugins.Add(entryAsm);
+            }
         }
 
-        public AssemblyPluginResolver() { }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AssemblyPluginResolver"/> class.
+        /// </summary>
+        public AssemblyPluginResolver()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AssemblyPluginResolver"/> class.
+        /// </summary>
+        /// <param name="logger">
+        /// The logger.
+        /// </param>
         public AssemblyPluginResolver(ILog logger)
         {
-            _logger = logger;
-            _typeResolver = new TypeResolver(_logger);
+            this._logger = logger;
+            this._typeResolver = new TypeResolver(this._logger);
         }
 
+        /// <summary>
+        /// Gets the loaded plugins.
+        /// </summary>
+        public static HashSet<Assembly> LoadedPlugins
+        {
+            get
+            {
+                return _loadedPlugins;
+            }
+        }
+
+        /// <summary>
+        /// The load plugins.
+        /// </summary>
         public void LoadPlugins()
         {
-            string[] pluginFiles = Directory.GetFiles(PathUtil.ApplicationPath, String.Format(CultureInfo.InvariantCulture, "{0}.*.Plugins.dll", AppUtil.ProductName));
+            string[] pluginFiles = Directory.GetFiles(
+                PathUtil.ApplicationPath, 
+                string.Format(CultureInfo.InvariantCulture, "{0}.*.Plugins.dll", AppUtil.ProductName));
             var publicKey = Assembly.GetExecutingAssembly().GetName().GetPublicKey();
 
             using (var asmLoaderProxy = AppDomainProxy<AssemblyLoader>.GetProxy(AppDomain.CurrentDomain.BaseDirectory))
@@ -50,49 +92,118 @@ namespace SkyDean.FareLiz.WinForm.Utils
                     try
                     {
                         if (loader.IsValidPluginAssembly(f, publicKey))
+                        {
                             LoadedPlugins.Add(Assembly.LoadFile(f));
+                        }
                     }
                     catch (Exception ex)
                     {
-                        _logger.ErrorFormat("Failed to load assembly [{0}]: {1}", f, ex);
+                        this._logger.ErrorFormat("Failed to load assembly [{0}]: {1}", f, ex);
                     }
                 }
             }
         }
 
+        /// <summary>
+        /// The get archive manager types.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="IList"/>.
+        /// </returns>
         public IList<Type> GetArchiveManagerTypes()
         {
-            return _typeResolver.GetTypes(typeof(IArchiveManager), LoadedPlugins);
+            return this._typeResolver.GetTypes(typeof(IArchiveManager), LoadedPlugins);
         }
 
+        /// <summary>
+        /// The get fare data provider types.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="IList"/>.
+        /// </returns>
         public IList<Type> GetFareDataProviderTypes()
         {
-            return _typeResolver.GetTypes(typeof(IFareDataProvider));
+            return this._typeResolver.GetTypes(typeof(IFareDataProvider));
         }
 
+        /// <summary>
+        /// The get fare database types.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="IList"/>.
+        /// </returns>
         public IList<Type> GetFareDatabaseTypes()
         {
-            return _typeResolver.GetTypes(typeof(ISyncableDatabase));
+            return this._typeResolver.GetTypes(typeof(ISyncableDatabase));
         }
 
+        /// <summary>
+        /// The get db syncer types.
+        /// </summary>
+        /// <param name="dbType">
+        /// The db type.
+        /// </param>
+        /// <returns>
+        /// The <see cref="IList"/>.
+        /// </returns>
         public IList<Type> GetDbSyncerTypes(Type dbType)
         {
-            return _typeResolver.GetTypes(typeof(IDatabaseSyncer<>), dbType);
+            return this._typeResolver.GetTypes(typeof(IDatabaseSyncer<>), dbType);
         }
 
+        /// <summary>
+        /// The create any object.
+        /// </summary>
+        /// <param name="interfaceType">
+        /// The interface type.
+        /// </param>
+        /// <param name="throwOnNull">
+        /// The throw on null.
+        /// </param>
+        /// <param name="constructorParams">
+        /// The constructor params.
+        /// </param>
+        /// <returns>
+        /// The <see cref="object"/>.
+        /// </returns>
         public object CreateAnyObject(Type interfaceType, bool throwOnNull, params object[] constructorParams)
         {
-            return CreateAnyObject(interfaceType, null, throwOnNull, constructorParams);
+            return this.CreateAnyObject(interfaceType, null, throwOnNull, constructorParams);
         }
 
+        /// <summary>
+        /// The create any object.
+        /// </summary>
+        /// <param name="interfaceType">
+        /// The interface type.
+        /// </param>
+        /// <param name="genericType">
+        /// The generic type.
+        /// </param>
+        /// <param name="throwOnNull">
+        /// The throw on null.
+        /// </param>
+        /// <param name="constructorParams">
+        /// The constructor params.
+        /// </param>
+        /// <returns>
+        /// The <see cref="object"/>.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// </exception>
         public object CreateAnyObject(Type interfaceType, Type[] genericType, bool throwOnNull, params object[] constructorParams)
         {
-            IList<Type> classTypes = _typeResolver.GetTypes(interfaceType, genericType);
+            IList<Type> classTypes = this._typeResolver.GetTypes(interfaceType, genericType);
             if (classTypes.Count > 0)
+            {
                 return Activator.CreateInstance(classTypes.First(), constructorParams);
+            }
 
             if (throwOnNull)
-                throw new ArgumentException("There is no implementation for interface [" + interfaceType + "]. Make sure that the plugins are properly installed!");
+            {
+                throw new ArgumentException(
+                    "There is no implementation for interface [" + interfaceType + "]. Make sure that the plugins are properly installed!");
+            }
 
             return null;
         }

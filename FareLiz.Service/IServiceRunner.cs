@@ -1,15 +1,16 @@
-﻿using SkyDean.FareLiz.Core;
-
-namespace SkyDean.FareLiz.Service
+﻿namespace SkyDean.FareLiz.Service
 {
-    /// <summary>
-    /// Interface for service plugin
-    /// </summary>
+    using SkyDean.FareLiz.Core;
+
+    /// <summary>Interface for service plugin</summary>
     public interface IServiceRunner : IPlugin
     {
         /// <summary>
         /// Starts the service
         /// </summary>
+        /// <param name="args">
+        /// The args.
+        /// </param>
         void RunService(string[] args);
     }
 }

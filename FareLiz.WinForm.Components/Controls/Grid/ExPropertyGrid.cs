@@ -4,20 +4,41 @@
     using System.Reflection;
     using System.Windows.Forms;
 
-    /// <summary>
-    /// Extends PropertyGrid to provide a changable description area height.
-    /// </summary>
+    /// <summary>Extends PropertyGrid to provide a changable description area height.</summary>
     public class ExPropertyGrid : PropertyGrid
     {
+        /// <summary>
+        /// The description area line count.
+        /// </summary>
         private int descriptionAreaLineCount = 2;
-        private Control docComment = null;
-        private Control propertyGridView = null;
-        private Type docCommentType = null;
+
+        /// <summary>
+        /// The doc comment.
+        /// </summary>
+        private Control docComment;
+
+        /// <summary>
+        /// The doc comment type.
+        /// </summary>
+        private Type docCommentType;
+
+        /// <summary>
+        /// The lines property.
+        /// </summary>
         private PropertyInfo linesProperty;
+
+        /// <summary>
+        /// The property grid view.
+        /// </summary>
+        private Control propertyGridView;
+
+        /// <summary>
+        /// The size change is from user.
+        /// </summary>
         private bool sizeChangeIsFromUser = true;
 
         /// <summary>
-        /// Initializes a new instance of the CustomPropertyGrid class.
+        /// Initializes a new instance of the <see cref="ExPropertyGrid"/> class. Initializes a new instance of the CustomPropertyGrid class.
         /// </summary>
         public ExPropertyGrid()
         {
@@ -29,9 +50,7 @@
                     this.docCommentType = controlType;
                     this.docComment = control;
                     this.linesProperty = this.docCommentType.GetProperty("Lines");
-                    FieldInfo userSizedField = this.docCommentType.BaseType.GetField(
-                        "userSized",
-                        BindingFlags.Instance | BindingFlags.NonPublic);
+                    FieldInfo userSizedField = this.docCommentType.BaseType.GetField("userSized", BindingFlags.Instance | BindingFlags.NonPublic);
                     userSizedField.SetValue(this.docComment, true);
                 }
                 else if (controlType.Name == "PropertyGridView")
@@ -43,14 +62,7 @@
             this.docComment.SizeChanged += this.HandleDocCommentSizeChanged;
         }
 
-        /// <summary>
-        /// Occurs when the description area size is changed by the user.
-        /// </summary>
-        public event EventHandler UserChangedDescriptionAreaSize;
-
-        /// <summary>
-        /// Gets or sets the description area line count.
-        /// </summary>
+        /// <summary>Gets or sets the description area line count.</summary>
         /// <value>The description area line count.</value>
         /// <exception cref="ArgumentException"> If value is less than zero.</exception>
         /// <exception cref="TypeLoadException"> If not of the all objects required to set the field were found.</exception>
@@ -65,17 +77,12 @@
             {
                 if (value < 0)
                 {
-                    throw new ArgumentException(
-                        "The value cannot be less than zero.");
+                    throw new ArgumentException("The value cannot be less than zero.");
                 }
 
-                if (this.docCommentType == null ||
-                    this.docComment == null ||
-                    this.propertyGridView == null ||
-                    this.linesProperty == null)
+                if (this.docCommentType == null || this.docComment == null || this.propertyGridView == null || this.linesProperty == null)
                 {
-                    throw new TypeLoadException(
-                        "Not all of the objects required to set the field were found.");
+                    throw new TypeLoadException("Not all of the objects required to set the field were found.");
                 }
 
                 try
@@ -105,9 +112,7 @@
             }
         }
 
-        /// <summary>
-        /// Gets or sets the height of the description area.
-        /// </summary>
+        /// <summary>Gets or sets the height of the description area.</summary>
         /// <value>The height of the description area.</value>
         public int DescriptionAreaHeight
         {
@@ -129,10 +134,15 @@
             }
         }
 
+        /// <summary>Occurs when the description area size is changed by the user.</summary>
+        public event EventHandler UserChangedDescriptionAreaSize;
+
         /// <summary>
         /// Raises the UserChangedDescriptionAreaSize event.
         /// </summary>
-        /// <param name="e">The System.EventArgs instance containing the event data.</param>
+        /// <param name="e">
+        /// The System.EventArgs instance containing the event data.
+        /// </param>
         protected void OnUserChangedDescriptionAreaSize(EventArgs e)
         {
             EventHandler handler = this.UserChangedDescriptionAreaSize;
@@ -145,8 +155,12 @@
         /// <summary>
         /// Handles this.docComment.SizeChanged.
         /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The System.EventArgs instance containing the event data.</param>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The System.EventArgs instance containing the event data.
+        /// </param>
         private void HandleDocCommentSizeChanged(object sender, EventArgs e)
         {
             if (this.IsHandleCreated && this.sizeChangeIsFromUser)

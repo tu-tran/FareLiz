@@ -1,76 +1,197 @@
-﻿using SkyDean.FareLiz.Core;
-using SkyDean.FareLiz.Core.Data;
-using SkyDean.FareLiz.Data.Config;
-using SkyDean.FareLiz.WinForm.Config;
-using SkyDean.FareLiz.WinForm.Data;
-using System;
-using System.ComponentModel;
-
-namespace SkyDean.FareLiz.WinForm
+﻿namespace SkyDean.FareLiz.WinForm
 {
+    using System;
+    using System.ComponentModel;
+
+    using SkyDean.FareLiz.Core;
+    using SkyDean.FareLiz.Core.Data;
+    using SkyDean.FareLiz.Data.Config;
+    using SkyDean.FareLiz.WinForm.Data;
+
+    /// <summary>
+    /// The execution info.
+    /// </summary>
     [Serializable]
     [DefaultProperty("IsMinimized")]
     public class ExecutionInfo
     {
-        [DisplayName("Start application minimized"), Description("Start application minimized"), Category("Application Settings"), DefaultValue(true)]
+        /// <summary>
+        /// The _departure date range.
+        /// </summary>
+        private DateRangeDiff _departureDateRange = new DateRangeDiff(0, 0);
+
+        /// <summary>
+        /// The _max stay duration.
+        /// </summary>
+        private int _maxStayDuration = 1;
+
+        /// <summary>
+        /// The _min stay duration.
+        /// </summary>
+        private int _minStayDuration = 1;
+
+        /// <summary>
+        /// The _price limit.
+        /// </summary>
+        private int _priceLimit = 1;
+
+        /// <summary>
+        /// The _return date range.
+        /// </summary>
+        private DateRangeDiff _returnDateRange = new DateRangeDiff(0, 0);
+
+        /// <summary>
+        /// Gets or sets a value indicating whether is minimized.
+        /// </summary>
+        [DisplayName("Start application minimized")]
+        [Description("Start application minimized")]
+        [Category("Application Settings")]
+        [DefaultValue(true)]
         public bool IsMinimized { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether auto sync.
+        /// </summary>
         [DisplayName("Auto-synchronize new data")]
-        [Description("Send database to synchronizing service after checking for new fare data. This parameter is for operation mode CloseAndExport"), Category("Application Settings"), DefaultValue(true)]
+        [Description("Send database to synchronizing service after checking for new fare data. This parameter is for operation mode CloseAndExport")]
+        [Category("Application Settings")]
+        [DefaultValue(true)]
         public bool AutoSync { get; set; }
 
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden), EditorBrowsable(EditorBrowsableState.Never)]
+        /// <summary>
+        /// Gets or sets the departure.
+        /// </summary>
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         [IniConfigurable(true, "Departure")]
         public Airport Departure { get; set; }
 
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden), EditorBrowsable(EditorBrowsableState.Never)]
+        /// <summary>
+        /// Gets or sets the destination.
+        /// </summary>
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         [IniConfigurable(true, "Destination")]
         public Airport Destination { get; set; }
 
-        [DisplayName("Departure date"), Description("Flight departure date"), Category("Flight Details")]
+        /// <summary>
+        /// Gets or sets the departure date.
+        /// </summary>
+        [DisplayName("Departure date")]
+        [Description("Flight departure date")]
+        [Category("Flight Details")]
         public DateTime DepartureDate { get; set; }
 
-        [DisplayName("Offset for departure date"), Description("Offset for departure date"), Category("Flight Details"), DefaultValue(15), TypeConverter(typeof(DateRangeDiffConverter))]
+        /// <summary>
+        /// Gets or sets the departure date range.
+        /// </summary>
+        [DisplayName("Offset for departure date")]
+        [Description("Offset for departure date")]
+        [Category("Flight Details")]
+        [DefaultValue(15)]
+        [TypeConverter(typeof(DateRangeDiffConverter))]
         public DateRangeDiff DepartureDateRange
         {
-            get { return _departureDateRange; }
-            set { _departureDateRange = value; }
-        }
-        DateRangeDiff _departureDateRange = new DateRangeDiff(0, 0);
+            get
+            {
+                return this._departureDateRange;
+            }
 
-        [DisplayName("Return date"), Description("Flight return date"), Category("Flight Details")]
+            set
+            {
+                this._departureDateRange = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the return date.
+        /// </summary>
+        [DisplayName("Return date")]
+        [Description("Flight return date")]
+        [Category("Flight Details")]
         public DateTime ReturnDate { get; set; }
 
-        [DisplayName("Offset for return date"), Description("Offset for return date"), Category("Flight Details"), DefaultValue(15), TypeConverter(typeof(DateRangeDiffConverter))]
+        /// <summary>
+        /// Gets or sets the return date range.
+        /// </summary>
+        [DisplayName("Offset for return date")]
+        [Description("Offset for return date")]
+        [Category("Flight Details")]
+        [DefaultValue(15)]
+        [TypeConverter(typeof(DateRangeDiffConverter))]
         public DateRangeDiff ReturnDateRange
         {
-            get { return _returnDateRange; }
-            set { _returnDateRange = value; }
-        }
-        DateRangeDiff _returnDateRange = new DateRangeDiff(0, 0);
+            get
+            {
+                return this._returnDateRange;
+            }
 
-        [DisplayName("Minimum stay duration"), Description("Minimum stay duration"), Category("Flight Details"), DefaultValue(37)]
+            set
+            {
+                this._returnDateRange = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the min stay duration.
+        /// </summary>
+        [DisplayName("Minimum stay duration")]
+        [Description("Minimum stay duration")]
+        [Category("Flight Details")]
+        [DefaultValue(37)]
         public int MinStayDuration
         {
-            get { return _minStayDuration; }
-            set { _minStayDuration = (value < 1 ? 1 : value); }
-        }
-        int _minStayDuration = 1;
+            get
+            {
+                return this._minStayDuration;
+            }
 
-        [DisplayName("Maximum stay duration"), Description("Maximum stay duration"), Category("Flight Details"), DefaultValue(43)]
+            set
+            {
+                this._minStayDuration = value < 1 ? 1 : value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the max stay duration.
+        /// </summary>
+        [DisplayName("Maximum stay duration")]
+        [Description("Maximum stay duration")]
+        [Category("Flight Details")]
+        [DefaultValue(43)]
         public int MaxStayDuration
         {
-            get { return _maxStayDuration; }
-            set { _maxStayDuration = (value < 1 ? 1 : value); }
-        }
-        int _maxStayDuration = 1;
+            get
+            {
+                return this._maxStayDuration;
+            }
 
-        [DisplayName("Price limit"), Description("Price limit"), Category("Flight Details"), DefaultValue(1000)]
+            set
+            {
+                this._maxStayDuration = value < 1 ? 1 : value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the price limit.
+        /// </summary>
+        [DisplayName("Price limit")]
+        [Description("Price limit")]
+        [Category("Flight Details")]
+        [DefaultValue(1000)]
         public int PriceLimit
         {
-            get { return _priceLimit; }
-            set { _priceLimit = (value < 1 ? 1 : value); }
+            get
+            {
+                return this._priceLimit;
+            }
+
+            set
+            {
+                this._priceLimit = value < 1 ? 1 : value;
+            }
         }
-        int _priceLimit = 1;
     }
 }

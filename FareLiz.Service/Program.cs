@@ -1,20 +1,30 @@
-﻿using log4net;
-using System;
-using System.Windows.Forms;
-using SkyDean.FareLiz.Core.Utils;
-
-namespace SkyDean.FareLiz.Service
+﻿namespace SkyDean.FareLiz.Service
 {
+    using System;
+    using System.Windows.Forms;
+
+    using log4net;
+
+    using SkyDean.FareLiz.Core.Utils;
+
+    /// <summary>
+    /// The program.
+    /// </summary>
     internal static class Program
     {
         /// <summary>
-        ///     The main entry point for the application.
+        /// The main entry point for the application.
         /// </summary>
+        /// <param name="args">
+        /// The args.
+        /// </param>
         [STAThread]
         private static void Main(string[] args)
         {
             if (args.Length < 1)
+            {
                 return;
+            }
 
             var logger = LogUtil.GetLogger();
             var exceptionHelper = new ExceptionHelper(logger, false, true);
@@ -35,18 +45,34 @@ namespace SkyDean.FareLiz.Service
             // Get arguments and ignore the first argument
             string[] svcArgs = new string[args.Length - 1];
             for (int i = 1; i < args.Length; i++)
+            {
                 svcArgs[i - 1] = args[i];
+            }
 
             service.Logger = logger;
             service.Initialize();
             service.RunService(svcArgs);
         }
 
+        /// <summary>
+        /// The get service.
+        /// </summary>
+        /// <param name="name">
+        /// The name.
+        /// </param>
+        /// <param name="logger">
+        /// The logger.
+        /// </param>
+        /// <returns>
+        /// The <see cref="IServiceRunner"/>.
+        /// </returns>
         private static IServiceRunner GetService(string name, ILog logger)
         {
             var targetType = Type.GetType(name);
             if (targetType == null)
+            {
                 return null;
+            }
 
             var typeResolver = new TypeResolver(logger);
             if (targetType.IsClass && !targetType.IsAbstract && typeof(IServiceRunner).IsAssignableFrom(targetType))

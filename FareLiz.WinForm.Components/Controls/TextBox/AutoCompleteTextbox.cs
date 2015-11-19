@@ -6,48 +6,156 @@
     using System.Drawing;
     using System.Windows.Forms;
 
+    /// <summary>
+    /// The auto complete textbox.
+    /// </summary>
+    /// <typeparam name="T">
+    /// </typeparam>
     public partial class AutoCompleteTextbox<T> : TextBox
     {
-        // string to remember a former input
-        private bool _suppressAutoSuggest = false, _suppressSelIndexChanged = false;
-        private object _prevSelItem = null;
+        /// <summary>
+        /// The _mouse index.
+        /// </summary>
         private int _mouseIndex = -1;
+
+        /// <summary>
+        /// The _prev sel index.
+        /// </summary>
         private int _prevSelIndex = -1;
+
+        /// <summary>
+        /// The _prev sel item.
+        /// </summary>
+        private object _prevSelItem;
+
+        // string to remember a former input
+        /// <summary>
+        /// The _suppress auto suggest.
+        /// </summary>
+        private bool _suppressAutoSuggest;
+
+        /// <summary>
+        /// The _suppress sel index changed.
+        /// </summary>
+        private bool _suppressSelIndexChanged;
+
+        // the constructor
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AutoCompleteTextbox{T}"/> class.
+        /// </summary>
+        public AutoCompleteTextbox()
+        {
+            this.InitializeComponent();
+            this.listBox.DataSource = this.CurrentAutoCompleteList;
+        }
+
+        /// <summary>
+        /// The selected item changed.
+        /// </summary>
         public event EventHandler SelectedItemChanged;
 
         #region Properties
+
         // the list for our suggestions database
+        /// <summary>
+        /// The _auto completed list.
+        /// </summary>
         private IList<T> _autoCompletedList;
+
+        /// <summary>
+        /// Gets or sets the auto complete list.
+        /// </summary>
         public virtual IList<T> AutoCompleteList
         {
-            get { return this._autoCompletedList; }
-            set { this._autoCompletedList = value; }
+            get
+            {
+                return this._autoCompletedList;
+            }
+
+            set
+            {
+                this._autoCompletedList = value;
+            }
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether always show suggest.
+        /// </summary>
         public bool AlwaysShowSuggest { get; set; }
 
         // case sensitivity
-        private bool _caseSensitive = false;
-        public bool CaseSensitive { get { return this._caseSensitive; } set { this._caseSensitive = value; } }
+        /// <summary>
+        /// The _case sensitive.
+        /// </summary>
+        private bool _caseSensitive;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether case sensitive.
+        /// </summary>
+        public bool CaseSensitive
+        {
+            get
+            {
+                return this._caseSensitive;
+            }
+
+            set
+            {
+                this._caseSensitive = value;
+            }
+        }
 
         // minimum characters to be typed before suggestions are displayed
-        private int _minTypedCharacters = 0;
+        /// <summary>
+        /// The _min typed characters.
+        /// </summary>
+        private int _minTypedCharacters;
+
+        /// <summary>
+        /// Gets or sets the min typed characters.
+        /// </summary>
         public int MinTypedCharacters
         {
-            get { return this._minTypedCharacters; }
-            set { this._minTypedCharacters = value > 0 ? value : 1; }
+            get
+            {
+                return this._minTypedCharacters;
+            }
+
+            set
+            {
+                this._minTypedCharacters = value > 0 ? value : 1;
+            }
         }
 
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden), EditorBrowsable(EditorBrowsableState.Never)]
+        /// <summary>
+        /// Gets or sets the selected index.
+        /// </summary>
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public int SelectedIndex
         {
-            get { return this.listBox.SelectedIndex; }
-            set { this.listBox.SelectedIndex = value; }
+            get
+            {
+                return this.listBox.SelectedIndex;
+            }
+
+            set
+            {
+                this.listBox.SelectedIndex = value;
+            }
         }
 
+        /// <summary>
+        /// Gets or sets the text.
+        /// </summary>
         public new string Text
         {
-            get { return base.Text; }
+            get
+            {
+                return base.Text;
+            }
+
             set
             {
                 this._suppressAutoSuggest = true;
@@ -58,52 +166,101 @@
             }
         }
 
+        /// <summary>
+        /// The _visible items.
+        /// </summary>
         private int _visibleItems = 10;
-        public int VisibleSuggestItems { get { return this._visibleItems; } set { this._visibleItems = value > 3 ? value : 3; } }
 
-        // the actual list of currently displayed suggestions
-        private ListBox.ObjectCollection CurrentAutoCompleteList;
-
-        // the parent Form of this control
-        private Form ParentForm { get { return this.Parent.FindForm(); } }
-        #endregion Properties
-
-        // the constructor
-        public AutoCompleteTextbox()
-            : base()
+        /// <summary>
+        /// Gets or sets the visible suggest items.
+        /// </summary>
+        public int VisibleSuggestItems
         {
-            this.InitializeComponent();
-            this.listBox.DataSource = this.CurrentAutoCompleteList;
-        }
-
-        #region Methods
-        public void HideSuggestionListBox()
-        {
-            if ((this.ParentForm != null))
+            get
             {
-                this.panel.Hide();   // hiding the panel also hides the listbox
-                if (this.ParentForm.Controls.Contains(this.panel))
-                    this.ParentForm.Controls.Remove(this.panel);
+                return this._visibleItems;
+            }
+
+            set
+            {
+                this._visibleItems = value > 3 ? value : 3;
             }
         }
 
+        // the actual list of currently displayed suggestions
+        /// <summary>
+        /// The current auto complete list.
+        /// </summary>
+        private ListBox.ObjectCollection CurrentAutoCompleteList;
+
+        // the parent Form of this control
+        /// <summary>
+        /// Gets the parent form.
+        /// </summary>
+        private Form ParentForm
+        {
+            get
+            {
+                return this.Parent.FindForm();
+            }
+        }
+
+        #endregion Properties
+
+        #region Methods
+
+        /// <summary>
+        /// The hide suggestion list box.
+        /// </summary>
+        public void HideSuggestionListBox()
+        {
+            if (this.ParentForm != null)
+            {
+                this.panel.Hide(); // hiding the panel also hides the listbox
+                if (this.ParentForm.Controls.Contains(this.panel))
+                {
+                    this.ParentForm.Controls.Remove(this.panel);
+                }
+            }
+        }
+
+        /// <summary>
+        /// The on key down.
+        /// </summary>
+        /// <param name="args">
+        /// The args.
+        /// </param>
         protected override void OnKeyDown(KeyEventArgs args)
         {
             args.Handled = true;
-            if ((args.KeyCode == Keys.Up))
-                this.MoveSelectionInListBox((this.SelectedIndex - 1));    // Up: move the selection in listbox one up
+            if (args.KeyCode == Keys.Up)
+            {
+                this.MoveSelectionInListBox((this.SelectedIndex - 1)); // Up: move the selection in listbox one up
+            }
             else if ((args.KeyCode == Keys.Down))
-                this.MoveSelectionInListBox((this.SelectedIndex + 1));    // Down: move the selection in listbox one down
+            {
+                this.MoveSelectionInListBox((this.SelectedIndex + 1)); // Down: move the selection in listbox one down
+            }
             else if ((args.KeyCode == Keys.PageUp))
-                this.MoveSelectionInListBox((this.SelectedIndex - 10));   // Page Up: move 10 up
+            {
+                this.MoveSelectionInListBox((this.SelectedIndex - 10)); // Page Up: move 10 up
+            }
             else if ((args.KeyCode == Keys.PageDown))
-                this.MoveSelectionInListBox((this.SelectedIndex + 10));   // Pade Down: move 10 down
+            {
+                this.MoveSelectionInListBox((this.SelectedIndex + 10)); // Pade Down: move 10 down
+            }
             else if ((args.KeyCode == Keys.Enter))
-                this.SelectItem();                                   // Enter: select the item in the ListBox
+            {
+                this.SelectItem(); // Enter: select the item in the ListBox
+            }
             else if (args.KeyCode == Keys.Escape)
-                this.HideSuggestionListBox();                        // Escape: Hide suggestion box
+            {
+                this.HideSuggestionListBox(); // Escape: Hide suggestion box
+            }
             else if (args.Control && args.KeyCode == Keys.A)
+            {
                 this.SelectAll(); // Crtl+A: select all
+            }
             else
             {
                 base.OnKeyDown(args); // work is not done, maybe the base class will process the event, so call it...            
@@ -111,27 +268,63 @@
             }
         }
 
+        /// <summary>
+        /// The on got focus.
+        /// </summary>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         protected override void OnGotFocus(EventArgs e)
         {
             if (this.AlwaysShowSuggest && !this.panel.Visible && this.listBox.Items.Count > 0)
+            {
                 this.ShowSuggests();
+            }
+
             base.OnGotFocus(e);
         }
 
+        /// <summary>
+        /// The on lost focus.
+        /// </summary>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         protected override void OnLostFocus(EventArgs e)
         {
             if (!(this.ContainsFocus || this.panel.ContainsFocus))
-                this.SelectItem();   // then hide the stuff and select the last valid item
+            {
+                this.SelectItem(); // then hide the stuff and select the last valid item
+            }
+
             base.OnLostFocus(e);
         }
 
+        /// <summary>
+        /// The on text changed.
+        /// </summary>
+        /// <param name="args">
+        /// The args.
+        /// </param>
         protected override void OnTextChanged(EventArgs args)
         {
             if (!(this.DesignMode || this._suppressAutoSuggest))
+            {
                 this.ShowSuggests();
+            }
+
             base.OnTextChanged(args);
         }
 
+        /// <summary>
+        /// The list box_ key down.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void listBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
@@ -141,33 +334,67 @@
             }
         }
 
+        /// <summary>
+        /// The list box_ mouse click.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void listBox_MouseClick(object sender, MouseEventArgs e)
         {
             this.SelectItem();
         }
 
+        /// <summary>
+        /// The move selection in list box.
+        /// </summary>
+        /// <param name="index">
+        /// The index.
+        /// </param>
         private void MoveSelectionInListBox(int index)
         {
             if (this.listBox.Items.Count < 1)
+            {
                 return;
+            }
 
-            if (index <= -1)    // beginning of list
+            if (index <= -1)
+            {
+                // beginning of list
                 this.listBox.SelectedIndex = 0;
+            }
+            else if (index > (this.listBox.Items.Count - 1))
+            {
+                // end of list
+                this.listBox.SelectedIndex = this.listBox.Items.Count - 1;
+            }
             else
-                if (index > (this.listBox.Items.Count - 1))  // end of list
-                    this.listBox.SelectedIndex = (this.listBox.Items.Count - 1);
-                else
-                    this.listBox.SelectedIndex = index; // somewhere in the middle
+            {
+                this.listBox.SelectedIndex = index; // somewhere in the middle
+            }
 
             if (!this.panel.Visible && this.listBox.Items.Count > 0)
+            {
                 this.ShowSuggests();
+            }
         }
 
         // selects the current item
+        /// <summary>
+        /// The select item.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="bool"/>.
+        /// </returns>
         private bool SelectItem()
         {
             if (this.AutoCompleteList == null || this.AutoCompleteList.Count < 1)
+            {
                 return false;
+            }
 
             this._suppressSelIndexChanged = this._suppressAutoSuggest = true;
 
@@ -175,13 +402,19 @@
             if (this.listBox.Items.Count > 0)
             {
                 if (this._mouseIndex > 0 && this._mouseIndex < this.listBox.Items.Count)
+                {
                     this.SelectedIndex = this._mouseIndex;
+                }
 
                 if (this.SelectedIndex > -1)
                 {
-                    base.Text = this.listBox.GetItemText(this.listBox.SelectedItem); // set the Text of the TextBox to the selected item of the ListBox
+                    base.Text = this.listBox.GetItemText(this.listBox.SelectedItem);
+
+                        // set the Text of the TextBox to the selected item of the ListBox
                     if (this.ContainsFocus)
+                    {
                         this.SelectAll();
+                    }
                 }
                 else
                 {
@@ -199,7 +432,10 @@
                     {
                         this.listBox.SelectedItem = this._prevSelItem;
                         if (this.SelectedIndex < 0)
+                        {
                             this.SelectedIndex = 0;
+                        }
+
                         base.Text = this.listBox.GetItemText(this.listBox.SelectedItem);
                     }
                 }
@@ -211,8 +447,10 @@
             {
                 // The listbox was empty
                 object newSelItem = null;
+
                 // ListBox is empty: Try to match the item with the data source
-                if (!String.IsNullOrEmpty(base.Text))
+                if (!string.IsNullOrEmpty(base.Text))
+                {
                     foreach (var item in this.AutoCompleteList)
                     {
                         var itemText = this.listBox.GetItemText(item);
@@ -222,13 +460,18 @@
                             break;
                         }
                     }
+                }
 
                 if (newSelItem == null)
                 {
                     if (this._prevSelItem == null)
+                    {
                         newSelItem = this.AutoCompleteList[0];
+                    }
                     else
+                    {
                         newSelItem = this._prevSelItem;
+                    }
                 }
 
                 if (newSelItem != null)
@@ -244,7 +487,10 @@
             if (this._prevSelItem != selItem)
             {
                 if (this.SelectedItemChanged != null)
+                {
                     this.SelectedItemChanged(this, EventArgs.Empty);
+                }
+
                 this._prevSelItem = selItem;
             }
 
@@ -254,6 +500,9 @@
 
         // shows the suggestions in ListBox beneath the TextBox
         // and fitting it into the ParentForm
+        /// <summary>
+        /// The show suggests.
+        /// </summary>
         private void ShowSuggests()
         {
             // show only if MinTypedCharacters have been typed
@@ -270,19 +519,24 @@
                     // (but after refresh to prevent drawing empty rectangles)
                     this.listBox.SelectedIndex = 0;
                     this.panel.Show();
+
                     // at the top of all controls
                     this.panel.BringToFront();
+
                     // then give the focuse back to the TextBox (this control)
                     this.Focus();
                 }
+
                 // or hide if no results
                 else
                 {
                     this.HideSuggestionListBox();
                 }
+
                 // prevent overlapping problems with other controls
                 this.panel.ResumeLayout(true);
             }
+
             // hide if typed chars <= MinCharsTyped
             else
             {
@@ -292,11 +546,15 @@
 
         // This is a timecritical part
         // Fills/ refreshed the CurrentAutoCompleteList with appropreate candidates
+        /// <summary>
+        /// The update current auto complete list and panel.
+        /// </summary>
         private void UpdateCurrentAutoCompleteListAndPanel()
         {
             var parentForm = this.ParentForm;
+
             // if there is a ParentForm
-            if ((parentForm != null))
+            if (parentForm != null)
             {
                 // Update auto complete data source
                 // the list of suggestions has to be refreshed so clear it
@@ -308,13 +566,15 @@
                 foreach (object obj in this.AutoCompleteList)
                 {
                     string str = obj.ToString();
-                    bool isMatch = (this.MinTypedCharacters == 0 && String.IsNullOrEmpty(txt)) ||
-                                   str.IndexOf(txt, this.CaseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase) > -1;
+                    bool isMatch = (this.MinTypedCharacters == 0 && string.IsNullOrEmpty(txt))
+                                   || str.IndexOf(txt, this.CaseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase) > -1;
                     if (isMatch)
                     {
-                        this.CurrentAutoCompleteList.Add(obj);   // Add candidates to new CurrentAutoCompleteList                        
+                        this.CurrentAutoCompleteList.Add(obj); // Add candidates to new CurrentAutoCompleteList                        
                         if (++curIndex == this.VisibleSuggestItems)
+                        {
                             break;
+                        }
                     }
                 }
 
@@ -324,17 +584,19 @@
                 // Visual rendering
                 // get its width
                 this.listBox.Width = this.Width;
-                // calculate the remeining height beneath the TextBox
 
-                var itemsHeight = 5 + (this.listBox.DrawMode == DrawMode.Normal
-                    ? TextRenderer.MeasureText(new string('\n', this.CurrentAutoCompleteList.Count), this.listBox.Font).Height
-                    : this.CurrentAutoCompleteList.Count * this.listBox.ItemHeight);
+                // calculate the remeining height beneath the TextBox
+                var itemsHeight = 5
+                                  + (this.listBox.DrawMode == DrawMode.Normal
+                                         ? TextRenderer.MeasureText(new string('\n', this.CurrentAutoCompleteList.Count), this.listBox.Font).Height
+                                         : this.CurrentAutoCompleteList.Count * this.listBox.ItemHeight);
 
                 var borderWidth = 2 * SystemInformation.BorderSize.Width;
                 var screenLoc = this.PointToScreen(Point.Empty);
                 var relLocation = parentForm.PointToClient(screenLoc);
                 int maxHeight = parentForm.ClientSize.Height - this.Height - relLocation.Y;
                 this.listBox.Height = (itemsHeight > maxHeight ? maxHeight : itemsHeight);
+
                 // and the Location to use
                 this.panel.Location = new Point(relLocation.X - borderWidth, relLocation.Y + this.Height - borderWidth);
                 this.panel.Size = this.listBox.Size;
@@ -345,15 +607,35 @@
             }
         }
 
+        /// <summary>
+        /// The list box_ selected index changed.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void listBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (this._suppressSelIndexChanged)
+            {
                 return;
+            }
 
             this.RefreshItem(this._prevSelIndex);
             this._prevSelIndex = this.listBox.SelectedIndex;
         }
 
+        /// <summary>
+        /// The list box_ mouse leave.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void listBox_MouseLeave(object sender, EventArgs e)
         {
             this.RefreshItem(this._mouseIndex);
@@ -361,6 +643,15 @@
             this._mouseIndex = -1;
         }
 
+        /// <summary>
+        /// The list box_ mouse move.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void listBox_MouseMove(object sender, MouseEventArgs e)
         {
             int index = this.listBox.IndexFromPoint(e.Location);
@@ -373,6 +664,12 @@
             }
         }
 
+        /// <summary>
+        /// The refresh item.
+        /// </summary>
+        /// <param name="index">
+        /// The index.
+        /// </param>
         private void RefreshItem(int index)
         {
             if (index > -1 && index < this.listBox.Items.Count)
@@ -382,20 +679,35 @@
             }
         }
 
+        /// <summary>
+        /// The list box on draw item.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void ListBoxOnDrawItem(object sender, DrawItemEventArgs e)
         {
             if (this.listBox.Items.Count < 0 || e.Index < 0)
+            {
                 return;
+            }
 
             // Draw the background of the ListBox control for each item.
-            var isHighlighted = (e.Index == this._mouseIndex || (this._mouseIndex < 0 && e.Index == this.SelectedIndex));
+            var isHighlighted = e.Index == this._mouseIndex || (this._mouseIndex < 0 && e.Index == this.SelectedIndex);
             Brush backBrush;
             var bounds = e.Bounds;
 
             if (isHighlighted)
+            {
                 backBrush = SystemBrushes.Highlight;
+            }
             else
+            {
                 backBrush = SystemBrushes.Window;
+            }
 
             e.Graphics.FillRectangle(backBrush, bounds);
 
@@ -413,7 +725,7 @@
             // If the ListBox has focus, draw a focus rectangle around the selected item.
             e.DrawFocusRectangle();
         }
+
         #endregion Methods
     }
-
 }

@@ -1,20 +1,30 @@
-﻿using System;
-using System.IO;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SkyDean.FareLiz.Data;
-using SkyDean.FareLiz.Data.Config;
-using SkyDean.FareLiz.WinForm;
-
-namespace FareLiz.Tests.Data
+﻿namespace FareLiz.Tests.Data
 {
+    using System;
+    using System.IO;
+
+    using log4net;
+
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+    using SkyDean.FareLiz.Data;
+    using SkyDean.FareLiz.Data.Config;
+    using SkyDean.FareLiz.WinForm;
+
+    /// <summary>
+    /// The object ini config test.
+    /// </summary>
     [TestClass]
     public class ObjectIniConfigTest
     {
+        /// <summary>
+        /// The test method 1.
+        /// </summary>
         [TestMethod]
         public void TestMethod1()
         {
             string fileName = "UnitTestLogger";
-            var logger = log4net.LogManager.GetLogger(fileName);
+            var logger = LogManager.GetLogger(fileName);
             var target = new ObjectIniConfig("UnitTest.ini", logger);
             string dept = "Departure Test Location String";
             string dest = "Destination Test Location String";
@@ -23,13 +33,13 @@ namespace FareLiz.Tests.Data
             DateTime retDate = DateTime.Now.AddDays(7);
 
             var obj = new ExecutionInfo
-            {
-                Departure = AirportDataProvider.FromIATA("HEL"),
-                Destination = AirportDataProvider.FromIATA("SGN"),
-                IsMinimized = isMin,
-                DepartureDate = deptDate,
-                ReturnDate = retDate
-            };
+                          {
+                              Departure = AirportDataProvider.FromIATA("HEL"), 
+                              Destination = AirportDataProvider.FromIATA("SGN"), 
+                              IsMinimized = isMin, 
+                              DepartureDate = deptDate, 
+                              ReturnDate = retDate
+                          };
             target.SaveData(obj);
             bool actual = File.Exists(fileName);
             Assert.AreEqual(true, actual, "INI configuration file should be created");
@@ -41,7 +51,7 @@ namespace FareLiz.Tests.Data
             target.RemoveAllSections();
             target.Load(fileName);
 
-            var newObj = new ExecutionInfo();  // Initialize empty object
+            var newObj = new ExecutionInfo(); // Initialize empty object
             target.Load(fileName);
             target.ApplyData(newObj);
 

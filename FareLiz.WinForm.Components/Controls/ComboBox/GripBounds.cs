@@ -2,27 +2,51 @@
 {
     using System.Drawing;
 
-    /// <summary>
-    ///     CodeProject.com "Simple pop-up control" "http://www.codeproject.com/cs/miscctrl/simplepopup.asp".
-    /// </summary>
+    /// <summary>CodeProject.com "Simple pop-up control" "http://www.codeproject.com/cs/miscctrl/simplepopup.asp".</summary>
     internal struct GripBounds
     {
+        /// <summary>
+        /// The grip size.
+        /// </summary>
         private const int GripSize = 6;
+
+        /// <summary>
+        /// The corner grip size.
+        /// </summary>
         private const int CornerGripSize = GripSize << 1;
 
+        /// <summary>
+        /// The client rectangle.
+        /// </summary>
         private readonly Rectangle clientRectangle;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GripBounds"/> struct.
+        /// </summary>
+        /// <param name="clientRectangle">
+        /// The client rectangle.
+        /// </param>
         public GripBounds(Rectangle clientRectangle)
         {
             this.clientRectangle = clientRectangle;
         }
 
+        /// <summary>
+        /// Gets the client rectangle.
+        /// </summary>
         public Rectangle ClientRectangle
         {
-            get { return this.clientRectangle; }
-            //set { clientRectangle = value; }
+            get
+            {
+                return this.clientRectangle;
+            }
+
+            // set { clientRectangle = value; }
         }
 
+        /// <summary>
+        /// Gets the bottom.
+        /// </summary>
         public Rectangle Bottom
         {
             get
@@ -34,6 +58,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets the bottom right.
+        /// </summary>
         public Rectangle BottomRight
         {
             get
@@ -47,6 +74,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets the top.
+        /// </summary>
         public Rectangle Top
         {
             get
@@ -57,6 +87,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets the top right.
+        /// </summary>
         public Rectangle TopRight
         {
             get
@@ -69,6 +102,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets the left.
+        /// </summary>
         public Rectangle Left
         {
             get
@@ -79,6 +115,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets the bottom left.
+        /// </summary>
         public Rectangle BottomLeft
         {
             get
@@ -91,6 +130,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets the right.
+        /// </summary>
         public Rectangle Right
         {
             get
@@ -102,6 +144,9 @@
             }
         }
 
+        /// <summary>
+        /// Gets the top left.
+        /// </summary>
         public Rectangle TopLeft
         {
             get

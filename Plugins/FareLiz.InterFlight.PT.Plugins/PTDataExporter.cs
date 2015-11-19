@@ -1,20 +1,40 @@
-﻿using System;
-using System.Globalization;
-using System.IO;
-using System.Text;
-using System.Xml;
-using SkyDean.FareLiz.Core.Data;
-
-namespace SkyDean.FareLiz.InterFlight
+﻿namespace SkyDean.FareLiz.InterFlight
 {
+    using System;
+    using System.Globalization;
+    using System.IO;
+    using System.Text;
+    using System.Xml;
+
+    using SkyDean.FareLiz.Core.Data;
+
+    /// <summary>
+    /// The pt data exporter.
+    /// </summary>
     internal class PTDataExporter
     {
+        /// <summary>
+        /// The export data.
+        /// </summary>
+        /// <param name="targetStream">
+        /// The target stream.
+        /// </param>
+        /// <param name="route">
+        /// The route.
+        /// </param>
+        /// <exception cref="ArgumentException">
+        /// </exception>
         public void ExportData(Stream targetStream, TravelRoute route)
         {
             if (targetStream == null)
+            {
                 throw new ArgumentException("targetStream cannot be null");
+            }
+
             if (route == null)
+            {
                 throw new ArgumentException("route cannot be null");
+            }
 
             var setting = new XmlWriterSettings();
             setting.OmitXmlDeclaration = true;
@@ -45,13 +65,17 @@ namespace SkyDean.FareLiz.InterFlight
                         {
                             var outboundLeg = f.OutboundLeg;
                             if (outboundLeg == null)
+                            {
                                 continue;
+                            }
 
                             writer.WriteStartElement("div");
                             writer.WriteAttributeString("class", "flights_b");
                             writer.WriteAttributeString("id", "flight_result_0");
-                            if (f.TravelAgency != null && !String.IsNullOrEmpty(f.TravelAgency.Url))
+                            if (f.TravelAgency != null && !string.IsNullOrEmpty(f.TravelAgency.Url))
+                            {
                                 writer.WriteAttributeString("onclick", "click('" + f.TravelAgency.Url + "')");
+                            }
 
                             // Outbound
                             writer.WriteStartElement("div");

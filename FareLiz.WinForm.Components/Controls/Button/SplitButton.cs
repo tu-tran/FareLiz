@@ -1,5 +1,4 @@
 //Get the latest version of SplitButton at: http://wyday.com/splitbutton/
-
 namespace SkyDean.FareLiz.WinForm.Components.Controls.Button
 {
     using System;
@@ -10,131 +9,99 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Button
 
     using ContentAlignment = System.Drawing.ContentAlignment;
 
+    /// <summary>
+    /// The split button.
+    /// </summary>
     public class SplitButton : ImageButton
     {
+        /// <summary>
+        /// The split section width.
+        /// </summary>
         private const int SplitSectionWidth = 18;
 
+        /// <summary>
+        /// The border size.
+        /// </summary>
         private static readonly int BorderSize = SystemInformation.Border3DSize.Width * 2;
+
+        /// <summary>
+        /// The _state.
+        /// </summary>
         private PushButtonState _state;
+
+        /// <summary>
+        /// The drop down rectangle.
+        /// </summary>
         private Rectangle dropDownRectangle;
+
+        /// <summary>
+        /// The is mouse entered.
+        /// </summary>
         private bool isMouseEntered;
 
+        /// <summary>
+        /// The is split menu visible.
+        /// </summary>
         private bool isSplitMenuVisible;
 
-
+        /// <summary>
+        /// The m_ split menu.
+        /// </summary>
         private ContextMenu m_SplitMenu;
+
+        /// <summary>
+        /// The m_ split menu strip.
+        /// </summary>
         private ContextMenuStrip m_SplitMenuStrip;
+
+        /// <summary>
+        /// The show split.
+        /// </summary>
         private bool showSplit;
+
+        /// <summary>
+        /// The skip next open.
+        /// </summary>
         private bool skipNextOpen;
 
+        /// <summary>
+        /// The text format flags.
+        /// </summary>
         private TextFormatFlags textFormatFlags = TextFormatFlags.Default;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SplitButton"/> class.
+        /// </summary>
         public SplitButton()
         {
             this.AutoSize = true;
         }
 
-        #region Properties
-
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden), EditorBrowsable(EditorBrowsableState.Never)]
-        public override ContextMenuStrip ContextMenuStrip
-        {
-            get { return this.SplitMenuStrip; }
-            set { this.SplitMenuStrip = value; }
-        }
-
-        [DefaultValue(null)]
-        public ContextMenu SplitMenu
-        {
-            get { return this.m_SplitMenu; }
-            set
-            {
-                //remove the event handlers for the old SplitMenu
-                if (this.m_SplitMenu != null)
-                {
-                    this.m_SplitMenu.Popup -= this.SplitMenu_Popup;
-                }
-
-                //add the event handlers for the new SplitMenu
-                if (value != null)
-                {
-                    this.ShowSplit = true;
-                    value.Popup += this.SplitMenu_Popup;
-                }
-                else
-                    this.ShowSplit = false;
-
-                this.m_SplitMenu = value;
-            }
-        }
-
-        [DefaultValue(null)]
-        public ContextMenuStrip SplitMenuStrip
-        {
-            get { return this.m_SplitMenuStrip; }
-            set
-            {
-                //remove the event handlers for the old SplitMenuStrip
-                if (this.m_SplitMenuStrip != null)
-                {
-                    this.m_SplitMenuStrip.Closing -= this.SplitMenuStrip_Closing;
-                    this.m_SplitMenuStrip.Opening -= this.SplitMenuStrip_Opening;
-                }
-
-                //add the event handlers for the new SplitMenuStrip
-                if (value != null)
-                {
-                    this.ShowSplit = true;
-                    value.Closing += this.SplitMenuStrip_Closing;
-                    value.Opening += this.SplitMenuStrip_Opening;
-                }
-                else
-                    this.ShowSplit = false;
-
-
-                this.m_SplitMenuStrip = value;
-            }
-        }
-
-        [DefaultValue(true)]
-        public bool ShowSplit
-        {
-            set
-            {
-                if (value != this.showSplit)
-                {
-                    this.showSplit = value;
-                    this.Invalidate();
-
-                    if (this.Parent != null)
-                        this.Parent.PerformLayout();
-                }
-            }
-        }
-
-        private PushButtonState State
-        {
-            get { return this._state; }
-            set
-            {
-                if (!this._state.Equals(value))
-                {
-                    this._state = value;
-                    this.Invalidate();
-                }
-            }
-        }
-
-        #endregion Properties
-
+        /// <summary>
+        /// The is input key.
+        /// </summary>
+        /// <param name="keyData">
+        /// The key data.
+        /// </param>
+        /// <returns>
+        /// The <see cref="bool"/>.
+        /// </returns>
         protected override bool IsInputKey(Keys keyData)
         {
             if (keyData.Equals(Keys.Down) && this.showSplit)
+            {
                 return true;
+            }
 
             return base.IsInputKey(keyData);
         }
 
+        /// <summary>
+        /// The on got focus.
+        /// </summary>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         protected override void OnGotFocus(EventArgs e)
         {
             if (!this.showSplit)
@@ -149,6 +116,12 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Button
             }
         }
 
+        /// <summary>
+        /// The on key down.
+        /// </summary>
+        /// <param name="kevent">
+        /// The kevent.
+        /// </param>
         protected override void OnKeyDown(KeyEventArgs kevent)
         {
             if (this.showSplit)
@@ -157,7 +130,6 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Button
                 {
                     this.ShowContextMenuStrip();
                 }
-
                 else if (kevent.KeyCode.Equals(Keys.Space) && kevent.Modifiers == Keys.None)
                 {
                     this.State = PushButtonState.Pressed;
@@ -167,6 +139,12 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Button
             base.OnKeyDown(kevent);
         }
 
+        /// <summary>
+        /// The on key up.
+        /// </summary>
+        /// <param name="kevent">
+        /// The kevent.
+        /// </param>
         protected override void OnKeyUp(KeyEventArgs kevent)
         {
             if (kevent.KeyCode.Equals(Keys.Space))
@@ -187,6 +165,12 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Button
             base.OnKeyUp(kevent);
         }
 
+        /// <summary>
+        /// The on enabled changed.
+        /// </summary>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         protected override void OnEnabledChanged(EventArgs e)
         {
             this.State = this.Enabled ? PushButtonState.Normal : PushButtonState.Disabled;
@@ -194,6 +178,12 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Button
             base.OnEnabledChanged(e);
         }
 
+        /// <summary>
+        /// The on lost focus.
+        /// </summary>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         protected override void OnLostFocus(EventArgs e)
         {
             if (!this.showSplit)
@@ -208,6 +198,12 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Button
             }
         }
 
+        /// <summary>
+        /// The on mouse enter.
+        /// </summary>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         protected override void OnMouseEnter(EventArgs e)
         {
             if (!this.showSplit)
@@ -224,6 +220,12 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Button
             }
         }
 
+        /// <summary>
+        /// The on mouse leave.
+        /// </summary>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         protected override void OnMouseLeave(EventArgs e)
         {
             if (!this.showSplit)
@@ -240,6 +242,12 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Button
             }
         }
 
+        /// <summary>
+        /// The on mouse down.
+        /// </summary>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         protected override void OnMouseDown(MouseEventArgs e)
         {
             if (!this.showSplit)
@@ -248,9 +256,11 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Button
                 return;
             }
 
-            //handle ContextMenu re-clicking the drop-down region to close the menu
+            // handle ContextMenu re-clicking the drop-down region to close the menu
             if (this.m_SplitMenu != null && e.Button == MouseButtons.Left && !this.isMouseEntered)
+            {
                 this.skipNextOpen = true;
+            }
 
             if (this.dropDownRectangle.Contains(e.Location) && !this.isSplitMenuVisible && e.Button == MouseButtons.Left)
             {
@@ -262,6 +272,12 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Button
             }
         }
 
+        /// <summary>
+        /// The on mouse up.
+        /// </summary>
+        /// <param name="mevent">
+        /// The mevent.
+        /// </param>
         protected override void OnMouseUp(MouseEventArgs mevent)
         {
             if (!this.showSplit)
@@ -286,12 +302,20 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Button
             }
         }
 
+        /// <summary>
+        /// The on paint.
+        /// </summary>
+        /// <param name="pevent">
+        /// The pevent.
+        /// </param>
         protected override void OnPaint(PaintEventArgs pevent)
         {
             base.OnPaint(pevent);
 
             if (!this.showSplit)
+            {
                 return;
+            }
 
             Graphics g = pevent.Graphics;
             Rectangle bounds = this.ClientRectangle;
@@ -315,15 +339,13 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Button
             this.dropDownRectangle = new Rectangle(bounds.Right - SplitSectionWidth, 0, SplitSectionWidth, bounds.Height);
 
             int internalBorder = BorderSize;
-            var focusRect =
-                new Rectangle(internalBorder - 1,
-                              internalBorder - 1,
-                              bounds.Width - this.dropDownRectangle.Width - internalBorder,
-                              bounds.Height - (internalBorder * 2) + 2);
+            var focusRect = new Rectangle(
+                internalBorder - 1, 
+                internalBorder - 1, 
+                bounds.Width - this.dropDownRectangle.Width - internalBorder, 
+                bounds.Height - (internalBorder * 2) + 2);
 
-            bool drawSplitLine = (this.State == PushButtonState.Hot || this.State == PushButtonState.Pressed ||
-                                  !Application.RenderWithVisualStyles);
-
+            bool drawSplitLine = this.State == PushButtonState.Hot || this.State == PushButtonState.Pressed || !Application.RenderWithVisualStyles;
 
             if (this.RightToLeft == RightToLeft.Yes)
             {
@@ -333,10 +355,18 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Button
                 if (drawSplitLine)
                 {
                     // draw two lines at the edge of the dropdown button
-                    g.DrawLine(SystemPens.ButtonShadow, bounds.Left + SplitSectionWidth, BorderSize,
-                               bounds.Left + SplitSectionWidth, bounds.Bottom - BorderSize);
-                    g.DrawLine(SystemPens.ButtonFace, bounds.Left + SplitSectionWidth + 1, BorderSize,
-                               bounds.Left + SplitSectionWidth + 1, bounds.Bottom - BorderSize);
+                    g.DrawLine(
+                        SystemPens.ButtonShadow, 
+                        bounds.Left + SplitSectionWidth, 
+                        BorderSize, 
+                        bounds.Left + SplitSectionWidth, 
+                        bounds.Bottom - BorderSize);
+                    g.DrawLine(
+                        SystemPens.ButtonFace, 
+                        bounds.Left + SplitSectionWidth + 1, 
+                        BorderSize, 
+                        bounds.Left + SplitSectionWidth + 1, 
+                        bounds.Bottom - BorderSize);
                 }
             }
             else
@@ -344,17 +374,25 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Button
                 if (drawSplitLine)
                 {
                     // draw two lines at the edge of the dropdown button
-                    g.DrawLine(SystemPens.ButtonShadow, bounds.Right - SplitSectionWidth, BorderSize,
-                               bounds.Right - SplitSectionWidth, bounds.Bottom - BorderSize);
-                    g.DrawLine(SystemPens.ButtonFace, bounds.Right - SplitSectionWidth - 1, BorderSize,
-                               bounds.Right - SplitSectionWidth - 1, bounds.Bottom - BorderSize);
+                    g.DrawLine(
+                        SystemPens.ButtonShadow, 
+                        bounds.Right - SplitSectionWidth, 
+                        BorderSize, 
+                        bounds.Right - SplitSectionWidth, 
+                        bounds.Bottom - BorderSize);
+                    g.DrawLine(
+                        SystemPens.ButtonFace, 
+                        bounds.Right - SplitSectionWidth - 1, 
+                        BorderSize, 
+                        bounds.Right - SplitSectionWidth - 1, 
+                        bounds.Bottom - BorderSize);
                 }
             }
 
             // Draw an arrow in the correct location
             this.PaintArrow(g, this.dropDownRectangle);
 
-            //paint the image and text in the "button" part of the splitButton
+            // paint the image and text in the "button" part of the splitButton
             this.PaintTextandImage(g, new Rectangle(0, 0, this.ClientRectangle.Width - SplitSectionWidth, this.ClientRectangle.Height));
 
             // draw the focus rectangle.
@@ -364,6 +402,15 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Button
             }
         }
 
+        /// <summary>
+        /// The paint textand image.
+        /// </summary>
+        /// <param name="g">
+        /// The g.
+        /// </param>
+        /// <param name="bounds">
+        /// The bounds.
+        /// </param>
         private void PaintTextandImage(Graphics g, Rectangle bounds)
         {
             // Figure out where our text and image should go
@@ -372,69 +419,109 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Button
 
             this.CalculateButtonTextAndImageLayout(ref bounds, out text_rectangle, out image_rectangle);
 
-            //draw the image
+            // draw the image
             if (this.Image != null)
             {
                 if (this.Enabled)
+                {
                     g.DrawImage(this.Image, image_rectangle.X, image_rectangle.Y, this.Image.Width, this.Image.Height);
+                }
                 else
+                {
                     ControlPaint.DrawImageDisabled(g, this.Image, image_rectangle.X, image_rectangle.Y, this.BackColor);
+                }
             }
 
             // If we dont' use mnemonic, set formatFlag to NoPrefix as this will show ampersand.
             if (!this.UseMnemonic)
+            {
                 this.textFormatFlags = this.textFormatFlags | TextFormatFlags.NoPrefix;
+            }
             else if (!this.ShowKeyboardCues)
+            {
                 this.textFormatFlags = this.textFormatFlags | TextFormatFlags.HidePrefix;
+            }
 
-            //draw the text
+            // draw the text
             if (!string.IsNullOrEmpty(this.Text))
             {
                 if (this.Enabled)
+                {
                     TextRenderer.DrawText(g, this.Text, this.Font, text_rectangle, this.ForeColor, this.textFormatFlags);
+                }
                 else
+                {
                     ControlPaint.DrawStringDisabled(g, this.Text, this.Font, this.BackColor, text_rectangle, this.textFormatFlags);
+                }
             }
         }
 
+        /// <summary>
+        /// The paint arrow.
+        /// </summary>
+        /// <param name="g">
+        /// The g.
+        /// </param>
+        /// <param name="dropDownRect">
+        /// The drop down rect.
+        /// </param>
         private void PaintArrow(Graphics g, Rectangle dropDownRect)
         {
-            var middle = new Point(Convert.ToInt32(dropDownRect.Left + dropDownRect.Width / 2),
-                                   Convert.ToInt32(dropDownRect.Top + dropDownRect.Height / 2));
+            var middle = new Point(
+                Convert.ToInt32(dropDownRect.Left + dropDownRect.Width / 2), 
+                Convert.ToInt32(dropDownRect.Top + dropDownRect.Height / 2));
 
-            //if the width is odd - favor pushing it over one pixel right.
-            middle.X += (dropDownRect.Width % 2);
+            // if the width is odd - favor pushing it over one pixel right.
+            middle.X += dropDownRect.Width % 2;
 
-            var arrow = new[]
-                {
-                    new Point(middle.X - 2, middle.Y - 1), new Point(middle.X + 3, middle.Y - 1),
-                    new Point(middle.X, middle.Y + 2)
-                };
+            var arrow = new[] { new Point(middle.X - 2, middle.Y - 1), new Point(middle.X + 3, middle.Y - 1), new Point(middle.X, middle.Y + 2) };
 
             if (this.Enabled)
+            {
                 g.FillPolygon(SystemBrushes.ControlText, arrow);
+            }
             else
+            {
                 g.FillPolygon(SystemBrushes.ButtonShadow, arrow);
+            }
         }
 
+        /// <summary>
+        /// The get preferred size.
+        /// </summary>
+        /// <param name="proposedSize">
+        /// The proposed size.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Size"/>.
+        /// </returns>
         public override Size GetPreferredSize(Size proposedSize)
         {
             Size preferredSize = base.GetPreferredSize(proposedSize);
 
-            //autosize correctly for splitbuttons
+            // autosize correctly for splitbuttons
             if (this.showSplit)
             {
                 if (this.AutoSize)
+                {
                     return this.CalculateButtonAutoSize();
+                }
 
-                if (!string.IsNullOrEmpty(this.Text) &&
-                    TextRenderer.MeasureText(this.Text, this.Font).Width + SplitSectionWidth > preferredSize.Width)
+                if (!string.IsNullOrEmpty(this.Text) && TextRenderer.MeasureText(this.Text, this.Font).Width + SplitSectionWidth > preferredSize.Width)
+                {
                     return preferredSize + new Size(SplitSectionWidth + BorderSize * 2, 0);
+                }
             }
 
             return preferredSize;
         }
 
+        /// <summary>
+        /// The calculate button auto size.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="Size"/>.
+        /// </returns>
         private Size CalculateButtonAutoSize()
         {
             Size ret_size = Size.Empty;
@@ -467,16 +554,21 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Button
             }
 
             // Pad the result
-            ret_size.Height += (this.Padding.Vertical + 6);
-            ret_size.Width += (this.Padding.Horizontal + 6);
+            ret_size.Height += this.Padding.Vertical + 6;
+            ret_size.Width += this.Padding.Horizontal + 6;
 
-            //pad the splitButton arrow region
+            // pad the splitButton arrow region
             if (this.showSplit)
+            {
                 ret_size.Width += SplitSectionWidth;
+            }
 
             return ret_size;
         }
 
+        /// <summary>
+        /// The show context menu strip.
+        /// </summary>
         public void ShowContextMenuStrip()
         {
             if (this.skipNextOpen)
@@ -499,11 +591,29 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Button
             }
         }
 
+        /// <summary>
+        /// The split menu strip_ opening.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void SplitMenuStrip_Opening(object sender, CancelEventArgs e)
         {
             this.isSplitMenuVisible = true;
         }
 
+        /// <summary>
+        /// The split menu strip_ closing.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void SplitMenuStrip_Closing(object sender, ToolStripDropDownClosingEventArgs e)
         {
             this.isSplitMenuVisible = false;
@@ -512,23 +622,36 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Button
 
             if (e.CloseReason == ToolStripDropDownCloseReason.AppClicked)
             {
-                this.skipNextOpen = (this.dropDownRectangle.Contains(this.PointToClient(Cursor.Position))) &&
-                               MouseButtons == MouseButtons.Left;
+                this.skipNextOpen = this.dropDownRectangle.Contains(this.PointToClient(Cursor.Position)) && MouseButtons == MouseButtons.Left;
             }
         }
 
-
+        /// <summary>
+        /// The split menu_ popup.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void SplitMenu_Popup(object sender, EventArgs e)
         {
             this.isSplitMenuVisible = true;
         }
 
+        /// <summary>
+        /// The wnd proc.
+        /// </summary>
+        /// <param name="m">
+        /// The m.
+        /// </param>
         protected override void WndProc(ref Message m)
         {
-            //0x0212 == WM_EXITMENULOOP
+            // 0x0212 == WM_EXITMENULOOP
             if (m.Msg == 0x0212)
             {
-                //this message is only sent when a ContextMenu is closed (not a ContextMenuStrip)
+                // this message is only sent when a ContextMenu is closed (not a ContextMenuStrip)
                 this.isSplitMenuVisible = false;
                 this.SetButtonDrawState();
             }
@@ -536,6 +659,9 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Button
             base.WndProc(ref m);
         }
 
+        /// <summary>
+        /// The set button draw state.
+        /// </summary>
         private void SetButtonDrawState()
         {
             if (this.Bounds.Contains(this.Parent.PointToClient(Cursor.Position)))
@@ -556,14 +682,159 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Button
             }
         }
 
+        #region Properties
+
+        /// <summary>
+        /// Gets or sets the context menu strip.
+        /// </summary>
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override ContextMenuStrip ContextMenuStrip
+        {
+            get
+            {
+                return this.SplitMenuStrip;
+            }
+
+            set
+            {
+                this.SplitMenuStrip = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the split menu.
+        /// </summary>
+        [DefaultValue(null)]
+        public ContextMenu SplitMenu
+        {
+            get
+            {
+                return this.m_SplitMenu;
+            }
+
+            set
+            {
+                // remove the event handlers for the old SplitMenu
+                if (this.m_SplitMenu != null)
+                {
+                    this.m_SplitMenu.Popup -= this.SplitMenu_Popup;
+                }
+
+                // add the event handlers for the new SplitMenu
+                if (value != null)
+                {
+                    this.ShowSplit = true;
+                    value.Popup += this.SplitMenu_Popup;
+                }
+                else
+                {
+                    this.ShowSplit = false;
+                }
+
+                this.m_SplitMenu = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the split menu strip.
+        /// </summary>
+        [DefaultValue(null)]
+        public ContextMenuStrip SplitMenuStrip
+        {
+            get
+            {
+                return this.m_SplitMenuStrip;
+            }
+
+            set
+            {
+                // remove the event handlers for the old SplitMenuStrip
+                if (this.m_SplitMenuStrip != null)
+                {
+                    this.m_SplitMenuStrip.Closing -= this.SplitMenuStrip_Closing;
+                    this.m_SplitMenuStrip.Opening -= this.SplitMenuStrip_Opening;
+                }
+
+                // add the event handlers for the new SplitMenuStrip
+                if (value != null)
+                {
+                    this.ShowSplit = true;
+                    value.Closing += this.SplitMenuStrip_Closing;
+                    value.Opening += this.SplitMenuStrip_Opening;
+                }
+                else
+                {
+                    this.ShowSplit = false;
+                }
+
+                this.m_SplitMenuStrip = value;
+            }
+        }
+
+        /// <summary>
+        /// Sets a value indicating whether show split.
+        /// </summary>
+        [DefaultValue(true)]
+        public bool ShowSplit
+        {
+            set
+            {
+                if (value != this.showSplit)
+                {
+                    this.showSplit = value;
+                    this.Invalidate();
+
+                    if (this.Parent != null)
+                    {
+                        this.Parent.PerformLayout();
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the state.
+        /// </summary>
+        private PushButtonState State
+        {
+            get
+            {
+                return this._state;
+            }
+
+            set
+            {
+                if (!this._state.Equals(value))
+                {
+                    this._state = value;
+                    this.Invalidate();
+                }
+            }
+        }
+
+        #endregion Properties
+
         #region Button Layout Calculations
 
-        //The following layout functions were taken from Mono's Windows.Forms 
-        //implementation, specifically "ThemeWin32Classic.cs", 
-        //then modified to fit the context of this splitButton
+        // The following layout functions were taken from Mono's Windows.Forms 
+        // implementation, specifically "ThemeWin32Classic.cs", 
+        // then modified to fit the context of this splitButton
 
-        private void CalculateButtonTextAndImageLayout(ref Rectangle content_rect, out Rectangle textRectangle,
-                                                       out Rectangle imageRectangle)
+        /// <summary>
+        /// The calculate button text and image layout.
+        /// </summary>
+        /// <param name="content_rect">
+        /// The content_rect.
+        /// </param>
+        /// <param name="textRectangle">
+        /// The text rectangle.
+        /// </param>
+        /// <param name="imageRectangle">
+        /// The image rectangle.
+        /// </param>
+        private void CalculateButtonTextAndImageLayout(ref Rectangle content_rect, out Rectangle textRectangle, out Rectangle imageRectangle)
         {
             Size text_size = TextRenderer.MeasureText(this.Text, this.Font, content_rect.Size, this.textFormatFlags);
             Size image_size = this.Image == null ? Size.Empty : this.Image.Size;
@@ -574,44 +845,60 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Button
             switch (this.TextImageRelation)
             {
                 case TextImageRelation.Overlay:
+
                     // Overlay is easy, text always goes here
                     textRectangle = OverlayObjectRect(ref content_rect, ref text_size, this.TextAlign);
+
                     // Rectangle.Inflate(content_rect, -4, -4);
 
-                    //Offset on Windows 98 style when button is pressed
+                    // Offset on Windows 98 style when button is pressed
                     if (this._state == PushButtonState.Pressed && !Application.RenderWithVisualStyles)
+                    {
                         textRectangle.Offset(1, 1);
+                    }
 
                     // Image is dependent on ImageAlign
                     if (this.Image != null)
+                    {
                         imageRectangle = OverlayObjectRect(ref content_rect, ref image_size, this.ImageAlign);
+                    }
 
                     break;
                 case TextImageRelation.ImageAboveText:
                     content_rect.Inflate(-4, -4);
-                    this.LayoutTextAboveOrBelowImage(content_rect, false, text_size, image_size, out textRectangle,
-                                                out imageRectangle);
+                    this.LayoutTextAboveOrBelowImage(content_rect, false, text_size, image_size, out textRectangle, out imageRectangle);
                     break;
                 case TextImageRelation.TextAboveImage:
                     content_rect.Inflate(-4, -4);
-                    this.LayoutTextAboveOrBelowImage(content_rect, true, text_size, image_size, out textRectangle,
-                                                out imageRectangle);
+                    this.LayoutTextAboveOrBelowImage(content_rect, true, text_size, image_size, out textRectangle, out imageRectangle);
                     break;
                 case TextImageRelation.ImageBeforeText:
                     content_rect.Inflate(-4, -4);
-                    this.LayoutTextBeforeOrAfterImage(content_rect, false, text_size, image_size, out textRectangle,
-                                                 out imageRectangle);
+                    this.LayoutTextBeforeOrAfterImage(content_rect, false, text_size, image_size, out textRectangle, out imageRectangle);
                     break;
                 case TextImageRelation.TextBeforeImage:
                     content_rect.Inflate(-4, -4);
-                    this.LayoutTextBeforeOrAfterImage(content_rect, true, text_size, image_size, out textRectangle,
-                                                 out imageRectangle);
+                    this.LayoutTextBeforeOrAfterImage(content_rect, true, text_size, image_size, out textRectangle, out imageRectangle);
                     break;
             }
         }
 
-        private static Rectangle OverlayObjectRect(ref Rectangle container, ref Size sizeOfObject,
-                                                   ContentAlignment alignment)
+        /// <summary>
+        /// The overlay object rect.
+        /// </summary>
+        /// <param name="container">
+        /// The container.
+        /// </param>
+        /// <param name="sizeOfObject">
+        /// The size of object.
+        /// </param>
+        /// <param name="alignment">
+        /// The alignment.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Rectangle"/>.
+        /// </returns>
+        private static Rectangle OverlayObjectRect(ref Rectangle container, ref Size sizeOfObject, ContentAlignment alignment)
         {
             int x, y;
 
@@ -662,14 +949,42 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Button
             return new Rectangle(x, y, sizeOfObject.Width, sizeOfObject.Height);
         }
 
-        private void LayoutTextBeforeOrAfterImage(Rectangle totalArea, bool textFirst, Size textSize, Size imageSize,
-                                                  out Rectangle textRect, out Rectangle imageRect)
+        /// <summary>
+        /// The layout text before or after image.
+        /// </summary>
+        /// <param name="totalArea">
+        /// The total area.
+        /// </param>
+        /// <param name="textFirst">
+        /// The text first.
+        /// </param>
+        /// <param name="textSize">
+        /// The text size.
+        /// </param>
+        /// <param name="imageSize">
+        /// The image size.
+        /// </param>
+        /// <param name="textRect">
+        /// The text rect.
+        /// </param>
+        /// <param name="imageRect">
+        /// The image rect.
+        /// </param>
+        private void LayoutTextBeforeOrAfterImage(
+            Rectangle totalArea, 
+            bool textFirst, 
+            Size textSize, 
+            Size imageSize, 
+            out Rectangle textRect, 
+            out Rectangle imageRect)
         {
             int element_spacing = 0; // Spacing between the Text and the Image
             int total_width = textSize.Width + element_spacing + imageSize.Width;
 
             if (!textFirst)
+            {
                 element_spacing += 2;
+            }
 
             // If the text is too big, chop it down to the size we have available to it
             if (total_width > totalArea.Width)
@@ -688,49 +1003,94 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Button
             HorizontalAlignment h_image = GetHorizontalAlignment(this.ImageAlign);
 
             if (h_image == HorizontalAlignment.Left)
-                offset = 0;
-            else if (h_image == HorizontalAlignment.Right && h_text == HorizontalAlignment.Right)
-                offset = excess_width;
-            else if (h_image == HorizontalAlignment.Center &&
-                     (h_text == HorizontalAlignment.Left || h_text == HorizontalAlignment.Center))
-                offset += excess_width / 3;
-            else
-                offset += 2 * (excess_width / 3);
-
-            if (textFirst)
             {
-                final_text_rect = new Rectangle(totalArea.Left + offset,
-                                                AlignInRectangle(totalArea, textSize, this.TextAlign).Top, textSize.Width,
-                                                textSize.Height);
-                final_image_rect = new Rectangle(final_text_rect.Right + element_spacing,
-                                                 AlignInRectangle(totalArea, imageSize, this.ImageAlign).Top, imageSize.Width,
-                                                 imageSize.Height);
+                offset = 0;
+            }
+            else if (h_image == HorizontalAlignment.Right && h_text == HorizontalAlignment.Right)
+            {
+                offset = excess_width;
+            }
+            else if (h_image == HorizontalAlignment.Center && (h_text == HorizontalAlignment.Left || h_text == HorizontalAlignment.Center))
+            {
+                offset += excess_width / 3;
             }
             else
             {
-                final_image_rect = new Rectangle(totalArea.Left + offset,
-                                                 AlignInRectangle(totalArea, imageSize, this.ImageAlign).Top, imageSize.Width,
-                                                 imageSize.Height);
-                final_text_rect = new Rectangle(final_image_rect.Right + element_spacing,
-                                                AlignInRectangle(totalArea, textSize, this.TextAlign).Top, textSize.Width,
-                                                textSize.Height);
+                offset += 2 * (excess_width / 3);
+            }
+
+            if (textFirst)
+            {
+                final_text_rect = new Rectangle(
+                    totalArea.Left + offset, 
+                    AlignInRectangle(totalArea, textSize, this.TextAlign).Top, 
+                    textSize.Width, 
+                    textSize.Height);
+                final_image_rect = new Rectangle(
+                    final_text_rect.Right + element_spacing, 
+                    AlignInRectangle(totalArea, imageSize, this.ImageAlign).Top, 
+                    imageSize.Width, 
+                    imageSize.Height);
+            }
+            else
+            {
+                final_image_rect = new Rectangle(
+                    totalArea.Left + offset, 
+                    AlignInRectangle(totalArea, imageSize, this.ImageAlign).Top, 
+                    imageSize.Width, 
+                    imageSize.Height);
+                final_text_rect = new Rectangle(
+                    final_image_rect.Right + element_spacing, 
+                    AlignInRectangle(totalArea, textSize, this.TextAlign).Top, 
+                    textSize.Width, 
+                    textSize.Height);
             }
 
             textRect = final_text_rect;
             imageRect = final_image_rect;
         }
 
-        private void LayoutTextAboveOrBelowImage(Rectangle totalArea, bool textFirst, Size textSize, Size imageSize,
-                                                 out Rectangle textRect, out Rectangle imageRect)
+        /// <summary>
+        /// The layout text above or below image.
+        /// </summary>
+        /// <param name="totalArea">
+        /// The total area.
+        /// </param>
+        /// <param name="textFirst">
+        /// The text first.
+        /// </param>
+        /// <param name="textSize">
+        /// The text size.
+        /// </param>
+        /// <param name="imageSize">
+        /// The image size.
+        /// </param>
+        /// <param name="textRect">
+        /// The text rect.
+        /// </param>
+        /// <param name="imageRect">
+        /// The image rect.
+        /// </param>
+        private void LayoutTextAboveOrBelowImage(
+            Rectangle totalArea, 
+            bool textFirst, 
+            Size textSize, 
+            Size imageSize, 
+            out Rectangle textRect, 
+            out Rectangle imageRect)
         {
             int element_spacing = 0; // Spacing between the Text and the Image
             int total_height = textSize.Height + element_spacing + imageSize.Height;
 
             if (textFirst)
+            {
                 element_spacing += 2;
+            }
 
             if (textSize.Width > totalArea.Width)
+            {
                 textSize.Width = totalArea.Width;
+            }
 
             // If the there isn't enough room and we're text first, cut out the image
             if (total_height > totalArea.Height && textFirst)
@@ -749,39 +1109,67 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Button
             VerticalAlignment v_image = GetVerticalAlignment(this.ImageAlign);
 
             if (v_image == VerticalAlignment.Top)
-                offset = 0;
-            else if (v_image == VerticalAlignment.Bottom && v_text == VerticalAlignment.Bottom)
-                offset = excess_height;
-            else if (v_image == VerticalAlignment.Center &&
-                     (v_text == VerticalAlignment.Top || v_text == VerticalAlignment.Center))
-                offset += excess_height / 3;
-            else
-                offset += 2 * (excess_height / 3);
-
-            if (textFirst)
             {
-                final_text_rect = new Rectangle(AlignInRectangle(totalArea, textSize, this.TextAlign).Left,
-                                                totalArea.Top + offset, textSize.Width, textSize.Height);
-                final_image_rect = new Rectangle(AlignInRectangle(totalArea, imageSize, this.ImageAlign).Left,
-                                                 final_text_rect.Bottom + element_spacing, imageSize.Width,
-                                                 imageSize.Height);
+                offset = 0;
+            }
+            else if (v_image == VerticalAlignment.Bottom && v_text == VerticalAlignment.Bottom)
+            {
+                offset = excess_height;
+            }
+            else if (v_image == VerticalAlignment.Center && (v_text == VerticalAlignment.Top || v_text == VerticalAlignment.Center))
+            {
+                offset += excess_height / 3;
             }
             else
             {
-                final_image_rect = new Rectangle(AlignInRectangle(totalArea, imageSize, this.ImageAlign).Left,
-                                                 totalArea.Top + offset, imageSize.Width, imageSize.Height);
-                final_text_rect = new Rectangle(AlignInRectangle(totalArea, textSize, this.TextAlign).Left,
-                                                final_image_rect.Bottom + element_spacing, textSize.Width,
-                                                textSize.Height);
+                offset += 2 * (excess_height / 3);
+            }
+
+            if (textFirst)
+            {
+                final_text_rect = new Rectangle(
+                    AlignInRectangle(totalArea, textSize, this.TextAlign).Left, 
+                    totalArea.Top + offset, 
+                    textSize.Width, 
+                    textSize.Height);
+                final_image_rect = new Rectangle(
+                    AlignInRectangle(totalArea, imageSize, this.ImageAlign).Left, 
+                    final_text_rect.Bottom + element_spacing, 
+                    imageSize.Width, 
+                    imageSize.Height);
+            }
+            else
+            {
+                final_image_rect = new Rectangle(
+                    AlignInRectangle(totalArea, imageSize, this.ImageAlign).Left, 
+                    totalArea.Top + offset, 
+                    imageSize.Width, 
+                    imageSize.Height);
+                final_text_rect = new Rectangle(
+                    AlignInRectangle(totalArea, textSize, this.TextAlign).Left, 
+                    final_image_rect.Bottom + element_spacing, 
+                    textSize.Width, 
+                    textSize.Height);
 
                 if (final_text_rect.Bottom > totalArea.Bottom)
+                {
                     final_text_rect.Y = totalArea.Top;
+                }
             }
 
             textRect = final_text_rect;
             imageRect = final_image_rect;
         }
 
+        /// <summary>
+        /// The get horizontal alignment.
+        /// </summary>
+        /// <param name="align">
+        /// The align.
+        /// </param>
+        /// <returns>
+        /// The <see cref="HorizontalAlignment"/>.
+        /// </returns>
         private static HorizontalAlignment GetHorizontalAlignment(ContentAlignment align)
         {
             switch (align)
@@ -803,6 +1191,15 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Button
             return HorizontalAlignment.Left;
         }
 
+        /// <summary>
+        /// The get vertical alignment.
+        /// </summary>
+        /// <param name="align">
+        /// The align.
+        /// </param>
+        /// <returns>
+        /// The <see cref="VerticalAlignment"/>.
+        /// </returns>
         private static VerticalAlignment GetVerticalAlignment(ContentAlignment align)
         {
             switch (align)
@@ -824,29 +1221,51 @@ namespace SkyDean.FareLiz.WinForm.Components.Controls.Button
             return VerticalAlignment.Top;
         }
 
+        /// <summary>
+        /// The align in rectangle.
+        /// </summary>
+        /// <param name="outer">
+        /// The outer.
+        /// </param>
+        /// <param name="inner">
+        /// The inner.
+        /// </param>
+        /// <param name="align">
+        /// The align.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Rectangle"/>.
+        /// </returns>
         internal static Rectangle AlignInRectangle(Rectangle outer, Size inner, ContentAlignment align)
         {
             int x = 0;
             int y = 0;
 
-            if (align == ContentAlignment.BottomLeft || align == ContentAlignment.MiddleLeft ||
-                align == ContentAlignment.TopLeft)
+            if (align == ContentAlignment.BottomLeft || align == ContentAlignment.MiddleLeft || align == ContentAlignment.TopLeft)
+            {
                 x = outer.X;
-            else if (align == ContentAlignment.BottomCenter || align == ContentAlignment.MiddleCenter ||
-                     align == ContentAlignment.TopCenter)
+            }
+            else if (align == ContentAlignment.BottomCenter || align == ContentAlignment.MiddleCenter || align == ContentAlignment.TopCenter)
+            {
                 x = Math.Max(outer.X + ((outer.Width - inner.Width) / 2), outer.Left);
-            else if (align == ContentAlignment.BottomRight || align == ContentAlignment.MiddleRight ||
-                     align == ContentAlignment.TopRight)
+            }
+            else if (align == ContentAlignment.BottomRight || align == ContentAlignment.MiddleRight || align == ContentAlignment.TopRight)
+            {
                 x = outer.Right - inner.Width;
-            if (align == ContentAlignment.TopCenter || align == ContentAlignment.TopLeft ||
-                align == ContentAlignment.TopRight)
+            }
+
+            if (align == ContentAlignment.TopCenter || align == ContentAlignment.TopLeft || align == ContentAlignment.TopRight)
+            {
                 y = outer.Y;
-            else if (align == ContentAlignment.MiddleCenter || align == ContentAlignment.MiddleLeft ||
-                     align == ContentAlignment.MiddleRight)
+            }
+            else if (align == ContentAlignment.MiddleCenter || align == ContentAlignment.MiddleLeft || align == ContentAlignment.MiddleRight)
+            {
                 y = outer.Y + (outer.Height - inner.Height) / 2;
-            else if (align == ContentAlignment.BottomCenter || align == ContentAlignment.BottomRight ||
-                     align == ContentAlignment.BottomLeft)
+            }
+            else if (align == ContentAlignment.BottomCenter || align == ContentAlignment.BottomRight || align == ContentAlignment.BottomLeft)
+            {
                 y = outer.Bottom - inner.Height;
+            }
 
             return new Rectangle(x, y, Math.Min(inner.Width, outer.Width), Math.Min(inner.Height, outer.Height));
         }

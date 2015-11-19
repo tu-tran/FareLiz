@@ -1,46 +1,77 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Windows.Forms;
-using SkyDean.FareLiz.Core;
-using SkyDean.FareLiz.Core.Presentation;
-using SkyDean.FareLiz.Core.Utils;
-using SkyDean.FareLiz.Data.Monitoring;
-using SkyDean.FareLiz.Service.Utils;
-using SkyDean.FareLiz.WinForm.Components.Controls.Custom;
-using SkyDean.FareLiz.WinForm.Data;
-using SkyDean.FareLiz.WinForm.Presentation.Views;
-
-namespace SkyDean.FareLiz.WinForm.Presentation.Controllers
+﻿namespace SkyDean.FareLiz.WinForm.Presentation.Controllers
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.IO;
+    using System.Windows.Forms;
+
+    using SkyDean.FareLiz.Core;
+    using SkyDean.FareLiz.Core.Presentation;
+    using SkyDean.FareLiz.Core.Utils;
+    using SkyDean.FareLiz.Data.Monitoring;
+    using SkyDean.FareLiz.Service.Utils;
+    using SkyDean.FareLiz.WinForm.Components.Controls.Custom;
+    using SkyDean.FareLiz.WinForm.Data;
+    using SkyDean.FareLiz.WinForm.Presentation.Views;
+
+    /// <summary>
+    /// The check fare controller.
+    /// </summary>
     internal sealed class CheckFareController
     {
-        public CheckFareForm View { get; set; }
+        /// <summary>
+        /// The _live fare storage.
+        /// </summary>
         private readonly LiveFareFileStorage _liveFareStorage;
+
+        /// <summary>
+        /// The _monitors.
+        /// </summary>
         private readonly AggeratingFareRequestMonitor _monitors;
+
+        /// <summary>
+        /// The _execution param.
+        /// </summary>
         private ExecutionParam _executionParam;
 
+        /// <summary>
+        /// The events.
+        /// </summary>
         internal CheckFareEvents Events = new CheckFareEvents();
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CheckFareController"/> class.
+        /// </summary>
+        /// <param name="executionParam">
+        /// The execution param.
+        /// </param>
         internal CheckFareController(ExecutionParam executionParam = null)
         {
             this._executionParam = executionParam;
             var liveFareDir = Path.Combine(ProcessUtils.CurrentProcessDirectory, "LiveFare");
-            _liveFareStorage = new LiveFareFileStorage(liveFareDir);
-            _monitors = new AggeratingFareRequestMonitor();
+            this._liveFareStorage = new LiveFareFileStorage(liveFareDir);
+            this._monitors = new AggeratingFareRequestMonitor();
         }
+
+        /// <summary>
+        /// Gets or sets the view.
+        /// </summary>
+        public CheckFareForm View { get; set; }
 
         /// <summary>
         /// Get list of fare scanning requests based on the condition specified on the view
         /// </summary>
+        /// <returns>
+        /// The <see cref="List"/>.
+        /// </returns>
         internal List<FareMonitorRequest> GetRequests()
         {
-            int minDuration = View.MinDuration;
-            int maxDuration = View.MaxDuration;
+            int minDuration = this.View.MinDuration;
+            int maxDuration = this.View.MaxDuration;
             var result = new List<FareMonitorRequest>();
-            bool roundTrip = View.IsRoundTrip;
-            var departureRange = View.DepartureDateRange;
+            bool roundTrip = this.View.IsRoundTrip;
+            var departureRange = this.View.DepartureDateRange;
 
             for (int i = -Convert.ToInt32(departureRange.Minus); i <= departureRange.Plus; i++)
             {
@@ -48,14 +79,19 @@ namespace SkyDean.FareLiz.WinForm.Presentation.Controllers
                 int retEnd = roundTrip ? Convert.ToInt32(departureRange.Plus) : 0;
                 for (int j = retStart; j <= retEnd; j++)
                 {
-                    DateTime dept = View.DepartureDate.Date.AddDays(i);
-                    DateTime ret = roundTrip ? View.ReturnDate.Date.AddDays(j) : DateTime.MinValue;
+                    DateTime dept = this.View.DepartureDate.Date.AddDays(i);
+                    DateTime ret = roundTrip ? this.View.ReturnDate.Date.AddDays(j) : DateTime.MinValue;
                     int stayDuration = (int)(ret - dept).TotalDays;
                     if (roundTrip && (stayDuration < minDuration || stayDuration > maxDuration))
+                    {
                         continue;
+                    }
 
-                    if (dept.Date >= DateTime.Now.Date && (!roundTrip || ret.Date >= dept.Date)) // Make sure that the travel date range is valid
-                        result.Add(new FareMonitorRequest(View.Departure, View.Destination, dept, ret));
+                    if (dept.Date >= DateTime.Now.Date && (!roundTrip || ret.Date >= dept.Date))
+                    {
+                        // Make sure that the travel date range is valid
+                        result.Add(new FareMonitorRequest(this.View.Departure, this.View.Destination, dept, ret));
+                    }
                 }
             }
 
@@ -65,32 +101,48 @@ namespace SkyDean.FareLiz.WinForm.Presentation.Controllers
         /// <summary>
         /// Create new monitor for requests depending on the operation mode
         /// </summary>
+        /// <param name="requests">
+        /// The requests.
+        /// </param>
+        /// <param name="operationMode">
+        /// The operation Mode.
+        /// </param>
+        /// <returns>
+        /// The <see cref="FareRequestMonitor"/>.
+        /// </returns>
         internal FareRequestMonitor CreateMonitor(List<FareMonitorRequest> requests, OperationMode operationMode)
         {
             if (requests == null || requests.Count < 1)
+            {
                 return null;
+            }
 
             FareRequestMonitor newMon = null;
             FareMonitorEvents monitorEvents = null;
             if (operationMode == OperationMode.LiveMonitor)
             {
-                newMon = new LiveFareMonitor(_liveFareStorage, new TaskbarFlightNotifier(), WebFareBrowserControlFactory.Instance);
-                monitorEvents = Events[OperationMode.LiveMonitor];
+                newMon = new LiveFareMonitor(this._liveFareStorage, new TaskbarFlightNotifier(), WebFareBrowserControlFactory.Instance);
+                monitorEvents = this.Events[OperationMode.LiveMonitor];
             }
             else
             {
                 if (operationMode == OperationMode.ShowFare)
                 {
                     newMon = new FareRequestMonitor(WebFareBrowserControlFactory.Instance);
-                    monitorEvents = Events[OperationMode.ShowFare];
+                    monitorEvents = this.Events[OperationMode.ShowFare];
                 }
                 else if (operationMode == OperationMode.GetFareAndSave)
                 {
-                    newMon = new FareExportMonitor(AppContext.MonitorEnvironment.ArchiveManager, WebFareBrowserControlFactory.Instance, View.AutoSync);
-                    monitorEvents = Events[OperationMode.GetFareAndSave];
+                    newMon = new FareExportMonitor(
+                        AppContext.MonitorEnvironment.ArchiveManager, 
+                        WebFareBrowserControlFactory.Instance, 
+                        this.View.AutoSync);
+                    monitorEvents = this.Events[OperationMode.GetFareAndSave];
                 }
                 else
+                {
                     throw new ApplicationException("Unsupported opearation mode: " + operationMode);
+                }
             }
 
             monitorEvents.Attach(newMon);
@@ -99,83 +151,121 @@ namespace SkyDean.FareLiz.WinForm.Presentation.Controllers
             return newMon;
         }
 
+        /// <summary>
+        /// The start.
+        /// </summary>
+        /// <param name="monitor">
+        /// The monitor.
+        /// </param>
         internal void Start(FareRequestMonitor monitor)
         {
-            _monitors.Start(monitor);
+            this._monitors.Start(monitor);
         }
 
+        /// <summary>
+        /// The stop.
+        /// </summary>
+        /// <param name="monitor">
+        /// The monitor.
+        /// </param>
         internal void Stop(FareRequestMonitor monitor)
         {
-            _monitors.Clear(monitor.GetType());
+            this._monitors.Clear(monitor.GetType());
         }
 
         /// <summary>
         /// Start new fare scan and return the monitor responsible for the new requests
         /// </summary>
+        /// <param name="mode">
+        /// The mode.
+        /// </param>
+        /// <returns>
+        /// The <see cref="FareRequestMonitor"/>.
+        /// </returns>
         internal FareRequestMonitor Monitor(OperationMode mode)
         {
             FareRequestMonitor newMon = null;
             try
             {
                 // Validate the location of the journey
-                if (View.Departure.Equals(View.Destination))
+                if (this.View.Departure.Equals(this.View.Destination))
                 {
-                    View.Show("Departure location and destination cannot be the same:" + Environment.NewLine + View.Departure, "Invalid Route", MessageBoxIcon.Exclamation);
+                    this.View.Show(
+                        "Departure location and destination cannot be the same:" + Environment.NewLine + this.View.Departure, 
+                        "Invalid Route", 
+                        MessageBoxIcon.Exclamation);
                     return null;
                 }
 
                 // Get list of new requests for the monitor
-                var newRequests = GetRequests();
+                var newRequests = this.GetRequests();
                 if (newRequests.Count > 0)
                 {
-                    newMon = CreateMonitor(newRequests, mode);
+                    newMon = this.CreateMonitor(newRequests, mode);
                     if (mode != OperationMode.LiveMonitor)
                     {
-                        _monitors.Clear(newMon.GetType());
+                        this._monitors.Clear(newMon.GetType());
                     }
 
-                    AppContext.Logger.InfoFormat("{0}: Starting monitor for {1} new requests", GetType().Name, newRequests.Count);
-                    _monitors.Start(newMon);
+                    AppContext.Logger.InfoFormat("{0}: Starting monitor for {1} new requests", this.GetType().Name, newRequests.Count);
+                    this._monitors.Start(newMon);
                 }
                 else
                 {
-                    string period = (View.MinDuration == View.MaxDuration
-                        ? View.MinDuration.ToString(CultureInfo.InvariantCulture)
-                        : View.MinDuration.ToString(CultureInfo.InvariantCulture) + " and " + View.MaxDuration.ToString(CultureInfo.InvariantCulture));
+                    string period = this.View.MinDuration == this.View.MaxDuration
+                                         ? this.View.MinDuration.ToString(CultureInfo.InvariantCulture)
+                                         : this.View.MinDuration.ToString(CultureInfo.InvariantCulture) + " and "
+                                           + this.View.MaxDuration.ToString(CultureInfo.InvariantCulture);
 
-                    string message = String.Format(@"There is no travel date which satisfies the filter condition for the stay duration between {0} days (You selected travel period {1})!
+                    string message =
+                        string.Format(
+                            @"There is no travel date which satisfies the filter condition for the stay duration between {0} days (You selected travel period {1})!
 
-Double-check the filter conditions and make sure that not all travel dates are in the past", period, StringUtil.GetPeriodString(View.DepartureDate, View.ReturnDate));
+Double-check the filter conditions and make sure that not all travel dates are in the past", 
+                            period, 
+                            StringUtil.GetPeriodString(this.View.DepartureDate, this.View.ReturnDate));
                     AppContext.Logger.Debug(message);
                     AppContext.ProgressCallback.Inform(null, message, "Invalid parameters", NotificationType.Exclamation);
                 }
             }
             catch (Exception ex)
             {
-                AppContext.ProgressCallback.Inform(View, "Failed to start monitors: " + ex.Message, "Check Fares", NotificationType.Error);
-                AppContext.Logger.Error("Failed to start monitors: " + ex.ToString());
+                AppContext.ProgressCallback.Inform(this.View, "Failed to start monitors: " + ex.Message, "Check Fares", NotificationType.Error);
+                AppContext.Logger.Error("Failed to start monitors: " + ex);
             }
             finally
             {
-                View.SetScanner(true);
+                this.View.SetScanner(true);
             }
 
             return newMon;
         }
 
+        /// <summary>
+        /// The show live fare.
+        /// </summary>
         internal void ShowLiveFare()
         {
-            new LiveFareDataForm(_liveFareStorage).ShowDialog(View);
+            new LiveFareDataForm(this._liveFareStorage).ShowDialog(this.View);
         }
 
+        /// <summary>
+        /// The clear monitors.
+        /// </summary>
         internal void ClearMonitors()
         {
-            _monitors.Clear();
+            this._monitors.Clear();
         }
 
+        /// <summary>
+        /// The clear monitors.
+        /// </summary>
+        /// <param name="type">
+        /// The type.
+        /// </param>
         internal void ClearMonitors(Type type)
         {
-            _monitors.Clear(type);
+            this._monitors.Clear(type);
         }
     }
 }

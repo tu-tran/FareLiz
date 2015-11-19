@@ -1,89 +1,154 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Net;
-using System.Text.RegularExpressions;
-using System.Web;
-using SkyDean.FareLiz.Core;
-using SkyDean.FareLiz.Core.Data;
-using SkyDean.FareLiz.Core.Utils;
-using SkyDean.FareLiz.Core.Utils.HtmlAgilityPack;
-using SkyDean.FareLiz.Data;
-
-namespace SkyDean.FareLiz.InterFlight
+﻿namespace SkyDean.FareLiz.InterFlight
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.IO;
+    using System.Net;
+    using System.Text.RegularExpressions;
+    using System.Web;
+
+    using HtmlAgilityPack;
+
+    using SkyDean.FareLiz.Core;
+    using SkyDean.FareLiz.Core.Data;
+    using SkyDean.FareLiz.Core.Utils;
+    using SkyDean.FareLiz.Data;
+
+    /// <summary>
+    /// The pt data parser.
+    /// </summary>
     internal class PTDataParser
     {
-        internal int MaxFlightsPerAirline { get; set; }
-        internal int MaxAirlines { get; set; }
-        internal int MinPriceMargin { get; set; }
+        /// <summary>
+        /// The _root domain.
+        /// </summary>
         private readonly string _rootDomain;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PTDataParser"/> class.
+        /// </summary>
+        /// <param name="rootDomain">
+        /// The root domain.
+        /// </param>
+        /// <param name="maxFlightsPerAirline">
+        /// The max flights per airline.
+        /// </param>
+        /// <param name="maxAirlines">
+        /// The max airlines.
+        /// </param>
+        /// <param name="minPriceMargin">
+        /// The min price margin.
+        /// </param>
         internal PTDataParser(string rootDomain, int maxFlightsPerAirline, int maxAirlines, int minPriceMargin)
         {
-            _rootDomain = rootDomain;
-            MaxFlightsPerAirline = maxFlightsPerAirline;
-            MaxAirlines = maxAirlines;
-            MinPriceMargin = minPriceMargin;
+            this._rootDomain = rootDomain;
+            this.MaxFlightsPerAirline = maxFlightsPerAirline;
+            this.MaxAirlines = maxAirlines;
+            this.MinPriceMargin = minPriceMargin;
         }
 
+        /// <summary>
+        /// Gets or sets the max flights per airline.
+        /// </summary>
+        internal int MaxFlightsPerAirline { get; set; }
+
+        /// <summary>
+        /// Gets or sets the max airlines.
+        /// </summary>
+        internal int MaxAirlines { get; set; }
+
+        /// <summary>
+        /// Gets or sets the min price margin.
+        /// </summary>
+        internal int MinPriceMargin { get; set; }
+
+        /// <summary>
+        /// The parse web archive.
+        /// </summary>
+        /// <param name="htmlStream">
+        /// The html stream.
+        /// </param>
+        /// <returns>
+        /// The <see cref="RouteDataResult"/>.
+        /// </returns>
         internal RouteDataResult ParseWebArchive(Stream htmlStream)
         {
             var htmlDoc = new HtmlDocument();
             htmlDoc.Load(htmlStream);
-            return ParseWebArchive(htmlDoc);
+            return this.ParseWebArchive(htmlDoc);
         }
 
+        /// <summary>
+        /// The parse web archive.
+        /// </summary>
+        /// <param name="webDocument">
+        /// The web document.
+        /// </param>
+        /// <returns>
+        /// The <see cref="RouteDataResult"/>.
+        /// </returns>
         internal RouteDataResult ParseWebArchive(HtmlDocument webDocument)
         {
             var resultDivs = webDocument.DocumentNode.SelectNodes("//div[@id='results_list']");
 
-            if (resultDivs == null || resultDivs.Count < 1)  // Data is not ready yet
+            if (resultDivs == null || resultDivs.Count < 1)
+            {
+                // Data is not ready yet
                 return new RouteDataResult(DataResult.NotReady, null);
+            }
 
             HtmlNode originInput = webDocument.GetElementbyId("text_fly_from");
-            string origin = originInput.GetAttributeValue("value", "");
+            string origin = originInput.GetAttributeValue("value", string.Empty);
             HtmlNode destInput = webDocument.GetElementbyId("text_fly_to");
-            string destination = destInput.GetAttributeValue("value", "");
+            string destination = destInput.GetAttributeValue("value", string.Empty);
             var route = new TravelRoute(0, AirportDataProvider.FromIATA(origin), AirportDataProvider.FromIATA(destination));
 
-            foreach (var resultSection in resultDivs)   // Each result set
+            foreach (var resultSection in resultDivs)
             {
+                // Each result set
                 DateTime dataDate = DateTime.Now;
                 var dataDateAttrib = resultSection.Attributes["dataDate"];
                 if (dataDateAttrib != null)
                 {
                     string dataDateStr = dataDateAttrib.Value;
                     if (!DateTime.TryParse(dataDateStr, out dataDate))
+                    {
                         dataDate = DateTime.Now;
+                    }
                 }
 
                 var operatorData = new Dictionary<string, List<Flight>>();
                 var newData = new JourneyData(0, "EUR", dataDate);
 
                 var resultElements = resultSection.ChildNodes;
-                foreach (HtmlNode flightNode in resultElements) // Each flight in the set
+                foreach (HtmlNode flightNode in resultElements)
                 {
+                    // Each flight in the set
                     if (flightNode.Name != "div")
+                    {
                         continue;
+                    }
 
                     FlightLeg outboundLeg = null, inboundLeg = null;
                     string flightOperator = null;
                     TravelAgency travelAgency = null;
                     float price = 0;
 
-                    string onClickStr = flightNode.GetAttributeValue("onclick", "");
-                    travelAgency = TryGetTravelAgency(onClickStr, false);
+                    string onClickStr = flightNode.GetAttributeValue("onclick", string.Empty);
+                    travelAgency = this.TryGetTravelAgency(onClickStr, false);
 
                     // Loop through each column in table
                     var colNodes = flightNode.ChildNodes;
-                    foreach (HtmlNode flightDetailNode in colNodes) // Fetch the flight detail from the row
+                    foreach (HtmlNode flightDetailNode in colNodes)
                     {
+                        // Fetch the flight detail from the row
                         if (flightDetailNode.Name != "div")
+                        {
                             continue;
+                        }
 
-                        string className = flightDetailNode.GetAttributeValue("class", "");
+                        string className = flightDetailNode.GetAttributeValue("class", string.Empty);
                         switch (className)
                         {
                             case "f_outbound":
@@ -94,9 +159,10 @@ namespace SkyDean.FareLiz.InterFlight
                                 {
                                     string depDatePartStr = null, depTimePartStr = null, stopStr = null, arrDatePartStr = null, arrTimePartStr = null;
                                     TimeSpan duration = TimeSpan.Zero;
-                                    foreach (var dataNode in divNodes) // Each flight
+                                    foreach (var dataNode in divNodes)
                                     {
-                                        string dataClass = dataNode.GetAttributeValue("class", "");
+                                        // Each flight
+                                        string dataClass = dataNode.GetAttributeValue("class", string.Empty);
                                         switch (dataClass)
                                         {
                                             case "f_dep_date":
@@ -112,7 +178,7 @@ namespace SkyDean.FareLiz.InterFlight
                                                 arrTimePartStr = dataNode.InnerText;
                                                 break;
                                             case "f_duration":
-                                                duration = TryGetDuration(dataNode.InnerText);
+                                                duration = this.TryGetDuration(dataNode.InnerText);
                                                 break;
                                             case "f_stops":
                                                 stopStr = TryGetNumberString(dataNode.InnerText);
@@ -121,13 +187,21 @@ namespace SkyDean.FareLiz.InterFlight
                                     }
 
                                     // Validate that we got all required data
-                                    string depDateStr = String.Format(CultureInfo.InvariantCulture, "{0} {1}", depDatePartStr, depTimePartStr),
-                                           arrDateStr = String.Format(CultureInfo.InvariantCulture, "{0} {1}", arrDatePartStr, arrTimePartStr);
+                                    string depDateStr = string.Format(CultureInfo.InvariantCulture, "{0} {1}", depDatePartStr, depTimePartStr), 
+                                           arrDateStr = string.Format(CultureInfo.InvariantCulture, "{0} {1}", arrDatePartStr, arrTimePartStr);
                                     DateTime deptDate, arrDate;
-                                    if (DateTime.TryParseExact(depDateStr, "dd.MM.yy HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out deptDate)
-                                        && deptDate.IsDefined()
-                                        && DateTime.TryParseExact(arrDateStr, "dd.MM.yy HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out arrDate)
-                                        && arrDate.IsDefined())
+                                    if (DateTime.TryParseExact(
+                                        depDateStr, 
+                                        "dd.MM.yy HH:mm", 
+                                        CultureInfo.InvariantCulture, 
+                                        DateTimeStyles.None, 
+                                        out deptDate) && deptDate.IsDefined()
+                                        && DateTime.TryParseExact(
+                                            arrDateStr, 
+                                            "dd.MM.yy HH:mm", 
+                                            CultureInfo.InvariantCulture, 
+                                            DateTimeStyles.None, 
+                                            out arrDate) && arrDate.IsDefined())
                                     {
                                         if (duration > TimeSpan.Zero)
                                         {
@@ -135,16 +209,21 @@ namespace SkyDean.FareLiz.InterFlight
                                             int.TryParse(stopStr, out transit); // This might fail for straight flight: Just ignore it
                                             var flightLeg = new FlightLeg(deptDate, arrDate, duration, transit);
                                             if (className == "f_return")
+                                            {
                                                 inboundLeg = flightLeg;
+                                            }
                                             else
+                                            {
                                                 outboundLeg = flightLeg;
+                                            }
                                         }
                                     }
                                 }
+
                                 break;
 
                             case "f_company":
-                                flightOperator = flightDetailNode.InnerText.Replace("mm. ", "");
+                                flightOperator = flightDetailNode.InnerText.Replace("mm. ", string.Empty);
                                 break;
 
                             case "f_price":
@@ -157,25 +236,33 @@ namespace SkyDean.FareLiz.InterFlight
                     if (outboundLeg != null)
                     {
                         bool shouldAdd;
-                        if (shouldAdd = !operatorData.ContainsKey(flightOperator)) // Flight will always be added if it is the first from this operator
+                        if (shouldAdd = !operatorData.ContainsKey(flightOperator))
                         {
-                            if (operatorData.Keys.Count == MaxAirlines) // If we reached the limit for number of flight operators
+                            // Flight will always be added if it is the first from this operator
+                            if (operatorData.Keys.Count == this.MaxAirlines)
+                            {
+                                // If we reached the limit for number of flight operators
                                 continue;
+                            }
 
-                            operatorData.Add(flightOperator, new List<Flight>(MaxFlightsPerAirline));
+                            operatorData.Add(flightOperator, new List<Flight>(this.MaxFlightsPerAirline));
                         }
 
                         var opearatorFlights = operatorData[flightOperator];
-                        if (!shouldAdd) // This is not the first fly from this operator
+                        if (!shouldAdd)
                         {
-                            TimeSpan totalDuration = (outboundLeg == null ? TimeSpan.Zero : outboundLeg.Duration) + (inboundLeg == null ? TimeSpan.Zero : inboundLeg.Duration);
+                            // This is not the first fly from this operator
+                            TimeSpan totalDuration = (outboundLeg == null ? TimeSpan.Zero : outboundLeg.Duration)
+                                                     + (inboundLeg == null ? TimeSpan.Zero : inboundLeg.Duration);
                             var lastFlight = opearatorFlights[opearatorFlights.Count - 1];
 
-                            if ((price - lastFlight.Price) > MinPriceMargin)
+                            if ((price - lastFlight.Price) > this.MinPriceMargin)
                             {
                                 // If the price differs enough, add new flight if we still have space
-                                if (opearatorFlights.Count < MaxFlightsPerAirline)
+                                if (opearatorFlights.Count < this.MaxFlightsPerAirline)
+                                {
                                     shouldAdd = true;
+                                }
                             }
                             else
                             {
@@ -183,7 +270,7 @@ namespace SkyDean.FareLiz.InterFlight
                                 for (int i = opearatorFlights.Count - 1; i >= 0; i--)
                                 {
                                     var f = opearatorFlights[i];
-                                    if ((price - f.Price) <= MinPriceMargin && totalDuration < f.Duration)
+                                    if ((price - f.Price) <= this.MinPriceMargin && totalDuration < f.Duration)
                                     {
                                         opearatorFlights.RemoveAt(i);
                                         shouldAdd = true;
@@ -208,7 +295,9 @@ namespace SkyDean.FareLiz.InterFlight
                     DateTime deptDate = newData.Flights[0].OutboundLeg.Departure.Date;
                     DateTime retDate = DateTime.MinValue;
                     if (newData.Flights[0].InboundLeg != null)
+                    {
                         retDate = newData.Flights[0].InboundLeg.Departure.Date;
+                    }
 
                     foreach (var j in route.Journeys)
                     {
@@ -234,19 +323,46 @@ namespace SkyDean.FareLiz.InterFlight
             return new RouteDataResult(DataResult.Ready, route);
         }
 
+        /// <summary>
+        /// The parse web archive.
+        /// </summary>
+        /// <param name="htmlData">
+        /// The html data.
+        /// </param>
+        /// <returns>
+        /// The <see cref="RouteDataResult"/>.
+        /// </returns>
         internal RouteDataResult ParseWebArchive(string htmlData)
         {
             var htmlDoc = new HtmlDocument();
             htmlDoc.LoadHtml(htmlData);
-            return ParseWebArchive(htmlDoc);
+            return this.ParseWebArchive(htmlDoc);
         }
 
+        /// <summary>
+        /// The try get number string.
+        /// </summary>
+        /// <param name="input">
+        /// The input.
+        /// </param>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
         private static string TryGetNumberString(string input)
         {
             var match = Regex.Match(input, @"\d+");
             return match.Success ? match.Value : null;
         }
 
+        /// <summary>
+        /// The try get duration.
+        /// </summary>
+        /// <param name="input">
+        /// The input.
+        /// </param>
+        /// <returns>
+        /// The <see cref="TimeSpan"/>.
+        /// </returns>
         private TimeSpan TryGetDuration(string input)
         {
             var match = Regex.Match(input, @"(?<Hour>\d+?)([^\d]+?((?<Minute>\d+?)[^\d]*)?)?[^\d]");
@@ -255,7 +371,7 @@ namespace SkyDean.FareLiz.InterFlight
                 var hourStr = match.Groups["Hour"].Value;
                 var minuteStr = match.Groups["Minute"].Value;
                 int totalMin = int.Parse(hourStr) * 60;
-                if (!String.IsNullOrEmpty(minuteStr))
+                if (!string.IsNullOrEmpty(minuteStr))
                 {
                     int minute = int.Parse(minuteStr);
                     totalMin += minute;
@@ -268,39 +384,55 @@ namespace SkyDean.FareLiz.InterFlight
             return TimeSpan.Zero;
         }
 
+        /// <summary>
+        /// The try get travel agency.
+        /// </summary>
+        /// <param name="input">
+        /// The input.
+        /// </param>
+        /// <param name="forceRetrieveActualUrl">
+        /// The force retrieve actual url.
+        /// </param>
+        /// <returns>
+        /// The <see cref="TravelAgency"/>.
+        /// </returns>
         private TravelAgency TryGetTravelAgency(string input, bool forceRetrieveActualUrl)
         {
-            if (String.IsNullOrEmpty(input))
+            if (string.IsNullOrEmpty(input))
+            {
                 return null;
+            }
 
             var decoded = HttpUtility.HtmlDecode(input);
             var match = Regex.Match(decoded, @"click\('(?<OriginUrl>.+?\?snad=(?<Agency>.+?)_flight.+?&url=(?<Url>.+?)?)'\)", RegexOptions.IgnoreCase);
             if (match.Success)
             {
                 var agency = match.Groups["Agency"].Value;
-                if (!String.IsNullOrEmpty(agency))
+                if (!string.IsNullOrEmpty(agency))
                 {
                     var url = HttpUtility.UrlDecode(match.Groups["Url"].Value);
                     TravelAgency result = new TravelAgency(agency);
                     if (url.StartsWith("http"))
+                    {
                         result.Url = url;
+                    }
                     else
                     {
                         var originUrl = match.Groups["OriginUrl"].Value;
-                        var fullUrl = _rootDomain + "/" + originUrl;
+                        var fullUrl = this._rootDomain + "/" + originUrl;
                         if (forceRetrieveActualUrl)
                         {
                             try
                             {
                                 var httpRequest = (HttpWebRequest)WebRequest.Create(fullUrl);
                                 httpRequest.Method = "GET";
-                                httpRequest.Referer = _rootDomain;
+                                httpRequest.Referer = this._rootDomain;
                                 httpRequest.UserAgent = PTDataGenerator.USER_AGENT;
                                 httpRequest.Timeout = 2000;
                                 using (var response = (HttpWebResponse)httpRequest.GetResponse())
                                 {
                                     var header = response.GetResponseHeader("Refresh");
-                                    if (!String.IsNullOrEmpty(header))
+                                    if (!string.IsNullOrEmpty(header))
                                     {
                                         var urlMatch = Regex.Match(header, @"URL=\""(?<Url>.+?)?\""", RegexOptions.IgnoreCase);
                                         if (urlMatch.Success)
@@ -311,14 +443,18 @@ namespace SkyDean.FareLiz.InterFlight
                                     }
                                 }
                             }
-                            catch { }
+                            catch
+                            {
+                            }
                         }
 
                         result.Url = fullUrl;
                     }
+
                     return result;
                 }
             }
+
             return null;
         }
     }

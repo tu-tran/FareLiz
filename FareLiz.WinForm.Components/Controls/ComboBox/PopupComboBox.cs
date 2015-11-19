@@ -9,26 +9,27 @@
     using SkyDean.FareLiz.WinForm.Components.Utils;
 
     /// <summary>
-    ///     CodeProject.com "Simple pop-up control" "http://www.codeproject.com/cs/miscctrl/simplepopup.asp".
-    ///     Represents a Windows combo box control with a custom popup control attached.
+    /// CodeProject.com "Simple pop-up control" "http://www.codeproject.com/cs/miscctrl/simplepopup.asp". Represents a Windows combo box control with a
+    /// custom popup control attached.
     /// </summary>
-    [ToolboxBitmap(typeof(ComboBox)), ToolboxItem(true), ToolboxItemFilter("System.Windows.Forms"),
-     Description("Displays an editable text box with a drop-down list of permitted values.")]
+    [ToolboxBitmap(typeof(ComboBox))]
+    [ToolboxItem(true)]
+    [ToolboxItemFilter("System.Windows.Forms")]
+    [Description("Displays an editable text box with a drop-down list of permitted values.")]
     public partial class PopupComboBox : ComboBox
     {
         /// <summary>
-        ///     The pop-up wrapper for the dropDownControl.
-        ///     Made PROTECTED instead of PRIVATE so descendent classes can set its Resizable property.
-        ///     Note however the pop-up properties must be set after the dropDownControl is assigned, since this
-        ///     popup wrapper is recreated when the dropDownControl is assigned.
+        /// The pop-up wrapper for the dropDownControl. Made PROTECTED instead of PRIVATE so descendent classes can set its Resizable property. Note however the
+        /// pop-up properties must be set after the dropDownControl is assigned, since this popup wrapper is recreated when the dropDownControl is assigned.
         /// </summary>
         protected Popup dropDown;
 
+        /// <summary>
+        /// The drop down control.
+        /// </summary>
         private Control dropDownControl;
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="PopupControl.PopupComboBox" /> class.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="PopupControl.PopupComboBox" /> class.</summary>
         public PopupComboBox()
         {
             this.InitializeComponent();
@@ -36,26 +37,28 @@
             base.IntegralHeight = false;
         }
 
-        /// <summary>
-        ///     Gets or sets the drop down control.
-        /// </summary>
+        /// <summary>Gets or sets the drop down control.</summary>
         /// <value>The drop down control.</value>
         public Control DropDownControl
         {
-            get { return this.dropDownControl; }
+            get
+            {
+                return this.dropDownControl;
+            }
+
             set
             {
                 if (this.dropDownControl == value)
+                {
                     return;
+                }
 
                 this.dropDownControl = value;
                 this.dropDown = new Popup(value);
             }
         }
 
-        /// <summary>
-        ///     Shows the drop down.
-        /// </summary>
+        /// <summary>Shows the drop down.</summary>
         public void ShowDropDown()
         {
             if (this.dropDown != null)
@@ -64,9 +67,7 @@
             }
         }
 
-        /// <summary>
-        ///     Hides the drop down.
-        /// </summary>
+        /// <summary>Hides the drop down.</summary>
         public void HideDropDown()
         {
             if (this.dropDown != null)
@@ -76,10 +77,10 @@
         }
 
         /// <summary>
-        ///     Processes Windows messages.
+        /// Processes Windows messages.
         /// </summary>
         /// <param name="m">
-        ///     The Windows <see cref="T:System.Windows.Forms.Message" /> to process.
+        /// The Windows <see cref="T:System.Windows.Forms.Message"/> to process.
         /// </param>
         [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
         protected override void WndProc(ref Message m)
@@ -92,10 +93,14 @@
                     // on the combobox.
                     TimeSpan TimeSpan = DateTime.Now.Subtract(this.dropDown.LastClosedTimeStamp);
                     if (TimeSpan.TotalMilliseconds > 500)
+                    {
                         this.ShowDropDown();
+                    }
+
                     return;
                 }
             }
+
             base.WndProc(ref m);
         }
 
@@ -103,21 +108,34 @@
 
         /// <summary>This property is not relevant for this class.</summary>
         /// <returns>This property is not relevant for this class.</returns>
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden),
-         EditorBrowsable(EditorBrowsableState.Never)]
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public new int DropDownWidth
         {
-            get { return base.DropDownWidth; }
-            set { base.DropDownWidth = value; }
+            get
+            {
+                return base.DropDownWidth;
+            }
+
+            set
+            {
+                base.DropDownWidth = value;
+            }
         }
 
         /// <summary>This property is not relevant for this class.</summary>
         /// <returns>This property is not relevant for this class.</returns>
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden),
-         EditorBrowsable(EditorBrowsableState.Never)]
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public new int DropDownHeight
         {
-            get { return base.DropDownHeight; }
+            get
+            {
+                return base.DropDownHeight;
+            }
+
             set
             {
                 this.dropDown.Height = value;
@@ -127,31 +145,51 @@
 
         /// <summary>This property is not relevant for this class.</summary>
         /// <returns>This property is not relevant for this class.</returns>
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden),
-         EditorBrowsable(EditorBrowsableState.Never)]
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public new bool IntegralHeight
         {
-            get { return base.IntegralHeight; }
-            set { base.IntegralHeight = value; }
+            get
+            {
+                return base.IntegralHeight;
+            }
+
+            set
+            {
+                base.IntegralHeight = value;
+            }
         }
 
         /// <summary>This property is not relevant for this class.</summary>
         /// <returns>This property is not relevant for this class.</returns>
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden),
-         EditorBrowsable(EditorBrowsableState.Never)]
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public new ObjectCollection Items
         {
-            get { return base.Items; }
+            get
+            {
+                return base.Items;
+            }
         }
 
         /// <summary>This property is not relevant for this class.</summary>
         /// <returns>This property is not relevant for this class.</returns>
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden),
-         EditorBrowsable(EditorBrowsableState.Never)]
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public new int ItemHeight
         {
-            get { return base.ItemHeight; }
-            set { base.ItemHeight = value; }
+            get
+            {
+                return base.ItemHeight;
+            }
+
+            set
+            {
+                base.ItemHeight = value;
+            }
         }
 
         #endregion

@@ -1,145 +1,198 @@
-﻿using ProtoBuf;
-using SkyDean.FareLiz.Core.Utils;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Xml.Serialization;
-
-namespace SkyDean.FareLiz.Core.Data
+﻿namespace SkyDean.FareLiz.Core.Data
 {
-    /// <summary>
-    /// Business object for representing a flight journey
-    /// A journey may contain multiple historical data (whereas the actual flights are stored)
-    /// </summary>
-    [Serializable, ProtoContract]
+    using System;
+    using System.Collections.Generic;
+    using System.Xml.Serialization;
+
+    using ProtoBuf;
+
+    using SkyDean.FareLiz.Core.Utils;
+
+    /// <summary>Business object for representing a flight journey A journey may contain multiple historical data (whereas the actual flights are stored)</summary>
+    [Serializable]
+    [ProtoContract]
     public class Journey
     {
+        /// <summary>Initializes a new instance of the <see cref="Journey" /> class.</summary>
+        public Journey()
+        {
+            this.Data = new List<JourneyData>();
+        }
+
         /// <summary>
-        /// Unique ID for the journey
+        /// Initializes a new instance of the <see cref="Journey"/> class.
         /// </summary>
+        /// <param name="id">
+        /// The id.
+        /// </param>
+        /// <param name="route">
+        /// The route.
+        /// </param>
+        /// <param name="departureDate">
+        /// The departure date.
+        /// </param>
+        /// <param name="returnDate">
+        /// The return date.
+        /// </param>
+        public Journey(long id, TravelRoute route, DateTime departureDate, DateTime returnDate)
+            : this(route)
+        {
+            this.Id = id;
+            this.DepartureDate = departureDate;
+            this.ReturnDate = returnDate;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Journey"/> class.
+        /// </summary>
+        /// <param name="route">
+        /// The route.
+        /// </param>
+        public Journey(TravelRoute route)
+            : this()
+        {
+            this.Route = route;
+        }
+
+        /// <summary>Unique ID for the journey</summary>
         [ProtoMember(1)]
         public long Id { get; set; }
 
-        /// <summary>
-        /// Journey departure date
-        /// </summary>
+        /// <summary>Journey departure date</summary>
         [ProtoMember(2)]
         public DateTime DepartureDate { get; set; }
 
-        /// <summary>
-        /// Journey return date (for round-trip)
-        /// </summary>
+        /// <summary>Journey return date (for round-trip)</summary>
         [ProtoMember(3)]
         public DateTime ReturnDate { get; set; }
 
-        /// <summary>
-        /// Fare data history for the journeys
-        /// </summary>
+        /// <summary>Fare data history for the journeys</summary>
         [ProtoMember(4)]
         public List<JourneyData> Data { get; private set; }
 
-        /// <summary>
-        /// The parent route assosiated with the journey
-        /// </summary>
-        [XmlIgnore, ProtoIgnore]
+        /// <summary>The parent route assosiated with the journey</summary>
+        [XmlIgnore]
+        [ProtoIgnore]
         public TravelRoute Route { get; set; }
 
-        /// <summary>
-        /// IATA code of the departure airport
-        /// </summary>
-        [XmlIgnore, ProtoIgnore]
-        public string DepartureCode { get { return Route == null ? null : (Route.Departure == null ? null : Route.Departure.IATA); } }
+        /// <summary>IATA code of the departure airport</summary>
+        [XmlIgnore]
+        [ProtoIgnore]
+        public string DepartureCode
+        {
+            get
+            {
+                return this.Route == null ? null : (this.Route.Departure == null ? null : this.Route.Departure.IATA);
+            }
+        }
 
-        /// <summary>
-        /// IATA code of the destination airport
-        /// </summary>
-        [XmlIgnore, ProtoIgnore]
-        public string DestinationCode { get { return Route == null ? null : (Route.Destination == null ? null : Route.Destination.IATA); } }
+        /// <summary>IATA code of the destination airport</summary>
+        [XmlIgnore]
+        [ProtoIgnore]
+        public string DestinationCode
+        {
+            get
+            {
+                return this.Route == null ? null : (this.Route.Destination == null ? null : this.Route.Destination.IATA);
+            }
+        }
 
-        /// <summary>
-        /// Total stay duration in days (for round trip). For one-way trip, this property returns 0
-        /// </summary>
-        [XmlIgnore, ProtoIgnore]
+        /// <summary>Total stay duration in days (for round trip). For one-way trip, this property returns 0</summary>
+        [XmlIgnore]
+        [ProtoIgnore]
         public int StayDuration
         {
             get
             {
-                if (ReturnDate.IsUndefined() || DepartureDate.IsUndefined())
+                if (this.ReturnDate.IsUndefined() || this.DepartureDate.IsUndefined())
+                {
                     return 0;
+                }
 
-                return (int)(ReturnDate - DepartureDate).TotalDays;
+                return (int)(this.ReturnDate - this.DepartureDate).TotalDays;
             }
-        }
-
-        public Journey()
-        {
-            Data = new List<JourneyData>();
-        }
-
-        public Journey(long id, TravelRoute route, DateTime departureDate, DateTime returnDate)
-            : this(route)
-        {
-            Id = id;
-            DepartureDate = departureDate;
-            ReturnDate = returnDate;
-        }
-
-        public Journey(TravelRoute route)
-            : this()
-        {
-            Route = route;
         }
 
         /// <summary>
         /// Add fare data for the journey
         /// </summary>
+        /// <param name="data">
+        /// The data.
+        /// </param>
         public void AddData(IList<JourneyData> data)
         {
             if (data != null && data.Count > 0)
             {
-                Data.AddRange(data);
-                SetJourneyDataLinks(data);
+                this.Data.AddRange(data);
+                this.SetJourneyDataLinks(data);
             }
         }
 
         /// <summary>
         /// Add fare data for the journey
         /// </summary>
+        /// <param name="data">
+        /// The data.
+        /// </param>
         public void AddData(JourneyData data)
         {
             if (data != null)
             {
-                Data.Add(data);
+                this.Data.Add(data);
                 data.JourneyInfo = this;
             }
         }
 
+        /// <summary>The to string.</summary>
+        /// <returns>The <see cref="string" />.</returns>
         public override string ToString()
         {
-            return String.Format("{0} - [{1}-{2}] {3}", Id, DepartureCode, DestinationCode, StringUtil.GetPeriodString(DepartureDate, ReturnDate));
+            return string.Format(
+                "{0} - [{1}-{2}] {3}", 
+                this.Id, 
+                this.DepartureCode, 
+                this.DestinationCode, 
+                StringUtil.GetPeriodString(this.DepartureDate, this.ReturnDate));
         }
 
         /// <summary>
         /// Check that two journeys are the same (same departure, destination and travel dates)
         /// </summary>
+        /// <param name="other">
+        /// The other.
+        /// </param>
+        /// <returns>
+        /// The <see cref="bool"/>.
+        /// </returns>
         public bool IsSameTrip(Journey other)
         {
-            return (String.Equals(DepartureCode, other.DepartureCode, StringComparison.OrdinalIgnoreCase) &&
-                    String.Equals(DestinationCode, other.DestinationCode, StringComparison.OrdinalIgnoreCase) &&
-                    DepartureDate == other.DepartureDate && ReturnDate == other.ReturnDate);
+            return string.Equals(this.DepartureCode, other.DepartureCode, StringComparison.OrdinalIgnoreCase)
+                   && string.Equals(this.DestinationCode, other.DestinationCode, StringComparison.OrdinalIgnoreCase)
+                   && this.DepartureDate == other.DepartureDate && this.ReturnDate == other.ReturnDate;
         }
 
+        /// <summary>The set journey data links.</summary>
         [ProtoAfterDeserialization]
         public void SetJourneyDataLinks()
         {
-            SetJourneyDataLinks(Data);
+            this.SetJourneyDataLinks(this.Data);
         }
 
+        /// <summary>
+        /// The set journey data links.
+        /// </summary>
+        /// <param name="data">
+        /// The data.
+        /// </param>
         private void SetJourneyDataLinks(IList<JourneyData> data)
         {
             if (data != null && data.Count > 0)
+            {
                 foreach (var d in data)
+                {
                     d.JourneyInfo = this;
+                }
+            }
         }
     }
 }

@@ -1,12 +1,12 @@
-﻿using SkyDean.FareLiz.Core.Presentation;
-
-namespace SkyDean.FareLiz.Core
+﻿namespace SkyDean.FareLiz.Core
 {
     #region
 
     using System;
 
     using log4net;
+
+    using SkyDean.FareLiz.Core.Presentation;
 
     #endregion
 
@@ -17,6 +17,35 @@ namespace SkyDean.FareLiz.Core
 
         /// <summary>The _instance.</summary>
         private static AppContext _instance;
+
+        #endregion
+
+        #region Public Methods and Operators
+
+        /// <summary>
+        /// The initialize.
+        /// </summary>
+        /// <param name="instance">
+        /// The instance.
+        /// </param>
+        /// <exception cref="ApplicationException">
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// </exception>
+        public static void Initialize(AppContext instance)
+        {
+            if (_instance != null)
+            {
+                throw new ApplicationException("Access denied: Global context has already been initialized");
+            }
+
+            if (instance == null)
+            {
+                throw new ArgumentException("Global context cannot be nulled");
+            }
+
+            _instance = instance;
+        }
 
         #endregion
 
@@ -80,30 +109,10 @@ namespace SkyDean.FareLiz.Core
         /// <summary> Gets the progress callback.</summary>
         public static IProgressCallback ProgressCallback
         {
-            get { return _instance._progressCallback; }
-        }
-
-        #endregion
-
-        #region Public Methods and Operators
-
-        /// <summary>The initialize.</summary>
-        /// <param name="instance">The instance.</param>
-        /// <exception cref="ApplicationException"></exception>
-        /// <exception cref="ArgumentException"></exception>
-        public static void Initialize(AppContext instance)
-        {
-            if (_instance != null)
+            get
             {
-                throw new ApplicationException("Access denied: Global context has already been initialized");
+                return _instance._progressCallback;
             }
-
-            if (instance == null)
-            {
-                throw new ArgumentException("Global context cannot be nulled");
-            }
-
-            _instance = instance;
         }
 
         #endregion

@@ -1,36 +1,63 @@
-﻿using System;
-using System.ComponentModel;
-using System.Windows.Forms;
-using SkyDean.FareLiz.Core.Utils;
-using SkyDean.FareLiz.WinForm.Components.Dialog;
-
-namespace SkyDean.FareLiz.WinForm.Presentation.Views
+﻿namespace SkyDean.FareLiz.WinForm.Presentation.Views
 {
+    using System;
+    using System.ComponentModel;
+    using System.Windows.Forms;
+
+    using SkyDean.FareLiz.Core.Utils;
+    using SkyDean.FareLiz.WinForm.Components.Dialog;
+    using SkyDean.FareLiz.WinForm.Properties;
+
+    /// <summary>
+    /// The intro form.
+    /// </summary>
     public partial class IntroForm : SmartForm
     {
-        private bool _isNavigate = false;
+        /// <summary>
+        /// The _is navigate.
+        /// </summary>
+        private bool _isNavigate;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IntroForm"/> class.
+        /// </summary>
         public IntroForm()
         {
-            InitializeComponent();
-            Text = AppUtil.CompanyName + " " + AppUtil.ProductName;
-            imageList.Images.Add(Properties.Resources.SkyDeanIcon_BlackSmall);
+            this.InitializeComponent();
+            this.Text = AppUtil.CompanyName + " " + AppUtil.ProductName;
+            this.imageList.Images.Add(Resources.SkyDeanIcon_BlackSmall);
         }
 
+        /// <summary>
+        /// The intro form_ shown.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void IntroForm_Shown(object sender, EventArgs e)
         {
-            UpdateViews(sender as Control);
+            this.UpdateViews(sender as Control);
         }
 
+        /// <summary>
+        /// The update views.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
         private void UpdateViews(Control sender)
         {
-            int activeIdx = helpTab.SelectedIndex;
-            int total = helpTab.TabPages.Count;
-            btnPrevious.Enabled = activeIdx > 0;
-            btnNext.Enabled = activeIdx < total - 1;
+            int activeIdx = this.helpTab.SelectedIndex;
+            int total = this.helpTab.TabPages.Count;
+            this.btnPrevious.Enabled = activeIdx > 0;
+            this.btnNext.Enabled = activeIdx < total - 1;
 
             for (int i = 0; i < total; i++)
             {
-                var tabPgae = helpTab.TabPages[i];
+                var tabPgae = this.helpTab.TabPages[i];
                 if (i == activeIdx)
                 {
                     tabPgae.ImageIndex = 0;
@@ -43,45 +70,84 @@ namespace SkyDean.FareLiz.WinForm.Presentation.Views
                 }
             }
 
-            if (sender == btnNext)
+            if (sender == this.btnNext)
             {
                 if (activeIdx < total - 1)
-                    btnNext.Focus();
+                {
+                    this.btnNext.Focus();
+                }
                 else
-                    btnCancel.Focus();
+                {
+                    this.btnCancel.Focus();
+                }
             }
-            else if (sender == btnPrevious)
+            else if (sender == this.btnPrevious)
             {
                 if (activeIdx == 0)
-                    btnNext.Focus();
+                {
+                    this.btnNext.Focus();
+                }
                 else
-                    btnPrevious.Focus();
+                {
+                    this.btnPrevious.Focus();
+                }
             }
         }
 
+        /// <summary>
+        /// The navigate button_ click.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void NavigateButton_Click(object sender, EventArgs e)
         {
-            int activeIdx = helpTab.SelectedIndex;
+            int activeIdx = this.helpTab.SelectedIndex;
 
-            _isNavigate = true;
-            if (sender == btnPrevious)
-                helpTab.SelectedIndex = --activeIdx;
+            this._isNavigate = true;
+            if (sender == this.btnPrevious)
+            {
+                this.helpTab.SelectedIndex = --activeIdx;
+            }
             else
-                helpTab.SelectedIndex = ++activeIdx;
-            _isNavigate = false;
+            {
+                this.helpTab.SelectedIndex = ++activeIdx;
+            }
 
-            UpdateViews(sender as Control);
+            this._isNavigate = false;
+
+            this.UpdateViews(sender as Control);
         }
 
+        /// <summary>
+        /// The help tab_ selecting.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void helpTab_Selecting(object sender, TabControlCancelEventArgs e)
         {
-            e.Cancel = !_isNavigate;
+            e.Cancel = !this._isNavigate;
         }
 
+        /// <summary>
+        /// The intro form_ help button clicked.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void IntroForm_HelpButtonClicked(object sender, CancelEventArgs e)
         {
-            using (var about = new AboutForm())
-                about.ShowDialog();
+            using (var about = new AboutForm()) about.ShowDialog();
             e.Cancel = true;
         }
     }
