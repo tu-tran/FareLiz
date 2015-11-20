@@ -89,7 +89,6 @@
     <Compile Include="Utils\JourneyDateEqualityComparer.cs" />
     <Compile Include="Utils\Log4NetWrapper.cs" />
     <Compile Include="Utils\NonSerialiazableTypeSurrogateSelector.cs" />
-    <Compile Include="Utils\Debugger\ClassDebugger.cs" />
     <Compile Include="Utils\ObjectDataTransporter.cs" />
     <Compile Include="Utils\ReflectionDeepCloner.cs" />
     <Compile Include="Utils\Singleton.cs" />
