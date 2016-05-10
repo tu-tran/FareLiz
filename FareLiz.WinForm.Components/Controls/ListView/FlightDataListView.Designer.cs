@@ -207,7 +207,7 @@
             // 
             // colAgency
             // 
-            this.colAgency.Text = "Agency";
+            this.colAgency.Text = "TravelAgency";
             this.colAgency.Width = 120;
             // 
             // FlightDataListView

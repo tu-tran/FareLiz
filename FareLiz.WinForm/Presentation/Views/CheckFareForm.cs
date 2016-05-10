@@ -772,7 +772,7 @@
                         maxStay = j.StayDuration;
                     }
 
-                    var jPrice = j.Data.Max(d => d.Flights.Max(f => f.Price));
+                    var jPrice = j.Data.Max(d => d.Flights.Max(f => f.Fares.Max(p => p.Price)));
                     if (jPrice > maxPrice)
                     {
                         maxPrice = jPrice;

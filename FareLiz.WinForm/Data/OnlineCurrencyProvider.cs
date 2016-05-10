@@ -260,10 +260,8 @@
         /// <summary>The load data.</summary>
         private static void LoadData()
         {
-            string url = "http://finance.yahoo.com/webservice/v1/symbols/allcurrencies/quote?format=xml&random="
-                         + Rand.Next().ToString(CultureInfo.InvariantCulture);
             var wc = new WebClient();
-            var resultStr = wc.DownloadString(url);
+            var resultStr = wc.DownloadString("http://finance.yahoo.com/webservice/v1/symbols/allcurrencies/quote?format=xml");
             var result = new Dictionary<string, float>();
 
             using (var strReader = new StringReader(resultStr))

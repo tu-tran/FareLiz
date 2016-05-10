@@ -7,6 +7,8 @@
     using System.ComponentModel;
     using System.IO;
 
+    using SkyDean.FareLiz.Data.Monitoring;
+
     /// <summary>Data handler for International Flights (PT)</summary>
     [DisplayName("International Flight Data Handler (PT)")]
     [Description("Best covered for international flight routes")]
@@ -152,7 +154,8 @@
         /// </returns>
         public TravelRoute ReadData(string routeStringData)
         {
-            var parser = this.GetParser();
+            //TODO: FIX ME
+            var parser = this.GetParser(null);
             var result = parser.ParseWebArchive(routeStringData);
             return result == null ? null : result.ResultRoute;
         }
@@ -160,12 +163,17 @@
         /// <summary>
         /// The get parser.
         /// </summary>
+        /// <param name="request">The request.</param>
         /// <returns>
-        /// The <see cref="PTDataParser"/>.
+        /// The <see cref="PTDataParser" />.
         /// </returns>
-        private PTDataParser GetParser()
+        private PTDataParser GetParser(FlightFareRequest request)
         {
-            var parser = new PTDataParser(this._root_, this._config.MaxFlightsPerAirline, this._config.MaxAirlineCount, 1);
+            var parser = new PTDataParser(this._root_, this._config.MaxFlightsPerAirline, this._config.MaxAirlineCount, 1)
+                             {
+                                 Departure = request.Departure,
+                                 Destination = request.Destination
+                             };
             return parser;
         }
     }

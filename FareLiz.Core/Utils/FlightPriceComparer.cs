@@ -1,6 +1,7 @@
 namespace SkyDean.FareLiz.Core.Utils
 {
     using System.Collections.Generic;
+    using System.Linq;
 
     using SkyDean.FareLiz.Core.Data;
 

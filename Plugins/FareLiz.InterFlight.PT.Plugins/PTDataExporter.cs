@@ -40,6 +40,8 @@
             setting.OmitXmlDeclaration = true;
             setting.Indent = true;
             setting.Encoding = Encoding.Default;
+
+            /* TODO :FIX XML stream writer
             using (XmlWriter writer = XmlWriter.Create(targetStream, setting))
             {
                 writer.WriteStartElement("body");
@@ -171,6 +173,7 @@
 
                 writer.WriteEndElement();
             }
+             */
         }
     }
 }

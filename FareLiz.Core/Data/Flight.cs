@@ -1,13 +1,33 @@
 ﻿namespace SkyDean.FareLiz.Core.Data
 {
+    using ProtoBuf;
+    using SkyDean.FareLiz.Core.Utils;
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Globalization;
+    using System.Linq;
     using System.Xml.Serialization;
 
-    using ProtoBuf;
 
-    using SkyDean.FareLiz.Core.Utils;
+    /// <summary>
+    /// The fare data.
+    /// </summary>
+    [DebuggerDisplay("{TravelAgency} - {Price}")]
+    [Serializable]
+    [ProtoContract]
+    public class Fare
+    {
+        /// <summary>
+        /// Gets or sets the agency.
+        /// </summary>
+        public TravelAgency TravelAgency { get; set; }
+
+        /// <summary>
+        /// Gets or sets the price.
+        /// </summary>
+        public double Price { get; set; }
+    }
 
     /// <summary>Business object for storing the flight fare data</summary>
     [DebuggerDisplay("{Operator} - {Price}")]
@@ -42,19 +62,16 @@
         /// The inbound leg.
         /// </param>
         public Flight(
-            JourneyData baseData, 
-            string flightOperator, 
-            float price, 
-            TravelAgency travelAgency, 
-            FlightLeg outboundLeg, 
+            JourneyData baseData,
+            string flightOperator,
+            FlightLeg outboundLeg,
             FlightLeg inboundLeg)
         {
             this.JourneyData = baseData;
             this.Operator = flightOperator;
-            this.Price = price;
-            this.TravelAgency = travelAgency;
             this.OutboundLeg = outboundLeg;
             this.InboundLeg = inboundLeg;
+            this.Fares = new List<Fare>();
         }
 
         /// <summary>Inbound leg (return trip)</summary>
@@ -69,18 +86,30 @@
         [ProtoMember(3)]
         public FlightLeg OutboundLeg { get; set; }
 
-        /// <summary>Price of the flight (in the currency of the parent JourneyData)</summary>
-        [ProtoMember(4)]
-        public float Price { get; set; }
-
         /// <summary>The travel agency which sells the ticket</summary>
-        [ProtoMember(5)]
-        public TravelAgency TravelAgency { get; set; }
+        [ProtoMember(4)]
+        public List<Fare> Fares { get; set; }
 
         /// <summary>The parent JourneyData which contains this flight</summary>
         [XmlIgnore]
         [ProtoIgnore]
         public JourneyData JourneyData { get; set; }
+
+        /// <summary>Returns a formatted string for the flight dates</summary>
+        [XmlIgnore]
+        [ProtoIgnore]
+        public double Price
+        {
+            get { return this.Fares == null ? 0.0 : this.Fares.Min(f => f.Price); }
+        }
+
+        /// <summary>Returns a formatted string for the flight dates</summary>
+        [XmlIgnore]
+        [ProtoIgnore]
+        public TravelAgency TravelAgency
+        {
+            get { return this.Fares == null || this.Fares.Count < 1 ? null : this.Fares.First().TravelAgency; }
+        }
 
         /// <summary>Returns a formatted string for the flight dates</summary>
         [XmlIgnore]
@@ -116,11 +145,10 @@
             {
                 string outBound = this.OutboundLeg == null ? null : Environment.NewLine + "Outbound flight: " + this.OutboundLeg.DetailString;
                 string inBound = this.InboundLeg == null ? null : Environment.NewLine + "Return flight: " + this.InboundLeg.DetailString;
-                string agency = this.TravelAgency == null ? null : Environment.NewLine + "Travel agency: " + this.TravelAgency.Name;
                 string result = "Departure: " + this.JourneyData.JourneyInfo.Route.Departure + Environment.NewLine + "Destination: "
                                 + this.JourneyData.JourneyInfo.Route.Destination + Environment.NewLine + "Travel Period: " + this.TravelDateString
-                                + Environment.NewLine + "Flight duration: " + this.Duration.ToHourMinuteString() + outBound + inBound + agency
-                                + Environment.NewLine + "Data date: " + this.JourneyData.DataDate + Environment.NewLine + "Price: " + this.Price + " "
+                                + Environment.NewLine + "Flight duration: " + this.Duration.ToHourMinuteString() + outBound + inBound
+                                + Environment.NewLine + "Data date: " + this.JourneyData.DataDate + " "
                                 + this.JourneyData.Currency;
                 return result;
             }
@@ -145,7 +173,7 @@
         {
             get
             {
-                bool result = this.TravelAgency != null && !string.IsNullOrEmpty(this.TravelAgency.Url) && this.IsAvailable;
+                bool result = this.Price > 0.0 && this.IsAvailable;
                 return result;
             }
         }
@@ -193,7 +221,7 @@
         /// <returns>The <see cref="string" />.</returns>
         public override string ToString()
         {
-            return this.Operator + " - " + this.Price + this.JourneyData.Currency + " - " + this.Duration.ToHourMinuteString() + " ["
+            return this.Operator + " - " + this.JourneyData.Currency + " - " + this.Duration.ToHourMinuteString() + " ["
                    + this.OutboundLeg.Departure.ToString(CultureInfo.InvariantCulture) + "-"
                    + (this.InboundLeg == null ? null : this.InboundLeg.Departure.ToString(CultureInfo.InvariantCulture)) + "]";
         }

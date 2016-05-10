@@ -5,6 +5,7 @@
     using System.Drawing;
     using System.Drawing.Drawing2D;
     using System.Globalization;
+    using System.Linq;
     using System.Windows.Forms;
 
     using SkyDean.FareLiz.Core;
@@ -367,7 +368,7 @@
                 {
                     try
                     {
-                        BrowserUtils.Open(data.TravelAgency.Url);
+                        BrowserUtils.Open(data.Fares.First().TravelAgency.Url);
                     }
                     catch (Exception ex)
                     {

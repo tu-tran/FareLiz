@@ -21,7 +21,7 @@ namespace SkyDean.FareLiz.Core.Utils
         /// </returns>
         public bool Equals(Flight x, Flight y)
         {
-            return (x.InboundLeg.Departure == y.InboundLeg.Departure) && (x.OutboundLeg.Departure == y.OutboundLeg.Departure) && (x.Price == y.Price)
+            return (x.InboundLeg.Departure == y.InboundLeg.Departure) && (x.OutboundLeg.Departure == y.OutboundLeg.Departure)
                    && (x.Operator == y.Operator);
         }
 
@@ -36,7 +36,7 @@ namespace SkyDean.FareLiz.Core.Utils
         /// </returns>
         public int GetHashCode(Flight obj)
         {
-            return obj.Operator.GetHashCode() + obj.OutboundLeg.Departure.GetHashCode() + obj.Price.GetHashCode();
+            return obj.Operator.GetHashCode() + obj.OutboundLeg.Departure.GetHashCode() + obj.Fares.GetHashCode();
         }
     }
 }
