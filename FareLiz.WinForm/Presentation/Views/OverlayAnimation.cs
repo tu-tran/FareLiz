@@ -149,11 +149,11 @@
 
             if (this.imgArrow.Top <= this._imgTopLimit)
             {
-                this._imgStep = 3;
+                this._imgStep = 1;
             }
             else if (this.imgArrow.Bottom >= this._controlRect.Top)
             {
-                this._imgStep = -3;
+                this._imgStep = -1;
             }
 
             this.imgArrow.Top += this._imgStep;
@@ -217,7 +217,7 @@
                 throw new ArgumentException("The control [" + this._hostControl.Name + "] does not belong to any form");
             }
 
-            this._parentForm.Opacity = 0.85;
+            this._parentForm.Opacity = 0.8;
             this.Size = this._parentForm.Size; // Resize and align the form so that it fully cover the parent form
             this.Location = this._parentForm.Location;
             var screenLoc = this._hostControl.PointToScreen(Point.Empty);
