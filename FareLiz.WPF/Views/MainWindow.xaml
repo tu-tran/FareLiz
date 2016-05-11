@@ -1,0 +1,24 @@
+﻿<Window x:Class="FareLiz.WPF.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Name="RootWindow"
+        Title="SubSearch"
+        Width="500"
+        Height="400"
+        MinWidth="370"
+        MinHeight="120"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        Icon="/FareLiz.WPF;component/FareLiz.ico"
+        SizeToContent="WidthAndHeight"
+        Style="{StaticResource DefaultWindowStyle}">
+    <DockPanel>
+        <StatusBar Height="24" DockPanel.Dock="Bottom">
+            <TextBlock Margin="3,0,0,0">
+                <Run Text="{Binding Status}" />
+            </TextBlock>
+            <StatusBarItem HorizontalAlignment="Right">
+                <ResizeGrip Opacity="0.75" />
+            </StatusBarItem>
+        </StatusBar>
+    </DockPanel>
+</Window>

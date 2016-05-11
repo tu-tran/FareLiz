@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A5892918-5F9A-49CE-B09F-20D6B1BAF220}"
 	ProjectSection(SolutionItems) = preProject
@@ -65,6 +65,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FareLiz.Data", "FareLiz.Data\FareLiz.Data.csproj", "{399F5123-3DC8-4DE0-B38F-597F46F0EE45}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FareLiz.FileIO.Plugins", "Plugins\FareLiz.FileIO.Plugins\FareLiz.FileIO.Plugins.csproj", "{D6124BBD-8FD6-4548-BE76-D9F7B931D55C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FareLiz.WPF", "FareLiz.WPF\FareLiz.WPF.csproj", "{CC76CCA1-502F-45DE-A236-FB5D58991691}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -160,6 +162,14 @@ Global
 		{D6124BBD-8FD6-4548-BE76-D9F7B931D55C}.Release|x64.Build.0 = Release|x64
 		{D6124BBD-8FD6-4548-BE76-D9F7B931D55C}.Release|x86.ActiveCfg = Release|x86
 		{D6124BBD-8FD6-4548-BE76-D9F7B931D55C}.Release|x86.Build.0 = Release|x86
+		{CC76CCA1-502F-45DE-A236-FB5D58991691}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CC76CCA1-502F-45DE-A236-FB5D58991691}.Debug|x64.Build.0 = Debug|Any CPU
+		{CC76CCA1-502F-45DE-A236-FB5D58991691}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CC76CCA1-502F-45DE-A236-FB5D58991691}.Debug|x86.Build.0 = Debug|Any CPU
+		{CC76CCA1-502F-45DE-A236-FB5D58991691}.Release|x64.ActiveCfg = Release|Any CPU
+		{CC76CCA1-502F-45DE-A236-FB5D58991691}.Release|x64.Build.0 = Release|Any CPU
+		{CC76CCA1-502F-45DE-A236-FB5D58991691}.Release|x86.ActiveCfg = Release|Any CPU
+		{CC76CCA1-502F-45DE-A236-FB5D58991691}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
