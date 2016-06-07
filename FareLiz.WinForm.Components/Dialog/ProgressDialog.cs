@@ -483,8 +483,7 @@
             set
             {
                 this.SafeInvoke(
-                    (StyleInvoker)
-                    delegate { this.progressBar.Style = value == ProgressStyle.Marquee ? ProgressBarStyle.Marquee : ProgressBarStyle.Continuous; });
+                    new Action(() => this.progressBar.Style = value == ProgressStyle.Marquee ? ProgressBarStyle.Marquee : ProgressBarStyle.Continuous));
             }
         }
 
@@ -693,7 +692,7 @@
                 }
 
                 ThreadPool.QueueUserWorkItem(
-                    delegate(object param)
+                    delegate (object param)
                     {
                         threadName = string.IsNullOrEmpty(threadName) ? title.Replace(" ", string.Empty) : threadName;
                         AppUtil.NameCurrentThread(threadName);

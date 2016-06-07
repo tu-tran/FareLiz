@@ -39,6 +39,11 @@
         private readonly DropNetClient _client;
 
         /// <summary>
+        /// The _authorize client.
+        /// </summary>
+        private readonly DropNetClient _authorizeClient;
+
+        /// <summary>
         /// The _data grep.
         /// </summary>
         private readonly DataGrep _dataGrep;
@@ -80,6 +85,7 @@
                 this._dataGrep.Convert(apiSecret),
                 this._dataGrep.Convert(curConfig.UserToken),
                 this._dataGrep.Convert(curConfig.UserSecret));
+            this._authorizeClient = new DropNetClient(this._dataGrep.Convert(apiKey), this._dataGrep.Convert(apiSecret));
             this.ResultConfig = curConfig == null ? new DropBoxSyncerConfig() : curConfig.ReflectionDeepClone(logger);
             this.ResultConfig.ApiKey = apiKey;
             this.ResultConfig.ApiSecret = apiSecret;
@@ -142,7 +148,7 @@ The web URL will also be copied to your clipboard. In case a new browser window 
                         {
                             try
                             {
-                                accessToken = this._client.GetAccessToken(); // Get token                            
+                                accessToken = this._authorizeClient.GetAccessToken(); // Get token                            
                             }
                             catch
                             {
@@ -199,8 +205,8 @@ The web URL will also be copied to your clipboard. In case a new browser window 
                 this._logger,
                 callback =>
                 {
-                    this._client.GetToken();
-                    result = this._client.BuildAuthorizeUrl();
+                    this._authorizeClient.GetToken();
+                    result = this._authorizeClient.BuildAuthorizeUrl();
                 });
             return result;
         }
