@@ -1,4 +1,5 @@
-@set NET_FRAMEWORK="%WINDIR%\Microsoft.NET\Framework\v3.5\MSBuild.exe"
+@set NET_FRAMEWORK="%WINDIR%\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe"
+@set SOLUTION_FILE=FareLiz.sln
 
 @del /F /S /Q *.log > nul 2>&1
 @set PLATFORM=x86
@@ -13,7 +14,9 @@
 @del /F /S /Q "%OUTPUT_DIR%\*" > nul 2>&1
 
 @echo Building %PLATFORM% Release...
-@%NET_FRAMEWORK% FareLiz.sln /t:Rebuild /p:Configuration=Release /p:Platform=%PLATFORM% > "%LOG_FILE%" 2>&1
+@echo Restoring Nuget packages...
+@nuget restore "%SOLUTION_FILE%"
+@%NET_FRAMEWORK% "%SOLUTION_FILE%" /t:Rebuild /p:Configuration=Release /p:Platform=%PLATFORM% > "%LOG_FILE%" 2>&1
 @echo Exit code %ERRORLEVEL% >> "%LOG_FILE%"
 @IF %ERRORLEVEL% NEQ 0 GOTO  Error
 
