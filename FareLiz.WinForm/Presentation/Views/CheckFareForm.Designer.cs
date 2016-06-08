@@ -355,7 +355,6 @@ namespace SkyDean.FareLiz.WinForm.Presentation.Views
             this.txtDeparture.Name = "txtDeparture";
             this.txtDeparture.Size = new System.Drawing.Size(225, 20);
             this.txtDeparture.TabIndex = 1;
-            this.txtDeparture.VisibleSuggestItems = 10;
             // 
             // txtDestination
             // 
@@ -370,7 +369,6 @@ namespace SkyDean.FareLiz.WinForm.Presentation.Views
             this.txtDestination.Name = "txtDestination";
             this.txtDestination.Size = new System.Drawing.Size(225, 20);
             this.txtDestination.TabIndex = 2;
-            this.txtDestination.VisibleSuggestItems = 10;
             // 
             // lblDeparture
             // 

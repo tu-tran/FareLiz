@@ -45,6 +45,7 @@
         /// </summary>
         public AutoCompleteTextbox()
         {
+            this.VisibleSuggestItems = int.MaxValue;
             this.InitializeComponent();
             this.listBox.DataSource = this.CurrentAutoCompleteList;
         }
