@@ -212,6 +212,15 @@ The web URL will also be copied to your clipboard. In case a new browser window 
         }
 
         /// <summary>
+        /// Sets the allow authorization.
+        /// </summary>
+        /// <param name="isEnabled">if set to <c>true</c> [is enabled].</param>
+        private void SetAllowAuthorization(bool isEnabled)
+        {
+            this.SafeInvoke(new MethodInvoker(() => this.btnAuthorize.Enabled = isEnabled));
+        }
+
+        /// <summary>
         /// The drop box config dialog_ load.
         /// </summary>
         /// <param name="sender">
@@ -231,6 +240,7 @@ The web URL will also be copied to your clipboard. In case a new browser window 
             }
 
             this.lblStatus.Text = validateStr;
+            this.SetAllowAuthorization(false);
             ThreadPool.QueueUserWorkItem(
                 o =>
                 {
@@ -255,6 +265,8 @@ The web URL will also be copied to your clipboard. In case a new browser window 
 
                             valid = false;
                         }
+
+                        this.SetAllowAuthorization(!valid);
                     }
 
                     if (this.IsDestructed())

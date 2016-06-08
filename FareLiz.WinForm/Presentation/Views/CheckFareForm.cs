@@ -132,7 +132,7 @@
         {
             get
             {
-                return this.InvokeIfNeeded(() => this.departureDatePicker.Value);
+                return this.InvokeIfNeeded(() => this.returnDatePicker.Value);
             }
         }
 
@@ -1206,7 +1206,7 @@
                 this.numMaxDuration.Enabled =
                 this.returnDatePicker.Enabled =
                 this.numReturnDateRangeMinus.Enabled =
-                this.numReturnDateRangePlus.Enabled = this.lblReturnPM.Enabled = this.btnNoReturnRange.Enabled = this.chkReturnDate.Checked;
+                this.numReturnDateRangePlus.Enabled = this.btnNoReturnRange.Enabled = this.chkReturnDate.Checked;
         }
 
         /// <summary>
