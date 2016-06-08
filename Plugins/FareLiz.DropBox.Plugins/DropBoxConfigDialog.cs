@@ -118,7 +118,7 @@
         {
             try
             {
-                this.btnAuthorize.Enabled = false;
+                this.SetAllowAuthorization(false);
                 string url = this.GetAuthorizeUrl();
                 AppContext.ProgressCallback.Inform(
                     this,
@@ -182,9 +182,10 @@ The web URL will also be copied to your clipboard. In case a new browser window 
                     "Connection problem",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
-                this._logger.Error("Failed to authorize DropBox", ex);
-                this.btnAuthorize.Enabled = true;
+                this._logger.Error("Failed to authorize DropBox", ex);                
             }
+
+            this.SetAllowAuthorization(true);
         }
 
         /// <summary>
@@ -265,10 +266,9 @@ The web URL will also be copied to your clipboard. In case a new browser window 
 
                             valid = false;
                         }
-
-                        this.SetAllowAuthorization(!valid);
                     }
 
+                    this.SetAllowAuthorization(!valid);
                     if (this.IsDestructed())
                     {
                         return;

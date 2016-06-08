@@ -88,6 +88,7 @@
 
             var globalContext = WinFormGlobalContext.GetInstance(this.Logger);
             globalContext.SetFirstStart(firstStart);
+            AppContext.Initialize(globalContext);
 
             MonitorEnvironment env = this.GetEnvironment(executionParam, globalContext);
             if (env == null)
@@ -97,7 +98,6 @@
 
             env.Logger = this.Logger;
             globalContext.SetEnvironment(env);
-            AppContext.Initialize(globalContext);
             var mainForm = new FlightStatisticForm(null, executionParam, true);
             CheckFareForm checkFareForm = null;
 

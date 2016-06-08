@@ -1,14 +1,13 @@
 ﻿namespace SkyDean.FareLiz.WinForm.Utils
 {
+    using SkyDean.FareLiz.Core;
+    using SkyDean.FareLiz.Core.Utils;
     using System;
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Reflection;
-
-    using SkyDean.FareLiz.Core;
-    using SkyDean.FareLiz.Core.Utils;
 
     /// <summary>Helper class used for resolving installed plugins</summary>
     public sealed class AssemblyPluginResolver : IPluginResolver
@@ -64,26 +63,17 @@
         public void LoadPlugins()
         {
             string[] pluginFiles = Directory.GetFiles(
-                PathUtil.ApplicationPath, 
+                PathUtil.ApplicationPath,
                 string.Format(CultureInfo.InvariantCulture, "{0}.*.Plugins.dll", AppUtil.ProductName));
-            var publicKey = Assembly.GetExecutingAssembly().GetName().GetPublicKey();
-
-            using (var asmLoaderProxy = AppDomainProxy<AssemblyLoader>.GetProxy(AppDomain.CurrentDomain.BaseDirectory))
+            foreach (var f in pluginFiles)
             {
-                var loader = asmLoaderProxy.Instance;
-                foreach (var f in pluginFiles)
+                try
                 {
-                    try
-                    {
-                        if (loader.IsValidPluginAssembly(f, publicKey))
-                        {
-                            LoadedPlugins.Add(Assembly.LoadFile(f));
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        this._logger.ErrorFormat("Failed to load assembly [{0}]: {1}", f, ex);
-                    }
+                    LoadedPlugins.Add(Assembly.LoadFile(f));
+                }
+                catch (Exception ex)
+                {
+                    this._logger.ErrorFormat("Failed to load assembly [{0}]: {1}", f, ex);
                 }
             }
         }

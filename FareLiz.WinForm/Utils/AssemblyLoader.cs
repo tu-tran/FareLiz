@@ -26,32 +26,5 @@
         {
             this._logger = logger;
         }
-
-        /// <summary>
-        /// The is valid plugin assembly.
-        /// </summary>
-        /// <param name="fileName">
-        /// The file name.
-        /// </param>
-        /// <param name="publicKey">
-        /// The public key.
-        /// </param>
-        /// <returns>
-        /// The <see cref="bool"/>.
-        /// </returns>
-        public bool IsValidPluginAssembly(string fileName, byte[] publicKey)
-        {
-            try
-            {
-                var refAsmKey = Assembly.ReflectionOnlyLoadFrom(fileName).GetName().GetPublicKey(); // Validate the public key
-                return ObjectExtension.AreEquals(publicKey, refAsmKey);
-            }
-            catch (Exception ex)
-            {
-                this._logger.ErrorFormat("Failed to load {0}: {1}", fileName, ex.Message);
-            }
-
-            return false;
-        }
     }
 }
