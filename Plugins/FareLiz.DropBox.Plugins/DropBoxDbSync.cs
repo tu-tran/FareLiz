@@ -552,16 +552,6 @@
             string apiSecret = this.Convert(this._config.ApiSecret);
             string userToken = this.Convert(this._config.UserToken);
             string userSecret = this.Convert(this._config.UserSecret);
-
-            bool isError = string.IsNullOrEmpty(apiKey) || string.IsNullOrEmpty(apiSecret) || string.IsNullOrEmpty(userToken)
-                            || string.IsNullOrEmpty(userSecret);
-            if (isError)
-            {
-                throw new ConfigurationException(
-                    this,
-                    "The plugin has not been properly configured. Please make sure that you have authenticated with DropBox");
-            }
-
             var result = new DropNetClient(apiKey, apiSecret, userToken, userSecret) { UseSandbox = true };
             return result;
         }
