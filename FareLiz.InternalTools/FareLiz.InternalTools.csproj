@@ -138,9 +138,9 @@
       <Project>{d6124bbd-8fd6-4548-be76-d9f7b931d55c}</Project>
       <Name>FareLiz.FileIO.Plugins</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Plugins\FareLiz.InterFlight.PT.Plugins\FareLiz.InterFlight.Plugins.csproj">
+    <ProjectReference Include="..\Plugins\FareLiz.InterFlight.PT.Plugins\FareLiz.InterFlight.PT.Plugins.csproj">
       <Project>{1c4723fb-cc22-4f99-9d1c-56db0b706d3b}</Project>
-      <Name>FareLiz.InterFlight.Plugins</Name>
+      <Name>FareLiz.InterFlight.PT.Plugins</Name>
     </ProjectReference>
     <ProjectReference Include="..\Plugins\FareLiz.SQLite.Plugins\FareLiz.SQLite.Plugins.csproj">
       <Project>{5dcc3b57-8592-484f-98a1-701e3e408818}</Project>

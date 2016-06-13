@@ -85,6 +85,16 @@
     <Compile Include="Monitoring\LiveFareMonitor.cs" />
     <Compile Include="Monitoring\StorageRoute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Web\RouteDataResult.cs" />
+    <Compile Include="Web\WebHandlerConfiguration.cs" />
+    <Compile Include="Web\WebDataProviderBase.cs" />
+    <Compile Include="Web\UserAgent.cs" />
+    <Compile Include="Web\WebResponseExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FareLiz.Core\FareLiz.Core.csproj">
@@ -96,6 +106,13 @@
     <EmbeddedResource Include="Csv\CsvException.resx">
       <DependentUpon>CsvException.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Properties\UserAgents.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

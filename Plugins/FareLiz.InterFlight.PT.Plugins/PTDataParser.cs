@@ -6,6 +6,7 @@
     using SkyDean.FareLiz.Core.Utils;
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Globalization;
     using System.IO;
     using System.Linq;
@@ -13,6 +14,8 @@
     using System.Text;
     using System.Text.RegularExpressions;
     using System.Web;
+
+    using SkyDean.FareLiz.Data.Web;
 
     /// <summary>
     /// The pt data parser.
@@ -462,10 +465,8 @@
                         {
                             try
                             {
-                                var httpRequest = (HttpWebRequest)WebRequest.Create(fullUrl);
-                                httpRequest.Method = "GET";
+                                var httpRequest = fullUrl.GetRequest("GET");
                                 httpRequest.Referer = this._rootDomain;
-                                httpRequest.UserAgent = PTDataGenerator.USER_AGENT;
                                 httpRequest.Timeout = 2000;
                                 using (var response = (HttpWebResponse)httpRequest.GetResponse())
                                 {
@@ -481,8 +482,9 @@
                                     }
                                 }
                             }
-                            catch
+                            catch (Exception ex)
                             {
+                                Trace.TraceError("Failed to extract travel agency data: {0}", ex);
                             }
                         }
 

@@ -8,6 +8,7 @@
     using SkyDean.FareLiz.Core.Data;
     using SkyDean.FareLiz.Core.Utils;
     using SkyDean.FareLiz.Data.Monitoring;
+    using SkyDean.FareLiz.Data.Web;
 
     /// <summary>
     /// The pt fare data provider.
@@ -173,78 +174,6 @@
             this._result_ = this._dataGrep.Convert(ResultBase);
             this._intermediateResult_ = this._dataGrep.Convert(IntermediateResultBase);
             this._resultReferal_ = this._dataGrep.Convert(ResultReferalBase);
-        }
-
-        /// <summary>
-        /// The query data.
-        /// </summary>
-        /// <param name="request">
-        /// The request.
-        /// </param>
-        /// <param name="progressChangedHandler">
-        /// The progress changed handler.
-        /// </param>
-        /// <returns>
-        /// The <see cref="DataRequestResult"/>.
-        /// </returns>
-        public DataRequestResult QueryData(FlightFareRequest request, JourneyProgressChangedEventHandler progressChangedHandler)
-        {
-            byte[] postData = this._generator.GeneratePOSTData(request);
-
-            var httpRequest = (HttpWebRequest)WebRequest.Create(this._request_ + "1");
-            httpRequest.Method = "POST";
-            httpRequest.CookieContainer = new CookieContainer();
-            httpRequest.Accept = PTDataGenerator.ACCEPT;
-            httpRequest.Referer = this._root_;
-            httpRequest.UserAgent = PTDataGenerator.USER_AGENT;
-            httpRequest.ContentType = "application/x-www-form-urlencoded";
-            httpRequest.ContentLength = postData.Length;
-
-            Stream stream = httpRequest.GetRequestStream();
-            stream.Write(postData, 0, postData.Length);
-            stream.Close();
-
-            string tokenId = null;
-            string requestId = null;
-
-            using (var response = (HttpWebResponse)httpRequest.GetResponse())
-            {
-                string waitUri = response.ResponseUri.ToString();
-                requestId = this.GetTicketId(response);
-                response.Close();
-
-                if (string.IsNullOrEmpty(requestId))
-                {
-                    return new DataRequestResult(DataRequestState.Failed, null);
-                }
-
-                var match = Regex.Match(waitUri, @"\?" + this._cookie_ + @"\=(?<id>.+?)\&", RegexOptions.IgnoreCase);
-                if (match.Success)
-                {
-                    tokenId = match.Groups["id"].Value;
-                }
-                else
-                {
-                    var cookies = response.Cookies;
-                    foreach (Cookie c in cookies)
-                    {
-                        if (c.Name == this._cookie_)
-                        {
-                            tokenId = c.Value;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            DataRequestResult requestResult;
-            do
-            {
-                requestResult = this.GetResult(requestId, tokenId, request);
-            }
-            while (requestResult.RequestState == DataRequestState.Pending || requestResult.RequestState == DataRequestState.Requested);
-
-            return requestResult;
         }
 
         /// <summary>

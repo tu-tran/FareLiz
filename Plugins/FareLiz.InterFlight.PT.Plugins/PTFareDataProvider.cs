@@ -1,126 +1,89 @@
 ﻿namespace SkyDean.FareLiz.InterFlight
 {
     using SkyDean.FareLiz.Core;
-    using SkyDean.FareLiz.Core.Config;
     using SkyDean.FareLiz.Core.Data;
-    using SkyDean.FareLiz.Core.Utils;
+    using SkyDean.FareLiz.Data.Web;
     using System.ComponentModel;
     using System.IO;
-
-    using SkyDean.FareLiz.Data.Monitoring;
+    using System.Net;
+    using System.Text.RegularExpressions;
 
     /// <summary>Data handler for International Flights (PT)</summary>
     [DisplayName("International Flight Data Handler (PT)")]
     [Description("Best covered for international flight routes")]
-    public sealed partial class PTFareDataProvider : IFareDataProvider
+    public sealed partial class PTFareDataProvider : WebDataProviderBase
     {
-        /// <summary>
-        /// The _min price margin.
-        /// </summary>
-        private const int _minPriceMargin = 3;
-
-        /// <summary>
-        /// The _config.
-        /// </summary>
-        private PTHandlerConfiguration _config;
-
-        /// <summary>
-        /// Gets a value indicating whether is configurable.
-        /// </summary>
-        public bool IsConfigurable
-        {
-            get
-            {
-                return true;
-            }
-        }
-
         /// <summary>
         /// Gets the service name.
         /// </summary>
-        public string ServiceName
+        public override string ServiceName { get { return "PT"; } }
+
+        /// <summary>
+        /// The query data.
+        /// </summary>
+        /// <param name="request">
+        /// The request.
+        /// </param>
+        /// <param name="progressChangedHandler">
+        /// The progress changed handler.
+        /// </param>
+        /// <returns>
+        /// The <see cref="DataRequestResult"/>.
+        /// </returns>
+        public override DataRequestResult QueryData(FlightFareRequest request, JourneyProgressChangedEventHandler progressChangedHandler)
         {
-            get
+            byte[] postData = this._generator.GeneratePOSTData(request);
+
+            var httpRequest = (this._request_ + "1").GetRequest("POST");
+            httpRequest.CookieContainer = new CookieContainer();
+            httpRequest.Referer = this._root_;
+            httpRequest.ContentLength = postData.Length;
+
+            Stream stream = httpRequest.GetRequestStream();
+            stream.Write(postData, 0, postData.Length);
+            stream.Close();
+
+            string tokenId = null;
+            string requestId = null;
+
+            using (var response = (HttpWebResponse)httpRequest.GetResponse())
             {
-                return "PT";
-            }
-        }
+                string waitUri = response.ResponseUri.ToString();
+                requestId = this.GetTicketId(response);
+                response.Close();
 
-        /// <summary>
-        /// Gets or sets the configuration.
-        /// </summary>
-        public IConfig Configuration
-        {
-            get
+                if (string.IsNullOrEmpty(requestId))
+                {
+                    return new DataRequestResult(DataRequestState.Failed, null);
+                }
+
+                var match = Regex.Match(waitUri, @"\?" + this._cookie_ + @"\=(?<id>.+?)\&", RegexOptions.IgnoreCase);
+                if (match.Success)
+                {
+                    tokenId = match.Groups["id"].Value;
+                }
+                else
+                {
+                    var cookies = response.Cookies;
+                    foreach (Cookie c in cookies)
+                    {
+                        if (c.Name == this._cookie_)
+                        {
+                            tokenId = c.Value;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            DataRequestResult requestResult;
+            do
             {
-                return this._config;
+                requestResult = this.GetResult(requestId, tokenId, request);
             }
+            while (requestResult.RequestState == DataRequestState.Pending || requestResult.RequestState == DataRequestState.Requested);
 
-            set
-            {
-                this._config = value as PTHandlerConfiguration;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the currency provider.
-        /// </summary>
-        public ICurrencyProvider CurrencyProvider { get; set; }
-
-        /// <summary>
-        /// Gets the default config.
-        /// </summary>
-        public IConfig DefaultConfig
-        {
-            get
-            {
-                return new PTHandlerConfiguration { SimultaneousRequests = 2, MaxAirlineCount = 15, MaxFlightsPerAirline = 3 };
-            }
-        }
-
-        /// <summary>
-        /// Gets the custom config builder.
-        /// </summary>
-        public IConfigBuilder CustomConfigBuilder
-        {
-            get
-            {
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// Gets the simultaneous requests.
-        /// </summary>
-        public int SimultaneousRequests
-        {
-            get
-            {
-                return this._config.SimultaneousRequests;
-            }
-        }
-
-        /// <summary>
-        /// Gets the timeout in seconds.
-        /// </summary>
-        public int TimeoutInSeconds
-        {
-            get
-            {
-                return this._config.TimeoutInSeconds;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the logger.
-        /// </summary>
-        public ILogger Logger { get; set; }
-
-        /// <summary>
-        /// The initialize.
-        /// </summary>
-        public void Initialize()
-        {
+            return requestResult;
         }
 
         /// <summary>
@@ -132,7 +95,7 @@
         /// <param name="route">
         /// The route.
         /// </param>
-        public void ExportData(Stream targetStream, TravelRoute route)
+        public override void ExportData(Stream targetStream, TravelRoute route)
         {
             if (route == null || route.Journeys.Count < 1)
             {
@@ -152,9 +115,8 @@
         /// <returns>
         /// The <see cref="TravelRoute"/>.
         /// </returns>
-        public TravelRoute ReadData(string routeStringData)
+        public override TravelRoute ReadData(string routeStringData)
         {
-            //TODO: FIX ME
             var parser = this.GetParser(null);
             var result = parser.ParseWebArchive(routeStringData);
             return result == null ? null : result.ResultRoute;
@@ -169,11 +131,11 @@
         /// </returns>
         private PTDataParser GetParser(FlightFareRequest request)
         {
-            var parser = new PTDataParser(this._root_, this._config.MaxFlightsPerAirline, this._config.MaxAirlineCount, 1)
-                             {
-                                 Departure = request.Departure,
-                                 Destination = request.Destination
-                             };
+            var parser = new PTDataParser(this._root_, this.Config.MaxFlightsPerAirline, this.Config.MaxAirlineCount, 1)
+            {
+                Departure = request.Departure,
+                Destination = request.Destination
+            };
             return parser;
         }
     }

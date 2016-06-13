@@ -36,7 +36,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "x64", "x64", "{5BA71F56-01F
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{5B280CAF-D811-4561-9EDE-F77565E8C15D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FareLiz.InterFlight.Plugins", "Plugins\FareLiz.InterFlight.PT.Plugins\FareLiz.InterFlight.Plugins.csproj", "{1C4723FB-CC22-4F99-9D1C-56DB0B706D3B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FareLiz.InterFlight.PT.Plugins", "Plugins\FareLiz.InterFlight.PT.Plugins\FareLiz.InterFlight.PT.Plugins.csproj", "{1C4723FB-CC22-4F99-9D1C-56DB0B706D3B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FareLiz.Core", "FareLiz.Core\FareLiz.Core.csproj", "{0FD609D6-29CA-42DE-B54F-1CA8857497FE}"
 EndProject
@@ -76,6 +76,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FareLiz.FileIO.Plugins", "Plugins\FareLiz.FileIO.Plugins\FareLiz.FileIO.Plugins.csproj", "{D6124BBD-8FD6-4548-BE76-D9F7B931D55C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FareLiz.WPF", "FareLiz.WPF\FareLiz.WPF.csproj", "{CC76CCA1-502F-45DE-A236-FB5D58991691}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FareLiz.InterFlight.Matrix.Plugins", "Plugins\FareLiz.InterFlight.Matrix.Plugins\FareLiz.InterFlight.Matrix.Plugins.csproj", "{F64BC112-B22C-4F36-B328-571A6CED7849}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -179,6 +181,14 @@ Global
 		{CC76CCA1-502F-45DE-A236-FB5D58991691}.Release|x64.Build.0 = Release|Any CPU
 		{CC76CCA1-502F-45DE-A236-FB5D58991691}.Release|x86.ActiveCfg = Release|Any CPU
 		{CC76CCA1-502F-45DE-A236-FB5D58991691}.Release|x86.Build.0 = Release|Any CPU
+		{F64BC112-B22C-4F36-B328-571A6CED7849}.Debug|x64.ActiveCfg = Debug|x64
+		{F64BC112-B22C-4F36-B328-571A6CED7849}.Debug|x64.Build.0 = Debug|x64
+		{F64BC112-B22C-4F36-B328-571A6CED7849}.Debug|x86.ActiveCfg = Debug|x86
+		{F64BC112-B22C-4F36-B328-571A6CED7849}.Debug|x86.Build.0 = Debug|x86
+		{F64BC112-B22C-4F36-B328-571A6CED7849}.Release|x64.ActiveCfg = Release|x64
+		{F64BC112-B22C-4F36-B328-571A6CED7849}.Release|x64.Build.0 = Release|x64
+		{F64BC112-B22C-4F36-B328-571A6CED7849}.Release|x86.ActiveCfg = Release|x86
+		{F64BC112-B22C-4F36-B328-571A6CED7849}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -191,5 +201,6 @@ Global
 		{E4DA53CC-78C7-4AC0-A8B0-7C826B10A3C9} = {5B280CAF-D811-4561-9EDE-F77565E8C15D}
 		{5DCC3B57-8592-484F-98A1-701E3E408818} = {5B280CAF-D811-4561-9EDE-F77565E8C15D}
 		{D6124BBD-8FD6-4548-BE76-D9F7B931D55C} = {5B280CAF-D811-4561-9EDE-F77565E8C15D}
+		{F64BC112-B22C-4F36-B328-571A6CED7849} = {5B280CAF-D811-4561-9EDE-F77565E8C15D}
 	EndGlobalSection
 EndGlobal

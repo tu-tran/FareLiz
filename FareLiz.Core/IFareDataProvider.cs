@@ -1,8 +1,7 @@
 ﻿namespace SkyDean.FareLiz.Core
 {
-    using System.IO;
-
     using SkyDean.FareLiz.Core.Data;
+    using System.IO;
 
     /// <summary>Interface for helper objects which are used to process the fare data</summary>
     public interface IFareDataProvider : IPlugin
