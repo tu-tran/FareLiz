@@ -1,32 +1,20 @@
 ﻿namespace SkyDean.FareLiz.InterFlight
 {
+    using SkyDean.FareLiz.Core;
     using System;
     using System.Globalization;
     using System.Text;
     using System.Web;
 
-    using SkyDean.FareLiz.Core;
-
     /// <summary>
-    /// The pt data generator.
+    /// The Matrix data generator.
     /// </summary>
-    public class PTDataGenerator
+    public class MatrixDataGenerator
     {
         /// <summary>
         /// The f i_ culture.
         /// </summary>
         public static readonly CultureInfo FI_CULTURE = new CultureInfo("fi-FI");
-
-        /// <summary>
-        /// The accept.
-        /// </summary>
-        public static readonly string ACCEPT = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8";
-
-        /// <summary>
-        /// The use r_ agent.
-        /// </summary>
-        public static readonly string USER_AGENT =
-                                          "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.64 Safari/537.31";
 
         /// <summary>
         /// The generate post data.

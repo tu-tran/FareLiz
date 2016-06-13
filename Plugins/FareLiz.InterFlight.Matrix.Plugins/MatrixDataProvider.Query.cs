@@ -1,18 +1,15 @@
 ﻿namespace SkyDean.FareLiz.InterFlight
 {
-    using System.IO;
-    using System.Net;
-    using System.Text.RegularExpressions;
-
     using SkyDean.FareLiz.Core;
     using SkyDean.FareLiz.Core.Data;
     using SkyDean.FareLiz.Core.Utils;
-    using SkyDean.FareLiz.Data.Monitoring;
+    using SkyDean.FareLiz.Data.Web;
+    using System.Net;
 
     /// <summary>
-    /// The pt fare data provider.
+    /// The Matrix fare data provider.
     /// </summary>
-    public partial class PTFareDataProvider
+    public partial class MatrixDataProvider
     {
         /// <summary>
         /// The seed.
@@ -50,8 +47,8 @@
         /// </summary>
         private static readonly byte[] DomainBase =
             {
-                0x37, 0x62, 0x38, 0x32, 0x64, 0x36, 0x63, 0x64, 0x30, 0x30, 0x31, 0x37, 0x38, 0x38, 0x36, 0x63, 
-                0x32, 0x61, 0x65, 0x38, 0x33, 0x64, 0x37, 0x33, 0x31, 0x39, 0x35, 0x34, 0x38, 0x31, 0x64, 0x30, 
+                0x37, 0x62, 0x38, 0x32, 0x64, 0x36, 0x63, 0x64, 0x30, 0x30, 0x31, 0x37, 0x38, 0x38, 0x36, 0x63,
+                0x32, 0x61, 0x65, 0x38, 0x33, 0x64, 0x37, 0x33, 0x31, 0x39, 0x35, 0x34, 0x38, 0x31, 0x64, 0x30,
                 0x33, 0x36, 0x61, 0x39, 0x32, 0x62, 0x36, 0x65, 0x36, 0x62, 0x33, 0x35, 0x66, 0x37, 0x62, 0x35
             };
 
@@ -60,8 +57,8 @@
         /// </summary>
         private static readonly byte[] CookieBase =
             {
-                0x37, 0x62, 0x38, 0x32, 0x64, 0x36, 0x63, 0x64, 0x30, 0x30, 0x31, 0x37, 0x38, 0x38, 0x36, 0x63, 
-                0x30, 0x61, 0x65, 0x38, 0x33, 0x64, 0x37, 0x33, 0x31, 0x39, 0x35, 0x34, 0x38, 0x31, 0x64, 0x30, 
+                0x37, 0x62, 0x38, 0x32, 0x64, 0x36, 0x63, 0x64, 0x30, 0x30, 0x31, 0x37, 0x38, 0x38, 0x36, 0x63,
+                0x30, 0x61, 0x65, 0x38, 0x33, 0x64, 0x37, 0x33, 0x31, 0x39, 0x35, 0x34, 0x38, 0x31, 0x64, 0x30,
                 0x33, 0x36, 0x38, 0x37, 0x34, 0x64, 0x30, 0x37, 0x36, 0x62, 0x33, 0x35, 0x66, 0x37, 0x62, 0x35
             };
 
@@ -123,7 +120,7 @@
         /// <summary>
         /// The _generator.
         /// </summary>
-        private readonly PTDataGenerator _generator = new PTDataGenerator();
+        private readonly MatrixDataGenerator _generator = new MatrixDataGenerator();
 
         /// <summary>
         /// The _root_.
@@ -161,9 +158,9 @@
         private readonly string _resultReferal_;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PTFareDataProvider"/> class.
+        /// Initializes a new instance of the <see cref="MatrixDataProvider"/> class.
         /// </summary>
-        public PTFareDataProvider()
+        public MatrixDataProvider()
         {
             this._dataGrep = new DataGrep(Seed);
             this._root_ = this._dataGrep.Convert(RootBase);
@@ -173,78 +170,6 @@
             this._result_ = this._dataGrep.Convert(ResultBase);
             this._intermediateResult_ = this._dataGrep.Convert(IntermediateResultBase);
             this._resultReferal_ = this._dataGrep.Convert(ResultReferalBase);
-        }
-
-        /// <summary>
-        /// The query data.
-        /// </summary>
-        /// <param name="request">
-        /// The request.
-        /// </param>
-        /// <param name="progressChangedHandler">
-        /// The progress changed handler.
-        /// </param>
-        /// <returns>
-        /// The <see cref="DataRequestResult"/>.
-        /// </returns>
-        public DataRequestResult QueryData(FlightFareRequest request, JourneyProgressChangedEventHandler progressChangedHandler)
-        {
-            byte[] postData = this._generator.GeneratePOSTData(request);
-
-            var httpRequest = (HttpWebRequest)WebRequest.Create(this._request_ + "1");
-            httpRequest.Method = "POST";
-            httpRequest.CookieContainer = new CookieContainer();
-            httpRequest.Accept = PTDataGenerator.ACCEPT;
-            httpRequest.Referer = this._root_;
-            httpRequest.UserAgent = PTDataGenerator.USER_AGENT;
-            httpRequest.ContentType = "application/x-www-form-urlencoded";
-            httpRequest.ContentLength = postData.Length;
-
-            Stream stream = httpRequest.GetRequestStream();
-            stream.Write(postData, 0, postData.Length);
-            stream.Close();
-
-            string tokenId = null;
-            string requestId = null;
-
-            using (var response = (HttpWebResponse)httpRequest.GetResponse())
-            {
-                string waitUri = response.ResponseUri.ToString();
-                requestId = this.GetTicketId(response);
-                response.Close();
-
-                if (string.IsNullOrEmpty(requestId))
-                {
-                    return new DataRequestResult(DataRequestState.Failed, null);
-                }
-
-                var match = Regex.Match(waitUri, @"\?" + this._cookie_ + @"\=(?<id>.+?)\&", RegexOptions.IgnoreCase);
-                if (match.Success)
-                {
-                    tokenId = match.Groups["id"].Value;
-                }
-                else
-                {
-                    var cookies = response.Cookies;
-                    foreach (Cookie c in cookies)
-                    {
-                        if (c.Name == this._cookie_)
-                        {
-                            tokenId = c.Value;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            DataRequestResult requestResult;
-            do
-            {
-                requestResult = this.GetResult(requestId, tokenId, request);
-            }
-            while (requestResult.RequestState == DataRequestState.Pending || requestResult.RequestState == DataRequestState.Requested);
-
-            return requestResult;
         }
 
         /// <summary>
@@ -258,7 +183,7 @@
             {
                 if (dataStream != null)
                 {
-                    return PTDataParser.ParseRequestId(dataStream, response.GetEncoding());
+                    return MatrixDataParser.ParseRequestId(dataStream, response.GetEncoding());
                 }
             }
 
@@ -285,7 +210,7 @@
             for (var i = 0; i < 4; i++)
             {
                 var requestUrl = string.Format(this._intermediateResult_, requestId, i);
-                using(requestUrl.GetResponse("GET", cookies, this._resultReferal_)){}
+                using (requestUrl.GetResponse("GET", cookies, this._resultReferal_)) { }
             }
 
             var resultUrl = string.Format(this._result_, requestId);
@@ -301,7 +226,7 @@
                         {
                             return new DataRequestResult(DataRequestState.Pending, dataResult.ResultRoute);
 
-                                // Data is not yet ready, return the current RequestState
+                            // Data is not yet ready, return the current RequestState
                         }
 
                         result = dataResult.ResultRoute;

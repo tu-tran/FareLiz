@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SkyDean.FareLiz.InterFlight</RootNamespace>
-    <AssemblyName>FareLiz.InterFlight.Plugins</AssemblyName>
+    <AssemblyName>FareLiz.InterFlight.Matrix.Plugins</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -75,15 +75,12 @@
     <Compile Include="..\..\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="PTDataExporter.cs" />
-    <Compile Include="PTDataParser.cs" />
-    <Compile Include="RouteDataResult.cs" />
-    <Compile Include="PTDataGenerator.cs" />
-    <Compile Include="PTFareDataProvider.cs" />
-    <Compile Include="PTFareDataProvider.Query.cs" />
-    <Compile Include="PTHandlerConfiguration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="WebResponseExtensions.cs" />
+    <Compile Include="MatrixDataExporter.cs" />
+    <Compile Include="MatrixDataGenerator.cs" />
+    <Compile Include="MatrixDataParser.cs" />
+    <Compile Include="MatrixDataProvider.cs" />
+    <Compile Include="MatrixDataProvider.Query.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\FareLiz.Core\FareLiz.Core.csproj">

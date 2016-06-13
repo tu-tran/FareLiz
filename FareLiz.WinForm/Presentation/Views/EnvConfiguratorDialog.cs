@@ -277,6 +277,7 @@
                 {
                     this.ResultEnvironment.ArchiveManager = this._typeResolver.CreateInstance<IArchiveManager>(selType);
                     this.ResultEnvironment.ArchiveManager.Configuration = this.ResultEnvironment.ArchiveManager.DefaultConfig;
+                    this.ResultEnvironment.ArchiveManager.Logger = this.ResultEnvironment.Logger;
                 }
             }
 
@@ -291,6 +292,7 @@
                 {
                     this.ResultEnvironment.FareDatabase = this._typeResolver.CreateInstance<IFareDatabase>(selType);
                     this.ResultEnvironment.FareDatabase.Configuration = this.ResultEnvironment.FareDatabase.DefaultConfig;
+                    this.ResultEnvironment.FareDatabase.Logger = this.ResultEnvironment.Logger;
                 }
             }
 
@@ -305,6 +307,7 @@
                 {
                     this.ResultEnvironment.FareDataProvider = this._typeResolver.CreateInstance<IFareDataProvider>(selType);
                     this.ResultEnvironment.FareDataProvider.Configuration = this.ResultEnvironment.FareDataProvider.DefaultConfig;
+                    this.ResultEnvironment.FareDataProvider.Logger = this.ResultEnvironment.Logger;
                 }
             }
 
@@ -322,6 +325,7 @@
                     else
                     {
                         syncer = this._typeResolver.CreateInstance<IDataSyncer>(selType);
+                        syncer.Logger = this.ResultEnvironment.Logger;
                     }
 
                     syncDb.DataSynchronizer = syncer;

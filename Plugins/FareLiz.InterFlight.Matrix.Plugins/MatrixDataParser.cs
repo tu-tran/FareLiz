@@ -4,20 +4,21 @@
     using SkyDean.FareLiz.Core;
     using SkyDean.FareLiz.Core.Data;
     using SkyDean.FareLiz.Core.Utils;
+    using SkyDean.FareLiz.Data.Web;
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Globalization;
     using System.IO;
-    using System.Linq;
     using System.Net;
     using System.Text;
     using System.Text.RegularExpressions;
     using System.Web;
 
     /// <summary>
-    /// The pt data parser.
+    /// The Matrix data parser.
     /// </summary>
-    internal class PTDataParser
+    internal class MatrixDataParser
     {
         /// <summary>
         /// The _root domain.
@@ -25,7 +26,7 @@
         private readonly string _rootDomain;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PTDataParser"/> class.
+        /// Initializes a new instance of the <see cref="MatrixDataParser"/> class.
         /// </summary>
         /// <param name="rootDomain">
         /// The root domain.
@@ -39,7 +40,7 @@
         /// <param name="minPriceMargin">
         /// The min price margin.
         /// </param>
-        internal PTDataParser(string rootDomain, int maxFlightsPerAirline, int maxAirlines, int minPriceMargin)
+        internal MatrixDataParser(string rootDomain, int maxFlightsPerAirline, int maxAirlines, int minPriceMargin)
         {
             this._rootDomain = rootDomain;
             this.MaxFlightsPerAirline = maxFlightsPerAirline;
@@ -462,10 +463,8 @@
                         {
                             try
                             {
-                                var httpRequest = (HttpWebRequest)WebRequest.Create(fullUrl);
-                                httpRequest.Method = "GET";
+                                var httpRequest = fullUrl.GetRequest("GET");
                                 httpRequest.Referer = this._rootDomain;
-                                httpRequest.UserAgent = PTDataGenerator.USER_AGENT;
                                 httpRequest.Timeout = 2000;
                                 using (var response = (HttpWebResponse)httpRequest.GetResponse())
                                 {
@@ -481,8 +480,9 @@
                                     }
                                 }
                             }
-                            catch
+                            catch (Exception ex)
                             {
+                                Trace.TraceError("Failed to extract travel agency data: {0}", ex);
                             }
                         }
 

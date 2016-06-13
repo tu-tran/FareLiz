@@ -4,18 +4,16 @@
     using SkyDean.FareLiz.Core;
     using SkyDean.FareLiz.Core.Data;
     using SkyDean.FareLiz.Core.Utils;
+    using SkyDean.FareLiz.Data.Web;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Globalization;
     using System.IO;
-    using System.Linq;
     using System.Net;
     using System.Text;
     using System.Text.RegularExpressions;
     using System.Web;
-
-    using SkyDean.FareLiz.Data.Web;
 
     /// <summary>
     /// The pt data parser.

@@ -212,6 +212,8 @@
                             return false;
                         }
 
+                        callback.Begin();
+                        callback.Style = ProgressStyle.Marquee;
                         callback.Title = "Restore Database from DropBox";
                         string message = string.Format("Downloading data from DropBox ({0})...", fileMeta.Size);
                         this.Logger.Info(message);

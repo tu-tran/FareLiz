@@ -1,17 +1,15 @@
 ﻿namespace SkyDean.FareLiz.InterFlight
 {
+    using SkyDean.FareLiz.Core.Data;
     using System;
-    using System.Globalization;
     using System.IO;
     using System.Text;
     using System.Xml;
 
-    using SkyDean.FareLiz.Core.Data;
-
     /// <summary>
-    /// The pt data exporter.
+    /// The Matrix data exporter.
     /// </summary>
-    internal class PTDataExporter
+    internal class MatrixDataExporter
     {
         /// <summary>
         /// The export data.
